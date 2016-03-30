@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+    ProjectType="Visual C++"
+    Version="8.00"
+    Name="firebird2intl"
+    OutputDirectory="$(ICU_ROOT_TMP_DIR)bin_tmp\"
+    IntermediateDirectory="$(ICU_ROOT_TMP_DIR)obj\$(ProjectName)\"
+    >
+    <Tool
+        Name="VCCLCompilerTool"
+        StringPooling="true"
+        EnableFunctionLevelLinking="false"
+        DisableLanguageExtensions="true"
+        WarningLevel="3"
+        DebugInformationFormat="3"
+        PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
+    />
+    <Tool
+        Name="VCLinkerTool"
+        GenerateDebugInformation="true"
+    />
+    <UserMacro
+        Name="ICU_COMPILER_SIGN"
+        Value="msvc8"
+    />
+    <UserMacro
+        Name="ICU_ROOT_TMP_DIR"
+        Value="$(SolutionDir)..\..\..\..\..\Temp\$(ICU_COMPILER_SIGN)_$(PlatformName)_$(ConfigurationName)\icu\"
+    />
+    <UserMacro
+        Name="ICU_OUT_BIN_DIR"
+        Value="$(ICU_ROOT_TMP_DIR)bin\"
+    />
+    <UserMacro
+        Name="ICU_OUT_LIB_DIR"
+        Value="$(ICU_ROOT_TMP_DIR)lib\"
+    />
+    <UserMacro
+        Name="ICU_OUT_INCLUDE_DIR"
+        Value="$(SolutionDir)..\..\..\..\..\gen\$(ICU_COMPILER_SIGN)_$(PlatformName)_$(ConfigurationName)\icu\include\"
+    />
+</VisualStudioPropertySheet>

@@ -21,21 +21,42 @@ UNICODE_VERSION=4.0.1
 #     Is the directory into which most data is built (prior to packaging)
 #     Is icu\source\data\build
 #
+!MESSAGE ICU data make path is [$(ICUMAKE)]
 !IF "$(ICUMAKE)"==""
 !ERROR Can't find ICUMAKE (ICU Data Make dir, should point to icu\source\data\ )!
 !ENDIF
-!MESSAGE ICU data make path is $(ICUMAKE)
 
-ICUOUT=$(ICUMAKE)\out
+!MESSAGE ICUTOOLS path is [$(ICUTOOLS)]
+!IF "$(ICUTOOLS)"==""
+!ERROR ICUTOOLS not defined!
+!ENDIF
+
+!MESSAGE ICU_INCLUDE_DIR path is [$(ICU_INCLUDE_DIR)]
+!IF "$(ICU_INCLUDE_DIR)"==""
+!ERROR ICU_INCLUDE_DIR not defined!
+!ENDIF
+
+!MESSAGE INT_ROOT_DIR path is [$(INT_ROOT_DIR)]
+!IF "$(INT_ROOT_DIR)"==""
+!ERROR INT_ROOT_DIR not defined!
+!ENDIF
+
+!MESSAGE ICU_ROOT_OUT path is [$(ICU_ROOT_OUT)]
+!IF "$(ICU_ROOT_OUT)"==""
+!ERROR ICU_ROOT_OUT not defined!
+!ENDIF
+
+ICUOUT=$(ICU_ROOT_OUT)makedata
+!MESSAGE ICUOUT path is [$(ICUOUT)]
 
 #  the prefix "icudt21_" for use in filenames
 ICUPKG=$(U_ICUDATA_NAME)$(U_ICUDATA_ENDIAN_SUFFIX)
 
-# need to nuke \\ for .NET...
-ICUOUT=$(ICUOUT:\\=\)
-
 ICUBLD=$(ICUOUT)\build\$(ICUPKG)
 ICUTMP=$(ICUOUT)\tmp
+
+!MESSAGE ICUBLD path is [$(ICUBLD)]
+!MESSAGE ICUTMP path is [$(ICUTMP)]
 
 #  ICUP
 #     The root of the ICU source directory tree
@@ -44,14 +65,13 @@ ICUP=$(ICUMAKE)\..\..
 ICUP=$(ICUP:\source\data\..\..=)
 # In case the first one didn't do it, try this one.  .NET would do the second one.
 ICUP=$(ICUP:\source\data\\..\..=)
-!MESSAGE ICU root path is $(ICUP)
+!MESSAGE ICUP (ICU root path) is [$(ICUP)]
 
 
 #  ICUSRCDATA
 #       The data directory in source
 #
 ICUSRCDATA=$(ICUP)\source\data
-ICUSRCDATA_RELATIVE_PATH=..\..\..\
 
 #  ICUUCM
 #       The directory that contains ucmcore.mk files along with *.ucm files
@@ -102,13 +122,14 @@ ICUDATA=$(ICUP)\source\data
 #      This is the same place that all of the other ICU DLLs go (the code-containing DLLs)
 #      The lib file for the data DLL goes in $(DLL_OUTPUT)/../lib/
 #
-!MESSAGE CFG is $(CFG)
-!IF "$(CFG)" == "Release" || "$(CFG)" == "release"  || "$(CFG)" == "Debug" || "$(CFG)" == "debug" 
-DLL_OUTPUT=$(ICUP)\bin
-ICUPBIN=$(ICUP)\bin
-!ELSE
-DLL_OUTPUT=$(ICUP)\$(CFG)\bin
-ICUPBIN=$(ICUP)\$(CFG)\bin
+!MESSAGE DLL_OUTPUT path is [$(DLL_OUTPUT)]
+!IF "$(DLL_OUTPUT)"==""
+!ERROR DLL_OUTPUT not defined!
+!ENDIF
+
+!MESSAGE ICUPBIN path is [$(ICUPBIN)]
+!IF "$(ICUPBIN)"==""
+!ERROR ICUPBIN not defined!
 !ENDIF
 
 #
@@ -122,20 +143,45 @@ TESTDATA=$(ICUP)\source\test\testdata
 #         When running the tests, ICU_DATA environment variable is set to here
 #         so that test data files can be loaded.  (Tests are NOT run from this makefile,
 #         only the data is put in place.)
-TESTDATAOUT=$(ICUP)\source\test\testdata\out\
+TESTDATAOUT=$(ICU_ROOT_OUT)testdata
+!MESSAGE TESTDATAOUT is [$(TESTDATAOUT)]
 
 #
 #   TESTDATABLD
 #		The build directory for test data intermidiate files
 #		(Tests are NOT run from this makefile,
 #         only the data is put in place.)
-TESTDATABLD=$(ICUP)\source\test\testdata\out\build
+TESTDATABLD=$(TESTDATAOUT)\build
+!MESSAGE TESTDATABLD is [$(TESTDATABLD)]
 
 #
 #   ICUTOOLS
 #       Directory under which all of the ICU data building tools live.
 #
-ICUTOOLS=$(ICUP)\source\tools
+
+ICUTOOLS__GENRB_EXE=$(ICUTOOLS)genrb.exe
+!MESSAGE ICUTOOLS__GENRB_EXE = $(ICUTOOLS__GENRB_EXE)
+
+ICUTOOLS__MAKECONV_EXE =$(ICUTOOLS)makeconv.exe
+!MESSAGE ICUTOOLS__MAKECONV_EXE = $(ICUTOOLS__MAKECONV_EXE)
+
+ICUTOOLS__GENNAMES_EXE=$(ICUTOOLS)gennames.exe
+!MESSAGE ICUTOOLS__GENNAMES_EXE = $(ICUTOOLS__GENNAMES_EXE)
+
+ICUTOOLS__GENPNAME_EXE=$(ICUTOOLS)genpname.exe
+!MESSAGE ICUTOOLS__GENPNAME_EXE = $(ICUTOOLS__GENPNAME_EXE)
+
+ICUTOOLS__GENPROPS_EXE=$(ICUTOOLS)genprops.exe
+!MESSAGE ICUTOOLS__GENPROPS_EXE = $(ICUTOOLS__GENPROPS_EXE)
+
+ICUTOOLS__GENNORM_EXE=$(ICUTOOLS)gennorm.exe
+!MESSAGE ICUTOOLS__GENNORM_EXE = $(ICUTOOLS__GENNORM_EXE)
+
+ICUTOOLS__GENCNVAL_EXE=$(ICUTOOLS)gencnval.exe
+!MESSAGE ICUTOOLS__GENCNVAL_EXE = $(ICUTOOLS__GENCNVAL_EXE)
+
+ICUTOOLS__GENUCA_EXE=$(ICUTOOLS)genuca.exe
+!MESSAGE ICUTOOLS__GENUCA_EXE = $(ICUTOOLS__GENUCA_EXE)
 
 # The current ICU tools need to be in the path first.
 PATH = $(ICUPBIN);$(PATH)
@@ -264,16 +310,28 @@ ALL_RES = $(INDEX_RES_FILES) $(RB_FILES) $(TRANSLIT_FILES) $(MISC_FILES)
 #				Building the common dll in $(ICUBLD) unconditionally copies it to $(DLL_OUTPUT) too.
 #
 #############################################################################
-ALL : GODATA "$(DLL_OUTPUT)\$(U_ICUDATA_NAME).dll" "$(TESTDATAOUT)\testdata.dat"
+ALL : GODATA "$(DLL_OUTPUT)$(U_ICUDATA_NAME).dll" "$(TESTDATAOUT)\testdata.dat"
 	@echo All targets are up to date
 
 #
 # testdata - nmake will invoke pkgdata, which will create testdata.dat
 #
-"$(TESTDATAOUT)\testdata.dat": "$(ICUBLD)\ucadata.icu" $(TRANSLIT_FILES) $(MISC_FILES) $(RB_FILES) {"$(ICUTOOLS)\genrb\$(CFG)"}genrb.exe
+# [Dmitry Kovalenko] critical changes:
+#  - was: ..... : ..... {"$(ICUTOOLS)\genrb\$(CFG)"}genrb.exe ....
+#  - [del] CFG=$(CFG)
+"$(TESTDATAOUT)\testdata.dat": "$(ICUBLD)\ucadata.icu" $(TRANSLIT_FILES) $(MISC_FILES) $(RB_FILES) "$(ICUTOOLS__GENRB_EXE)"
 	@cd "$(TESTDATA)"
 	@echo building testdata...
-	nmake /nologo /f "$(TESTDATA)\testdata.mk" TESTDATA=. ICUPBIN="$(ICUPBIN)" ICUTOOLS="$(ICUTOOLS)" ICUP="$(ICUP)" CFG=$(CFG) TESTDATAOUT="$(TESTDATAOUT)" ICUDATA="$(ICUDATA)" TESTDATABLD="$(TESTDATABLD)"
+    setlocal
+    set TESTDATA=.
+    set ICUPBIN=$(ICUPBIN)
+    set ICUTOOLS=$(ICUTOOLS)
+    set ICUP=$(ICUP)
+    set TESTDATAOUT=$(TESTDATAOUT)
+    set ICUDATA=$(ICUDATA)
+    set TESTDATABLD=$(TESTDATABLD)
+    nmake /nologo /f "$(TESTDATA)\testdata.mk"
+    endlocal
 
 #
 #  Break iterator data files.
@@ -285,10 +343,10 @@ BRK_FILES = sent.brk char.brk line.brk word.brk title.brk line_th.brk word_th.br
 #  move the .dll and .lib files to their final destination afterwards.
 #  The $(U_ICUDATA_NAME).lib and $(U_ICUDATA_NAME).exp should already be in the right place due to stubdata.
 #
-"$(DLL_OUTPUT)\$(U_ICUDATA_NAME).dll" : "$(ICUPBIN)\pkgdata.exe" $(CNV_FILES) $(BRK_FILES) "$(ICUBLD)\uprops.icu" "$(ICUBLD)\unames.icu" "$(ICUBLD)\pnames.icu" "$(ICUBLD)\unorm.icu" "$(ICUBLD)\cnvalias.icu" "$(ICUBLD)\ucadata.icu" "$(ICUBLD)\invuca.icu" "$(ICUBLD)\uidna.spp" $(INDEX_COL_FILES) $(COL_COL_FILES) $(ALL_RES) "$(ICUTMP)\icudata.res" "$(ICUP)\source\stubdata\stubdatabuilt.txt"
+"$(DLL_OUTPUT)$(U_ICUDATA_NAME).dll" : "$(ICUPBIN)pkgdata.exe" $(CNV_FILES) $(BRK_FILES) "$(ICUBLD)\uprops.icu" "$(ICUBLD)\unames.icu" "$(ICUBLD)\pnames.icu" "$(ICUBLD)\unorm.icu" "$(ICUBLD)\cnvalias.icu" "$(ICUBLD)\ucadata.icu" "$(ICUBLD)\invuca.icu" "$(ICUBLD)\uidna.spp" $(INDEX_COL_FILES) $(COL_COL_FILES) $(ALL_RES) "$(ICUTMP)\icudata.res" "$(INT_ROOT_DIR)stubdata\stubdatabuilt.txt"
 	echo Building icu data
 	cd "$(ICUBLD)"
-	@"$(ICUPBIN)\pkgdata" -Z -f -e $(U_ICUDATA_NAME) -v $(ICU_PACKAGE_MODE) -c -p $(ICUPKG) -T "$(ICUTMP)" -L $(U_ICUDATA_NAME) -d "$(ICUBLD)" -s . <<pkgdatain.txt
+	@"$(ICUPBIN)pkgdata" -Z -f -e $(U_ICUDATA_NAME) -v $(ICU_PACKAGE_MODE) -c -p $(ICUPKG) -T "$(ICUTMP)" -L $(U_ICUDATA_NAME) -d "$(ICUBLD)" -s . <<pkgdatain.txt
 unorm.icu
 uprops.icu
 pnames.icu
@@ -386,35 +444,35 @@ CLEAN : GODATA
 
 
 # Batch inference rule for creating converters
-{$(ICUSRCDATA_RELATIVE_PATH)\$(ICUUCM)}.ucm.cnv::
+{$(ICUSRCDATA)\$(ICUUCM)}.ucm.cnv::
 	@echo Generating converters
-	@"$(ICUTOOLS)\makeconv\$(CFG)\makeconv" -c -d"$(ICUBLD)" $<
+	@"$(ICUTOOLS__MAKECONV_EXE)" -c -d"$(ICUBLD)" $<
 
 # Batch inference rule for creating transliterator resource files
-{$(ICUSRCDATA_RELATIVE_PATH)\$(ICUTRNS)}.txt.res::
+{$(ICUSRCDATA)\$(ICUTRNS)}.txt.res::
 	@echo Making Transliterator Resource Bundle files
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -d"$(ICUBLD)" $<
+	@"$(ICUTOOLS__GENRB_EXE)" -k -d"$(ICUBLD)" $<
 
 # Batch inference rule for creating miscellaneous resource files
 # TODO: -q option is specified to squelch the 120+ warnings about
 #       empty intvectors and binary elements.  Unfortunately, this may
 #       squelch other legitimate warnings.  When there is a better
 #       way, remove the -q.
-{$(ICUSRCDATA_RELATIVE_PATH)\$(ICUMISC2)}.txt.res::
+{$(ICUSRCDATA)\$(ICUMISC2)}.txt.res::
 	@echo Making Miscellaneous Resource Bundle files
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -q -d"$(ICUBLD)" $<
+	@"$(ICUTOOLS__GENRB_EXE)" -k -q -d"$(ICUBLD)" $<
 
-{$(ICUSRCDATA_RELATIVE_PATH)\coll}.txt.crs::
+{$(ICUSRCDATA)\coll}.txt.crs::
 	@echo Making Collation files
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -d"$(ICUBLD)\coll" $<
+	@"$(ICUTOOLS__GENRB_EXE)" -k -d"$(ICUBLD)\coll" $<
 	ren "$(ICUBLD)\coll\*.res" "*.crs"
 	copy "$(ICUBLD)\coll\*.crs" "$(ICUBLD)\"
 	ren "$(ICUBLD)\coll\*.crs" "*.res"
 
 # Inference rule for creating resource bundle files
-{$(ICUSRCDATA_RELATIVE_PATH)\$(ICULOC)}.txt.res::
+{$(ICUSRCDATA)\$(ICULOC)}.txt.res::
 	@echo Making Locale Resource Bundle files
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -d"$(ICUBLD)" $<
+	@"$(ICUTOOLS__GENRB_EXE)" -k -d"$(ICUBLD)" $<
 
 $(INDEX_COL_FILES):
 	@echo Generating <<coll\res_index.txt
@@ -426,7 +484,7 @@ res_index {
     }
 }
 <<KEEP
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -d"$(ICUBLD)\coll" .\coll\res_index.txt
+	@"$(ICUTOOLS__GENRB_EXE)" -k -d"$(ICUBLD)\coll" .\coll\res_index.txt
 
 
 $(INDEX_RES_FILES):
@@ -439,55 +497,55 @@ res_index {
     }
 }
 <<KEEP
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -d"$(ICUBLD)" .\res_index.txt
+	@"$(ICUTOOLS__GENRB_EXE)" -k -d"$(ICUBLD)" .\res_index.txt
 
 # Inference rule for creating resource bundle files
-{$(ICUSRCDATA_RELATIVE_PATH)\$(ICULOC)}.txt.res::
+{$(ICUSRCDATA)\$(ICULOC)}.txt.res::
 	@echo Making Locale Resource Bundle files
-	@"$(ICUTOOLS)\genrb\$(CFG)\genrb" -k -d"$(ICUBLD)" $<
+	@"$(ICUTOOLS__GENRB_EXE)" -k -d"$(ICUBLD)" $<
 
 # DLL version information
 # If you modify this, modify winmode.c in pkgdata.
 "$(ICUTMP)\icudata.res": "$(ICUMISC)\icudata.rc"
 	@echo Creating data DLL version information from $**
-	@rc.exe /i "..\..\..\..\..\include" /r /fo $@ $**
+	@rc.exe /i "$(ICU_INCLUDE_DIR)\" /r /fo $@ $**
 
 # Targets for unames.icu
-"$(ICUBLD)\unames.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS)\gennames\$(CFG)\gennames.exe"
+"$(ICUBLD)\unames.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS__GENNAMES_EXE)"
 	@echo Creating data file for Unicode Names
 	@set ICU_DATA=$(ICUBLD)
-	@"$(ICUTOOLS)\gennames\$(CFG)\gennames" -1 -u $(UNICODE_VERSION) "$(ICUUNIDATA)\UnicodeData.txt"
+	@"$(ICUTOOLS__GENNAMES_EXE)" -1 -u $(UNICODE_VERSION) "$(ICUUNIDATA)\UnicodeData.txt"
 
 # Targets for pnames.icu
 # >> Depends on the Unicode data as well as uchar.h and uscript.h <<
-"$(ICUBLD)\pnames.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS)\genpname\$(CFG)\genpname.exe" "$(ICUP)\source\common\unicode\uchar.h" "$(ICUP)\source\common\unicode\uscript.h"
+"$(ICUBLD)\pnames.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS__GENPNAME_EXE)" "$(ICUP)\source\common\unicode\uchar.h" "$(ICUP)\source\common\unicode\uscript.h"
 	@echo Creating data file for Unicode Property Names
 	@set ICU_DATA=$(ICUBLD)
-	@"$(ICUTOOLS)\genpname\$(CFG)\genpname" -d "$(ICUBLD)"
+	@"$(ICUTOOLS__GENPNAME_EXE)" -d "$(ICUBLD)"
 
 # Targets for uprops.icu
-"$(ICUBLD)\uprops.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS)\genprops\$(CFG)\genprops.exe" "$(ICUBLD)\pnames.icu"
+"$(ICUBLD)\uprops.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS__GENPROPS_EXE)" "$(ICUBLD)\pnames.icu"
 	@echo Creating data file for Unicode Character Properties
 	@set ICU_DATA=$(ICUBLD)
-	@"$(ICUTOOLS)\genprops\$(CFG)\genprops" -u $(UNICODE_VERSION) -s "$(ICUUNIDATA)"
+	@"$(ICUTOOLS__GENPROPS_EXE)" -u $(UNICODE_VERSION) -s "$(ICUUNIDATA)"
 
 # Targets for unorm.icu
-"$(ICUBLD)\unorm.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS)\gennorm\$(CFG)\gennorm.exe"
+"$(ICUBLD)\unorm.icu": "$(ICUUNIDATA)\*.txt" "$(ICUTOOLS__GENNORM_EXE)"
 	@echo Creating data file for Unicode Normalization
 	@set ICU_DATA=$(ICUBLD)
-	@"$(ICUTOOLS)\gennorm\$(CFG)\gennorm" -u $(UNICODE_VERSION) -s "$(ICUUNIDATA)"
+	@"$(ICUTOOLS__GENNORM_EXE)" -u $(UNICODE_VERSION) -s "$(ICUUNIDATA)"
 
 # Targets for converters
-"$(ICUBLD)\cnvalias.icu" : {"$(ICUSRCDATA)\$(ICUUCM)"}\convrtrs.txt "$(ICUTOOLS)\gencnval\$(CFG)\gencnval.exe"
+"$(ICUBLD)\cnvalias.icu" : {"$(ICUSRCDATA)\$(ICUUCM)"}\convrtrs.txt "$(ICUTOOLS__GENCNVAL_EXE)"
 	@echo Creating data file for Converter Aliases
 	@set ICU_DATA=$(ICUBLD)
-	@"$(ICUTOOLS)\gencnval\$(CFG)\gencnval" "$(ICUSRCDATA)\$(ICUUCM)\convrtrs.txt"
+	@"$(ICUTOOLS__GENCNVAL_EXE)" "$(ICUSRCDATA)\$(ICUUCM)\convrtrs.txt"
 
 # Targets for ucadata.icu & invuca.icu
-"$(ICUBLD)\invuca.icu" "$(ICUBLD)\ucadata.icu": "$(ICUUNIDATA)\FractionalUCA.txt" "$(ICUTOOLS)\genuca\$(CFG)\genuca.exe" "$(ICUBLD)\uprops.icu" "$(ICUBLD)\unorm.icu"
+"$(ICUBLD)\invuca.icu" "$(ICUBLD)\ucadata.icu": "$(ICUUNIDATA)\FractionalUCA.txt" "$(ICUTOOLS__GENUCA_EXE)" "$(ICUBLD)\uprops.icu" "$(ICUBLD)\unorm.icu"
 	@echo Creating UCA data files
 	@set ICU_DATA=$(ICUBLD)
-	@"$(ICUTOOLS)\genuca\$(CFG)\genuca" -s "$(ICUUNIDATA)"
+	@"$(ICUTOOLS__GENUCA_EXE)" -s "$(ICUUNIDATA)"
 
 # Targets for uidna.spp
 "$(ICUBLD)\uidna.spp" : "$(ICUUNIDATA)\*.txt" "$(ICUMISC)\NamePrepProfile.txt"
@@ -495,7 +553,11 @@ res_index {
 
 # Dependencies on the tools for the batch inference rules
 
-$(UCM_SOURCE) : {"$(ICUTOOLS)\makeconv\$(CFG)"}makeconv.exe
+# [Dmitry Kovalenko] critical changes:
+#  - was: ..... : {"$(ICUTOOLS)\makeconv\$(CFG)"}makeconv.exe
+$(UCM_SOURCE) : "$(ICUTOOLS__MAKECONV_EXE)"
 
-$(TRANSLIT_SOURCE) $(MISC_SOURCE) $(GENRB_SOURCE) "$(ICUBLD)\root.res" : {"$(ICUTOOLS)\genrb\$(CFG)"}genrb.exe "$(ICUBLD)\ucadata.icu" "$(ICUBLD)\uprops.icu" "$(ICUBLD)\unorm.icu"
+# [Dmitry Kovalenko] critical changes:
+#  - was: ..... : ..... {"$(ICUTOOLS)\genrb\$(CFG)"}genrb.exe ....
+$(TRANSLIT_SOURCE) $(MISC_SOURCE) $(GENRB_SOURCE) "$(ICUBLD)\root.res" : "$(ICUTOOLS__GENRB_EXE)" "$(ICUBLD)\ucadata.icu" "$(ICUBLD)\uprops.icu" "$(ICUBLD)\unorm.icu"
 

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\src\include;..\..\..\src\include\gen;..\..\..\include;..\..\..\src\common\classes;../../../extern/icu/include"
+				AdditionalIncludeDirectories="..\..\..\src\include;..\..\..\src\include\gen;..\..\..\include;..\..\..\src\common\classes;$(ICU_INCLUDE_DIR)"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEV_BUILD;_WINDOWS;_USRDLL;SUPERCLIENT;FBTRACE_EXPORTS;NAMESPACE=Vulcan"
 				DebugInformationFormat="4"
 			/>
@@ -56,9 +56,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mpr.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\plugins\$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)\plugins\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -112,7 +112,7 @@
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\src\include\gen;..\..\..\src\include;..\..\..\src\common\classes;../../../extern/icu/include"
+				AdditionalIncludeDirectories="..\..\..\src\include\gen;..\..\..\src\include;..\..\..\src\common\classes;$(ICU_INCLUDE_DIR)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FBTRACE_EXPORTS;SUPERCLIENT;NAMESPACE=Vulcan"
 				UsePrecompiledHeader="0"
 			/>
@@ -128,9 +128,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mpr.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\plugins\$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)\plugins\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -182,7 +182,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\src\include;..\..\..\src\include\gen;..\..\..\include;..\..\..\src\common\classes;../../../extern/icu/include"
+				AdditionalIncludeDirectories="..\..\..\src\include;..\..\..\src\include\gen;..\..\..\include;..\..\..\src\common\classes;$(ICU_INCLUDE_DIR)"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEV_BUILD;_WINDOWS;_USRDLL;SUPERCLIENT;FBTRACE_EXPORTS;NAMESPACE=Vulcan"
 				Detect64BitPortabilityProblems="true"
 			/>
@@ -198,9 +198,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mpr.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\plugins\$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)\plugins\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -252,7 +252,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\src\include\gen;..\..\..\src\include;..\..\..\src\common\classes;../../../extern/icu/include"
+				AdditionalIncludeDirectories="..\..\..\src\include\gen;..\..\..\src\include;..\..\..\src\common\classes;$(ICU_INCLUDE_DIR)"
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -272,9 +272,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mpr.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\plugins\$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)\plugins\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 				TargetMachine="17"
 			/>
 			<Tool

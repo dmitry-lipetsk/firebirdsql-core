@@ -54,6 +54,7 @@
 
 #include "../common/classes/timestamp.h"
 #include "../common/classes/init.h"
+#include "../common/utilities/fb_delete_and_set_null.h"
 #include "../jrd/ThreadStart.h"
 
 #ifdef HAVE_PWD_H
@@ -701,7 +702,7 @@ rem_port* INET_analyze(const Firebird::PathName& file_name,
 	// string to reflect it...
 	Firebird::string temp;
 	temp.printf("%s/P%d", port->port_version->str_data, port->port_protocol & FB_PROTOCOL_MASK);
-	delete port->port_version;
+	Firebird::FB_DeletePtrAndSetNull(port->port_version);
 	port->port_version = REMOTE_make_string(temp.c_str());
 
 	if (packet->p_acpt.p_acpt_architecture == ARCHITECTURE) {
@@ -779,7 +780,7 @@ rem_port* INET_connect(const TEXT* name,
 
 	if (host.hasData())
 	{
-		delete port->port_connection;
+		FB_DeletePtrAndSetNull(port->port_connection);
 		port->port_connection = REMOTE_make_string(host.c_str());
 	}
 	else {
@@ -1126,8 +1127,7 @@ rem_port* INET_connect(const TEXT* name,
 		SetEvent(forkEvent);
 		CloseHandle(forkEvent);
 
-		delete forkSockets;
-		forkSockets = NULL;
+		Firebird::FB_DeletePtrAndSetNull(forkSockets);
 	}
 #endif
 }
@@ -1899,7 +1899,7 @@ static int fork(SOCKET old_handle, USHORT flag)
 	}
 
 	Firebird::string cmdLine;
-	cmdLine.printf("%s -i -h %" HANDLEFORMAT"@%" ULONGFORMAT, name, new_handle, GetCurrentProcessId());
+	cmdLine.printf("%s -i -h %" HANDLEFORMAT "@%" ULONGFORMAT, name, new_handle, GetCurrentProcessId());
 
 	STARTUPINFO start_crud;
 	start_crud.cb = sizeof(STARTUPINFO);

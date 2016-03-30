@@ -61,6 +61,7 @@
 #include "../jrd/isc_f_proto.h"
 #include "../jrd/sdl_proto.h"
 #include "../common/classes/ClumpletWriter.h"
+#include "../common/utilities/fb_delete_and_set_null.h"
 #include "../common/config/config.h"
 #include "../common/utils_proto.h"
 #include "../auth/trusted/AuthSspi.h"
@@ -658,7 +659,7 @@ ISC_STATUS GDS_COMPILE(ISC_STATUS* user_status,
 
 		send_and_receive(rdb, packet, user_status);
 		if (new_blr != blr) {
-			delete[] new_blr;
+			FB_DeleteArrayAndSetNull(new_blr);
 		}
 		if (user_status[1]) {
 			return user_status[1];
@@ -1276,12 +1277,11 @@ ISC_STATUS GDS_DSQL_EXECUTE2(ISC_STATUS* user_status,
 		// previous executions (possibly with different statement if
 		// isc_dsql_prepare is called multiple times).
 		// This should cure SF#919246
-		delete statement->rsr_bind_format;
-		statement->rsr_bind_format = NULL;
+		FB_DeletePtrAndSetNull(statement->rsr_bind_format);
+
 		if (port->port_statement)
 		{
-			delete port->port_statement->rsr_select_format;
-			port->port_statement->rsr_select_format = NULL;
+			FB_DeletePtrAndSetNull(port->port_statement->rsr_select_format);
 		}
 
 		// Parse the blr describing the message, if there is any.
@@ -1292,7 +1292,7 @@ ISC_STATUS GDS_DSQL_EXECUTE2(ISC_STATUS* user_status,
 			if (message != (RMessage*) - 1)
 			{
 				statement->rsr_bind_format = (rem_fmt*) message->msg_address;
-				delete message;
+				FB_DeletePtrAndSetNull(message);
 			}
 		}
 
@@ -1308,7 +1308,7 @@ ISC_STATUS GDS_DSQL_EXECUTE2(ISC_STATUS* user_status,
 			if (message != (RMessage*) - 1)
 			{
 				port->port_statement->rsr_select_format = (rem_fmt*) message->msg_address;
-				delete message;
+				FB_DeletePtrAndSetNull(message);
 			}
 
 			if (!port->port_statement->rsr_buffer)
@@ -1542,10 +1542,8 @@ ISC_STATUS GDS_DSQL_EXECUTE_IMMED2(ISC_STATUS* user_status,
 
 		REMOTE_reset_statement(statement);
 
-		delete statement->rsr_bind_format;
-		statement->rsr_bind_format = NULL;
-		delete statement->rsr_select_format;
-		statement->rsr_select_format = NULL;
+		FB_DeletePtrAndSetNull(statement->rsr_bind_format);
+		FB_DeletePtrAndSetNull(statement->rsr_select_format);
 
 		if (in_msg_length || out_msg_length)
 		{
@@ -1555,7 +1553,7 @@ ISC_STATUS GDS_DSQL_EXECUTE_IMMED2(ISC_STATUS* user_status,
 				if (message != (RMessage*) - 1)
 				{
 					statement->rsr_bind_format = (rem_fmt*) message->msg_address;
-					delete message;
+					FB_DeletePtrAndSetNull(message);
 				}
 			}
 			if (out_blr_length)
@@ -1564,7 +1562,7 @@ ISC_STATUS GDS_DSQL_EXECUTE_IMMED2(ISC_STATUS* user_status,
 				if (message != (RMessage*) - 1)
 				{
 					statement->rsr_select_format = (rem_fmt*) message->msg_address;
-					delete message;
+					FB_DeletePtrAndSetNull(message);
 				}
 			}
 		}
@@ -1686,7 +1684,8 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 	{
 		// make sure the protocol supports it
 
-		if (rdb->rdb_port->port_protocol < PROTOCOL_VERSION7) {
+		if (rdb->rdb_port->port_protocol < PROTOCOL_VERSION7)
+        {
 			return unsupported(user_status);
 		}
 
@@ -1708,7 +1707,8 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 				{
 					message->msg_address = NULL;
 					message = message->msg_next;
-					if (message == statement->rsr_message) {
+					if (message == statement->rsr_message)
+                    {
 						break;
 					}
 				}
@@ -1729,26 +1729,34 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 			if (statement->rsr_user_select_format &&
 				statement->rsr_user_select_format != statement->rsr_select_format)
 			{
-				delete statement->rsr_user_select_format;
+				FB_DeletePtrAndSetNull(statement->rsr_user_select_format);
 			}
+
 			RMessage* message = PARSE_messages(blr, blr_length);
+
 			if (message != (RMessage*) - 1)
 			{
 				statement->rsr_user_select_format = (rem_fmt*) message->msg_address;
-				delete message;
+				FB_DeletePtrAndSetNull(message);
 			}
-			else
-				statement->rsr_user_select_format = NULL;
-			if (statement->rsr_flags.test(Rsr::FETCHED))
-				blr_length = 0;
 			else
 			{
-				delete statement->rsr_select_format;
+				statement->rsr_user_select_format = NULL;
+            }
+
+			if (statement->rsr_flags.test(Rsr::FETCHED))
+			{
+				blr_length = 0;
+			}
+			else
+			{
+				FB_DeletePtrAndSetNull(statement->rsr_select_format);
 				statement->rsr_select_format = statement->rsr_user_select_format;
 			}
-		}
+		}//if blr_length
 
-		if (statement->rsr_flags.test(Rsr::BLOB)) {
+		if (statement->rsr_flags.test(Rsr::BLOB))
+        {
 			return fetch_blob(user_status, statement, blr_length, blr, msg_type, msg_length, msg);
 		}
 
@@ -1823,7 +1831,8 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 
 			// Make the batch request - and force the packet over the wire
 
-			if (!send_packet(rdb->rdb_port, packet, user_status)) {
+			if (!send_packet(rdb->rdb_port, packet, user_status))
+			{
 				return user_status[1];
 			}
 
@@ -1841,13 +1850,15 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 
 		// We've either got data, or some is on the way, or we have an error, or we have EOF
 
-		fb_assert(statement->rsr_msgs_waiting || (statement->rsr_rows_pending > 0) ||
-			   statement->haveException() || statement->rsr_flags.test(Rsr::EOF_SET));
+		fb_assert(statement->rsr_msgs_waiting ||
+				  (statement->rsr_rows_pending > 0) ||
+				  statement->haveException() ||
+				  statement->rsr_flags.test(Rsr::EOF_SET));
 
 		while (!statement->haveException() &&			// received a database error
-			!statement->rsr_flags.test(Rsr::EOF_SET) &&	// reached end of cursor
-			statement->rsr_msgs_waiting < 2	&&			// Have looked ahead for end of batch
-			statement->rsr_rows_pending != 0)
+			   !statement->rsr_flags.test(Rsr::EOF_SET) &&	// reached end of cursor
+			   statement->rsr_msgs_waiting < 2	&&			// Have looked ahead for end of batch
+			   statement->rsr_rows_pending != 0)
 		{
 			// Hit end of batch
 			if (!receive_queued_packet(port, user_status, statement->rsr_id))
@@ -1862,7 +1873,8 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 			{
 				// hvlad: we may have queued fetch packet but received EOF before start
 				// handling of this packet. Handle it now.
-				if (!clear_stmt_que(port, user_status, statement)) {
+				if (!clear_stmt_que(port, user_status, statement))
+				{
 					return user_status[1];
 				}
 
@@ -1891,6 +1903,7 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 				statement->raiseException();
 			}
 		}
+
 		statement->rsr_msgs_waiting--;
 
 		message = statement->rsr_message;
@@ -1901,6 +1914,7 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 			status_exception::raise(Arg::Gds(isc_port_len) <<
 				Arg::Num(msg_length) << Arg::Num(statement->rsr_user_select_format->fmt_length));
 		}
+
 		if (statement->rsr_user_select_format == statement->rsr_select_format) {
 			memcpy(msg, message->msg_address, msg_length);
 		}
@@ -1956,7 +1970,7 @@ ISC_STATUS GDS_DSQL_FREE(ISC_STATUS* user_status, Rsr** stmt_handle, USHORT opti
 			return unsupported(user_status);
 		}
 
-		fb_assert(statement->haveException() == 0);
+		//fb_assert(statement->haveException() == 0);
 		statement->clearException();
 
 		if (statement->rsr_flags.test(Rsr::LAZY))
@@ -2068,8 +2082,7 @@ ISC_STATUS GDS_DSQL_INSERT(ISC_STATUS* user_status,
 
 		// Free existing format unconditionally.
 		// This is also related to SF#919246
-		delete statement->rsr_bind_format;
-		statement->rsr_bind_format = NULL;
+		FB_DeletePtrAndSetNull(statement->rsr_bind_format);
 
 		// Parse the blr describing the message, if there is any.
 
@@ -2079,7 +2092,7 @@ ISC_STATUS GDS_DSQL_INSERT(ISC_STATUS* user_status,
 			if (message != (RMessage*) - 1)
 			{
 				statement->rsr_bind_format = (rem_fmt*) message->msg_address;
-				delete message;
+				FB_DeletePtrAndSetNull(message);
 			}
 		}
 
@@ -2550,7 +2563,7 @@ ISC_STATUS GDS_GET_SEGMENT(ISC_STATUS* user_status,
 		//   Our buffer (described by the structure blob) is counted strings
 		//   <count word> <string> <count word> <string>...
 
-		while (true)
+		for(;;)
 		{
 			// If there's data to be given away, give some away (p points to the local data)
 
@@ -2599,7 +2612,8 @@ ISC_STATUS GDS_GET_SEGMENT(ISC_STATUS* user_status,
 				blob->rbl_offset += l;
 				buffer_length -= l;
 
-				if (l) {
+				if (l)
+                {
 					memcpy(buffer, p, l);
 				}
 
@@ -2613,7 +2627,7 @@ ISC_STATUS GDS_GET_SEGMENT(ISC_STATUS* user_status,
 				{
 					break;
 				}
-			}
+			}//if blob->rbl_length
 
 			// We're done with buffer.  If this was the last, we're done
 
@@ -2670,7 +2684,7 @@ ISC_STATUS GDS_GET_SEGMENT(ISC_STATUS* user_status,
 				blob->rbl_flags |= Rbl::SEGMENT;
 			else if (response->p_resp_object == 2)
 				blob->rbl_flags |= Rbl::EOF_PENDING;
-		}
+		}//for
 
 		response->p_resp_data = temp;
 	}
@@ -4369,14 +4383,10 @@ ISC_STATUS GDS_TRANSACT_REQUEST(ISC_STATUS* user_status,
 
 		// Parse the blr describing the messages
 
-		delete procedure->rpr_in_msg;
-		procedure->rpr_in_msg = NULL;
-		delete procedure->rpr_in_format;
-		procedure->rpr_in_format = NULL;
-		delete procedure->rpr_out_msg;
-		procedure->rpr_out_msg = NULL;
-		delete procedure->rpr_out_format;
-		procedure->rpr_out_format = NULL;
+		FB_DeletePtrAndSetNull(procedure->rpr_in_msg);
+		FB_DeletePtrAndSetNull(procedure->rpr_in_format);
+		FB_DeletePtrAndSetNull(procedure->rpr_out_msg);
+		FB_DeletePtrAndSetNull(procedure->rpr_out_format);
 
 		RMessage* message = PARSE_messages(blr, blr_length);
 		if (message != (RMessage*) - 1)
@@ -4402,7 +4412,7 @@ ISC_STATUS GDS_TRANSACT_REQUEST(ISC_STATUS* user_status,
 				default:
 					RMessage* temp = message;
 					message = message->msg_next;
-					delete temp;
+					FB_DeletePtrAndSetNull(temp);
 					break;
 				}
 			}
@@ -4868,7 +4878,8 @@ static bool clear_stmt_que(rem_port* port, ISC_STATUS* user_status, Rsr* stateme
 
 	// hvlad: clear isc_req_sync error as it is received because of our batch
 	// fetching code, not because of wrong client application
-	if (statement->haveException() == isc_req_sync) {
+	if (statement->haveException() == isc_req_sync)
+    {
 		statement->clearException();
 	}
 
@@ -4935,7 +4946,9 @@ static bool batch_dsql_fetch(rem_port*	port,
 	// In addtion to the above we grab all the records in case of XNET as
 	// we need to clear the queue
 	bool clear_queue = false;
-	if (id != statement->rsr_id || port->port_type == rem_port::XNET) {
+
+	if (id != statement->rsr_id || port->port_type == rem_port::XNET)
+    {
 		clear_queue = true;
 	}
 
@@ -4961,9 +4974,11 @@ static bool batch_dsql_fetch(rem_port*	port,
 			prior->msg_next = new_msg;
 			new_msg->msg_prior = prior;
 #else
-			while (message->msg_next != new_msg->msg_next) {
+			while (message->msg_next != new_msg->msg_next)
+			{
 				message = message->msg_next;
 			}
+
 			message->msg_next = new_msg;
 #endif
 		}
@@ -4997,7 +5012,8 @@ static bool batch_dsql_fetch(rem_port*	port,
 
 		// See if we're at end of the batch
 
-		if (packet->p_sqldata.p_sqldata_status || !packet->p_sqldata.p_sqldata_messages ||
+		if (packet->p_sqldata.p_sqldata_status ||
+			!packet->p_sqldata.p_sqldata_messages ||
 			(port->port_flags & PORT_rpc))
 		{
 			if (packet->p_sqldata.p_sqldata_status == 100)
@@ -5009,16 +5025,22 @@ static bool batch_dsql_fetch(rem_port*	port,
 						   statement->rsr_rows_pending);
 #endif
 			}
+
 			--statement->rsr_batch_count;
-			if (statement->rsr_batch_count == 0) {
+
+			if (statement->rsr_batch_count == 0)
+			{
 				statement->rsr_rows_pending = 0;
 			}
+
 			dequeue_receive(port);
 
 			// clear next queued batch(es) if present
-			if (packet->p_sqldata.p_sqldata_status == 100) {
+			if (packet->p_sqldata.p_sqldata_status == 100)
+			{
 				clear_stmt_que(port, tmp_status, statement);
 			}
+
 			break;
 		}
 		statement->rsr_msgs_waiting++;
@@ -5027,11 +5049,14 @@ static bool batch_dsql_fetch(rem_port*	port,
 		fprintf(stdout, "Decrementing Rows Pending in batch_dsql_fetch=%lu\n",
 				   statement->rsr_rows_pending);
 #endif
-		if (!clear_queue) {
+		if (!clear_queue)
+		{
 			break;
 		}
 	}
+
 	packet->p_resp.p_resp_status_vector = save_status;
+
 	return true;
 }
 
@@ -5350,7 +5375,7 @@ static void disconnect( rem_port* port)
 
 	// Cleanup the queue
 
-	delete port->port_deferred_packets;
+	FB_DeletePtrAndSetNull(port->port_deferred_packets);
 
 	// Clear context reference for the associated event handler
 	// to avoid SEGV during shutdown
@@ -5366,7 +5391,7 @@ static void disconnect( rem_port* port)
 
 	port->port_flags |= PORT_disconnect;
 	port->disconnect();
-	delete rdb;
+	FB_DeletePtrAndSetNull(rdb);
 }
 
 
@@ -6318,7 +6343,7 @@ static void dequeue_receive( rem_port* port)
 
 	// Add queue entry onto free queue
 
-	delete que_inst;
+	FB_DeletePtrAndSetNull(que_inst);
 }
 
 
@@ -6369,7 +6394,7 @@ static void release_blob( Rbl* blob)
 		}
 	}
 
-	delete blob;
+	FB_DeletePtrAndSetNull(blob);
 }
 
 
@@ -6396,7 +6421,7 @@ static void release_event( Rvnt* event)
 		}
 	}
 
-	delete event;
+	FB_DeletePtrAndSetNull(event);
 }
 
 
@@ -6469,20 +6494,25 @@ static void release_statement( Rsr** statement)
  *	Release a GDML or SQL statement block ?
  *
  **************************************/
+	fb_assert(statement);
+	fb_assert(*statement);
 
-	delete (*statement)->rsr_bind_format;
-	if ((*statement)->rsr_user_select_format &&
+	FB_DeletePtrAndSetNull((*statement)->rsr_bind_format);
+
+    if ((*statement)->rsr_user_select_format &&
 		(*statement)->rsr_user_select_format != (*statement)->rsr_select_format)
 	{
-		delete (*statement)->rsr_user_select_format;
+		FB_DeletePtrAndSetNull((*statement)->rsr_user_select_format);
 	}
-	delete (*statement)->rsr_select_format;
+
+	FB_DeletePtrAndSetNull((*statement)->rsr_select_format);
+
 	(*statement)->releaseException();
 
 	REMOTE_release_messages((*statement)->rsr_message);
-	delete *statement;
-	*statement = NULL;
-}
+
+	FB_DeletePtrAndSetNull(*statement);
+}//release_statement
 
 
 static void release_sql_request( Rsr* statement)
@@ -6540,7 +6570,7 @@ static void release_transaction( Rtr* transaction)
 		}
 	}
 
-	delete transaction;
+	FB_DeletePtrAndSetNull(transaction);
 }
 
 

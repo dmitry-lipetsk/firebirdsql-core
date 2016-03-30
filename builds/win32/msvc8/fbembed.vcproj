@@ -62,9 +62,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird/bin/$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)bin\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 				ModuleDefinitionFile="..\defs\fbclient.def"
 			/>
 			<Tool
@@ -141,9 +141,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mpr.lib ws2_32.lib version.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird/bin/$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)bin\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/$(ConfigurationName)/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 				ModuleDefinitionFile="..\defs\fbclient.def"
 			/>
 			<Tool
@@ -217,9 +217,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird/bin/$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)bin\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 				ModuleDefinitionFile="..\defs\fbclient.def"
 				TargetMachine="17"
 			/>
@@ -297,9 +297,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mpr.lib ws2_32.lib version.lib icuuc.lib"
-				OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird/bin/$(ProjectName).dll"
+				OutputFile="$(FB_ROOT_OUT_DIR)bin\$(ProjectName).dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/$(ConfigurationName)/lib"
+				AdditionalLibraryDirectories="$(ICU_LIB_DIR)"
 				ModuleDefinitionFile="..\defs\fbclient.def"
 				TargetMachine="17"
 			/>
@@ -692,7 +692,7 @@
 			Name="UTILITIES files"
 			>
 			<File
-				RelativePath="..\..\..\gen\$(PlatformName)\utilities\gstat\dba.cpp"
+				RelativePath="$(FB_ROOT_GEN_DIR)utilities\gstat\dba.cpp"
 				>
 			</File>
 			<File

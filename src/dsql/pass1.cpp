@@ -287,10 +287,6 @@ static dsql_nod* pass1_rse_is_recursive(CompiledStatement*, dsql_nod*);
 static dsql_nod* pass1_recursive_cte(CompiledStatement*, dsql_nod*);
 static dsql_nod* process_returning(CompiledStatement*, dsql_nod*);
 
-#ifdef DSQL_DEBUG
-static void dump_context_stack(const DsqlContextStack* stack);
-#endif
-
 // CVC: more global variables???
 static const dsql_str* global_temp_collation_name = NULL;
 
@@ -523,7 +519,7 @@ dsql_ctx* PASS1_make_context(CompiledStatement* statement, const dsql_nod* relat
 				{
 					DEV_BLKCHK(field, dsql_type_fld);
 					DEV_BLKCHK(*input, dsql_type_nod);
-					MAKE_desc_from_field(&desc_node->nod_desc, field);
+					MAKE_desc_from_field(&desc_node->nod_desc, field, /*IsElement*/false);
 					//	set_parameter_type(statement, *input, &desc_node, false);
 					set_parameter_type(statement, *input, desc_node, false);
 				}
@@ -582,7 +578,7 @@ dsql_nod* PASS1_node(CompiledStatement* statement, dsql_nod* input)
 		field = (dsql_fld*) node->nod_arg[e_cast_target];
 		DEV_BLKCHK(field, dsql_type_fld);
 		DDL_resolve_intl_type(statement, field, NULL);
-		MAKE_desc_from_field(&node->nod_desc, field);
+		MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/false);
 		set_parameter_type(statement, node, NULL, false);
 		// If the source is nullable, so is the target
 		MAKE_desc(statement, &sub1->nod_desc, sub1, NULL);
@@ -854,7 +850,7 @@ dsql_nod* PASS1_node(CompiledStatement* statement, dsql_nod* input)
 			DEV_BLKCHK(temp, dsql_type_nod);
 
 			field->fld_flags |= FLD_nullable;
-			MAKE_desc_from_field(&(desc_node->nod_desc), field);
+			MAKE_desc_from_field(&(desc_node->nod_desc), field, /*IsElement*/false);
 			set_parameter_type(statement, temp, desc_node, false);
 		} // end scope
 
@@ -1483,7 +1479,7 @@ dsql_nod* PASS1_statement(CompiledStatement* statement, dsql_nod* input)
 				{
 					DEV_BLKCHK(field, dsql_type_fld);
 					DEV_BLKCHK(*ptr, dsql_type_nod);
-					MAKE_desc_from_field(&desc_node->nod_desc, field);
+					MAKE_desc_from_field(&desc_node->nod_desc, field, /*IsElement*/false);
 					// set_parameter_type(*ptr, &desc_node, false);
 					set_parameter_type(statement, *ptr, desc_node, false);
 				}
@@ -2637,7 +2633,7 @@ static dsql_nod* explode_outputs( CompiledStatement* statement, const dsql_prc* 
 		dsql_par* parameter = MAKE_parameter(statement->req_receive, true, true, 0, NULL);
 		p_node->nod_arg[e_par_index] = (dsql_nod*) (IPTR) parameter->par_index;
 		p_node->nod_arg[e_par_parameter] = (dsql_nod*) parameter;
-		MAKE_desc_from_field(&parameter->par_desc, field);
+		MAKE_desc_from_field(&parameter->par_desc, field, /*IsElement*/false);
 		parameter->par_name = parameter->par_alias = field->fld_name.c_str();
 		parameter->par_rel_name = procedure->prc_name.c_str();
 		parameter->par_owner_name = procedure->prc_owner.c_str();
@@ -3914,7 +3910,7 @@ static dsql_nod* pass1_collate( CompiledStatement* statement, dsql_nod* sub1,
 				  Arg::Gds(isc_collation_requires_text));
 	}
 	DDL_resolve_intl_type(statement, field, collation);
-	MAKE_desc_from_field(&node->nod_desc, field);
+	MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/false);
 	return node;
 }
 
@@ -10651,7 +10647,7 @@ static bool set_parameter_type(CompiledStatement* statement, dsql_nod* in_node,
 					{
 						parameter->par_desc = par_node->nod_desc;
 						parameter->par_node = par_node;
-						MAKE_desc_from_field(&parameter->par_desc, field);
+						MAKE_desc_from_field(&parameter->par_desc, field, /*IsElement*/false);
 						return true;
 					}
 				}
@@ -10954,26 +10950,6 @@ static void trace_line(const char* message, ...)
 	va_end(params);
 	buffer[sizeof(buffer) - 1] = 0;
 	gds__trace_raw(buffer);
-}
-
-static void dump_context_stack(const DsqlContextStack* stack)
-{
-	printf("Context dump\n");
-	printf("------------\n");
-
-	for (DsqlContextStack::const_iterator i(*stack); i.hasData(); ++i)
-	{
-		const dsql_ctx* context = i.object();
-
-		printf("scope: %2d; number: %2d; system: %d; returning: %d; alias: %-*.*s; "
-			   "internal alias: %-*.*s\n",
-			context->ctx_scope_level,
-			context->ctx_context,
-			(context->ctx_flags & CTX_system) != 0,
-			(context->ctx_flags & CTX_returning) != 0,
-			(int) MAX_SQL_IDENTIFIER_SIZE, (int) MAX_SQL_IDENTIFIER_SIZE, context->ctx_alias,
-			(int) MAX_SQL_IDENTIFIER_SIZE, (int) MAX_SQL_IDENTIFIER_SIZE, context->ctx_internal_alias);
-	}
 }
 
 /**

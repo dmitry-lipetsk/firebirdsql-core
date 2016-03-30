@@ -2,7 +2,7 @@
 set ERRLEV=0
 
 :: Set env vars
-@call setenvvar.bat
+@call helper__setenvvar.bat %*
 
 @if errorlevel 1 (call :ERROR Executing setenvvar.bat failed & goto :EOF)
 
@@ -10,15 +10,12 @@ set ERRLEV=0
 
 @if not exist %FB_GEN_DIR%\gpre_boot.exe (goto :HELP_BOOT & goto :EOF)
 
-
-@call set_build_target.bat %*
-
 ::==========
 :: MAIN
 
 @echo Building %FB_OBJ_DIR%
 
-call compile.bat %FB_ROOT_PATH%\builds\win32\%VS_VER%\Firebird2 make_all_%FB_TARGET_PLATFORM%.log
+call helper__compile.bat %FB_ROOT_PATH%\builds\win32\%VS_VER%\Firebird2 make_all.log
 if errorlevel 1 call :ERROR build failed - see make_all_%FB_TARGET_PLATFORM%.log for details
 
 @if "%ERRLEV%"=="1" (
@@ -30,10 +27,9 @@ if errorlevel 1 call :ERROR build failed - see make_all_%FB_TARGET_PLATFORM%.log
 
 ::===========
 :MOVE
-@echo Copying files to output
-@set FB_OUTPUT_DIR=%FB_ROOT_PATH%\output_%FB_TARGET_PLATFORM%
-@del %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\bin\*.exp 2>nul
-@del %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\bin\*.lib 2>nul
+@echo Copying files to output [%FB_OUTPUT_DIR%]
+@del %FB_BUILD__OUT_DIR%bin\*.exp 2>nul
+@del %FB_BUILD__OUT_DIR%bin\*.lib 2>nul
 @rmdir /q /s %FB_OUTPUT_DIR% 2>nul
 
 @mkdir %FB_OUTPUT_DIR% 2>nul
@@ -49,16 +45,16 @@ if errorlevel 1 call :ERROR build failed - see make_all_%FB_TARGET_PLATFORM%.log
 @mkdir %FB_OUTPUT_DIR%\plugins 2>nul
 
 for %%v in ( icuuc30 icudt30 icuin30 ) do (
-@copy %FB_ICU_SOURCE_BIN%\%%v.dll %FB_OUTPUT_DIR%\bin >nul
+@copy %FB_BUILD__ICU_SOURCE_BIN%\%%v.dll %FB_OUTPUT_DIR%\bin >nul
 )
 
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\bin\* %FB_OUTPUT_DIR%\bin >nul
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\intl\* %FB_OUTPUT_DIR%\intl >nul
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\udf\* %FB_OUTPUT_DIR%\udf >nul
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\system32\* %FB_OUTPUT_DIR%\system32 >nul
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\plugins\fbtrace.dll %FB_OUTPUT_DIR%\plugins\fbtrace.dll >nul
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\fbclient\fbclient.lib %FB_OUTPUT_DIR%\lib\fbclient_ms.lib >nul
-@copy %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\ib_util\ib_util.lib %FB_OUTPUT_DIR%\lib\ib_util_ms.lib >nul
+@copy %FB_BUILD__OUT_DIR%bin\* %FB_OUTPUT_DIR%\bin >nul
+@copy %FB_BUILD__OUT_DIR%intl\* %FB_OUTPUT_DIR%\intl >nul
+@copy %FB_BUILD__OUT_DIR%udf\* %FB_OUTPUT_DIR%\udf >nul
+@copy %FB_BUILD__OUT_DIR%system32\* %FB_OUTPUT_DIR%\system32 >nul
+@copy %FB_BUILD__OUT_DIR%plugins\fbtrace.dll %FB_OUTPUT_DIR%\plugins\fbtrace.dll >nul
+@copy %FB_BUILD__TEMP_DIR%fbclient\fbclient.lib %FB_OUTPUT_DIR%\lib\fbclient_ms.lib >nul
+@copy %FB_BUILD__TEMP_DIR%ib_util\ib_util.lib %FB_OUTPUT_DIR%\lib\ib_util_ms.lib >nul
 
 for %%v in ( btyacc gbak_embed gpre_boot gpre_embed isql_embed ) do (
 @del %FB_OUTPUT_DIR%\bin\%%v.exe >nul
@@ -121,33 +117,82 @@ copy %FB_ROOT_PATH%\src\extlib\fbudf\fbudf.sql %FB_OUTPUT_DIR%\udf > nul
 @copy %FB_INSTALL_SCRIPTS%\install_superclassic.bat %FB_OUTPUT_DIR%\bin >nul
 @copy %FB_INSTALL_SCRIPTS%\uninstall.bat %FB_OUTPUT_DIR%\bin >nul
 
-:: MSVC runtime
-if %MSVC_VERSION% == 14 (
-@copy "%VS140COMNTOOLS%\..\..\VC\redist\%FB_VC_CRT_ARCH%\Microsoft.VC140.CRT\vcruntime140.dll" %FB_OUTPUT_DIR% >nul
-@copy "%VS140COMNTOOLS%\..\..\VC\redist\%FB_VC_CRT_ARCH%\Microsoft.VC140.CRT\msvcp140.dll" %FB_OUTPUT_DIR% >nul
-) else (
-if %MSVC_VERSION% == 12 (
-@copy "%VS120COMNTOOLS%\..\..\VC\redist\%FB_VC_CRT_ARCH%\Microsoft.VC120.CRT\msvcr120.dll" %FB_OUTPUT_DIR% >nul
-@copy "%VS120COMNTOOLS%\..\..\VC\redist\%FB_VC_CRT_ARCH%\Microsoft.VC120.CRT\msvcp120.dll" %FB_OUTPUT_DIR% >nul
-) else (
-if %MSVC_VERSION% == 10 (
-@copy "%VS100COMNTOOLS%\..\..\VC\redist\%FB_VC10CRT_DIR%\Microsoft.VC100.CRT\msvcr100.dll" %FB_OUTPUT_DIR%\bin >nul
-) else (
-if %MSVC_VERSION% == 9 (
+:: ------------------------------------------ MSVC runtime 2013
+if %MSVC_VERSION% == 12 if %FB_PROCESSOR_ARCHITECTURE%==AMD64 if %FB_CFG_NAME%==Release (
+@copy "%VS120COMNTOOLS%..\..\VC\redist\x64\Microsoft.VC120.CRT\msvcr120.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 12 if %FB_PROCESSOR_ARCHITECTURE%==AMD64 if %FB_CFG_NAME%==Debug (
+@copy "%VS120COMNTOOLS%..\..\VC\redist\Debug_NonRedist\x64\Microsoft.VC120.DebugCRT\msvcr120d.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 12 if %FB_PROCESSOR_ARCHITECTURE%==x86 if %FB_CFG_NAME%==Release (
+@copy "%VS120COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC120.CRT\msvcr120.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 12 if %FB_PROCESSOR_ARCHITECTURE%==x86 if %FB_CFG_NAME%==Debug (
+@copy "%VS120COMNTOOLS%..\..\VC\redist\Debug_NonRedist\x86\Microsoft.VC120.DebugCRT\msvcr120d.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+:: ------------------------------------------ MSVC runtime 2012
+if %MSVC_VERSION% == 11 if %FB_PROCESSOR_ARCHITECTURE%==AMD64 if %FB_CFG_NAME%==Release (
+@copy "%VS110COMNTOOLS%..\..\VC\redist\x64\Microsoft.VC110.CRT\msvcr110.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 11 if %FB_PROCESSOR_ARCHITECTURE%==AMD64 if %FB_CFG_NAME%==Debug (
+@copy "%VS110COMNTOOLS%..\..\VC\redist\Debug_NonRedist\x64\Microsoft.VC110.DebugCRT\msvcr110d.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 11 if %FB_PROCESSOR_ARCHITECTURE%==x86 if %FB_CFG_NAME%==Release (
+@copy "%VS110COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC110.CRT\msvcr110.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 11 if %FB_PROCESSOR_ARCHITECTURE%==x86 if %FB_CFG_NAME%==Debug (
+@copy "%VS110COMNTOOLS%..\..\VC\redist\Debug_NonRedist\x86\Microsoft.VC110.DebugCRT\msvcr110d.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+:: ------------------------------------------ MSVC runtime 2010
+if %MSVC_VERSION% == 10 if %FB_PROCESSOR_ARCHITECTURE%==AMD64 if %FB_CFG_NAME%==Release (
+@copy "%VS100COMNTOOLS%..\..\VC\redist\x64\Microsoft.VC100.CRT\msvcr100.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 10 if %FB_PROCESSOR_ARCHITECTURE%==AMD64 if %FB_CFG_NAME%==Debug (
+@copy "%VS100COMNTOOLS%..\..\VC\redist\Debug_NonRedist\x64\Microsoft.VC100.DebugCRT\msvcr100d.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 10 if %FB_PROCESSOR_ARCHITECTURE%==x86 if %FB_CFG_NAME%==Release (
+@copy "%VS100COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+if %MSVC_VERSION% == 10 if %FB_PROCESSOR_ARCHITECTURE%==x86 if %FB_CFG_NAME%==Debug (
+@copy "%VS100COMNTOOLS%..\..\VC\redist\Debug_NonRedist\x86\Microsoft.VC100.DebugCRT\msvcr100d.dll" %FB_OUTPUT_DIR%\bin >nul
+)
+
+:: ------------------------------------------ MSVC runtime 2008
+if %MSVC_VERSION% == 9 if %FB_CFG_NAME%==Release (
 @copy "%VS90COMNTOOLS%\..\..\VC\redist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC90.CRT\msvcr90.dll" %FB_OUTPUT_DIR%\bin >nul
 @copy "%VS90COMNTOOLS%\..\..\VC\redist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC90.CRT\msvcp90.dll" %FB_OUTPUT_DIR%\bin >nul
 @copy "%VS90COMNTOOLS%\..\..\VC\redist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" %FB_OUTPUT_DIR%\bin >nul
-) else (
-if %MSVC_VERSION% == 8 (
+)
+
+if %MSVC_VERSION% == 9 if %FB_CFG_NAME%==Debug (
+@copy "%VS90COMNTOOLS%\..\..\VC\redist\Debug_NonRedist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC90.DebugCRT\msvcr90d.dll" %FB_OUTPUT_DIR%\bin >nul
+@copy "%VS90COMNTOOLS%\..\..\VC\redist\Debug_NonRedist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC90.DebugCRT\msvcp90d.dll" %FB_OUTPUT_DIR%\bin >nul
+@copy "%VS90COMNTOOLS%\..\..\VC\redist\Debug_NonRedist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC90.DebugCRT\Microsoft.VC90.DebugCRT.manifest" %FB_OUTPUT_DIR%\bin >nul
+)
+
+:: ------------------------------------------ MSVC runtime 2005
+if %MSVC_VERSION% == 8 if %FB_CFG_NAME%==Release (
 @copy "%VS80COMNTOOLS%\..\..\VC\redist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC80.CRT\msvcr80.dll" %FB_OUTPUT_DIR%\bin >nul
 @copy "%VS80COMNTOOLS%\..\..\VC\redist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC80.CRT\msvcp80.dll" %FB_OUTPUT_DIR%\bin >nul
 @copy "%VS80COMNTOOLS%\..\..\VC\redist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC80.CRT\Microsoft.VC80.CRT.manifest" %FB_OUTPUT_DIR%\bin >nul
 )
-)
-)
-)
-)
 
+if %MSVC_VERSION% == 8 if %FB_CFG_NAME%==Debug (
+@copy "%VS80COMNTOOLS%\..\..\VC\redist\Debug_NonRedist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC80.DebugCRT\msvcr80d.dll" %FB_OUTPUT_DIR%\bin >nul
+@copy "%VS80COMNTOOLS%\..\..\VC\redist\Debug_NonRedist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC80.DebugCRT\msvcp80d.dll" %FB_OUTPUT_DIR%\bin >nul
+@copy "%VS80COMNTOOLS%\..\..\VC\redist\Debug_NonRedist\%FB_PROCESSOR_ARCHITECTURE%\Microsoft.VC80.DebugCRT\Microsoft.VC80.DebugCRT.manifest" %FB_OUTPUT_DIR%\bin >nul
+)
 
 @goto :EOF
 
