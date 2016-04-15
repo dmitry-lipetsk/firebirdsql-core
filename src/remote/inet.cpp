@@ -777,7 +777,8 @@ rem_port* INET_connect(const TEXT* name,
 		delete port->port_connection;
 		port->port_connection = REMOTE_make_string(host.c_str());
 	}
-	else {
+	else
+	{
 		if (packet)
 		{
 			host = port->port_host->str_data;
@@ -787,10 +788,12 @@ rem_port* INET_connect(const TEXT* name,
 	if (protocol.isEmpty())
 	{
 		const unsigned short port2 = port->getPortConfig()->getRemoteServicePort();
-		if (port2) {
+		if (port2)
+		{
 			protocol.printf("%hu", port2);
 		}
-		else {
+		else
+		{
 			protocol = port->getPortConfig()->getRemoteServiceName();
 		}
 	}
