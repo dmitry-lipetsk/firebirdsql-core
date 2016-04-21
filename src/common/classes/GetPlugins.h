@@ -92,6 +92,16 @@ public:
 		this->getPlugin();
 	}//GetPlugins
 
+	~GetPlugins()
+	{
+		if (this->hasData())
+		{
+			this->pluginInterface->releasePlugin(currentPlugin);
+
+			this->currentPlugin = NULL;
+		}
+	}//~GetPlugins
+
 	bool hasData() const
 	{
 		return this->currentPlugin;
@@ -138,16 +148,6 @@ public:
 
 		this->getPlugin();
 	}//set
-
-	~GetPlugins()
-	{
-		if (this->hasData())
-		{
-			this->pluginInterface->releasePlugin(currentPlugin);
-
-			this->currentPlugin = NULL;
-		}
-	}//~GetPlugins
 
 private:
 	void getPlugin()
