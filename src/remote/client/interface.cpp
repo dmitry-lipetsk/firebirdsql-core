@@ -7524,8 +7524,9 @@ static inline void makeUtfString(bool uft8Convert, Firebird::string& s)
 	{
 		ISC_systemToUtf8(s);
 	}
+
 	ISC_unescape(s);
-}
+}//makeUtfString
 
 void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet* tags)
 {
