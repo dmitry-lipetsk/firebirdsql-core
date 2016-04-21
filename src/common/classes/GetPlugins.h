@@ -59,9 +59,12 @@ public:
 		  pluginSet(NULL), currentPlugin(NULL),
 		  ls(*getDefaultMemoryPool()), status(&ls)
 	{
+        /*const*/ RefPtr<IFirebirdConf>
+         spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
+
 		pluginSet.assignRefNoIncr(pluginInterface->getPlugins(&status, interfaceType,
 			(namesList ? namesList : knownConfig->getPlugins(interfaceType)),
-			FB_NEW FirebirdConf(knownConfig)));
+			 spCfg));
 		check(&status);
 
 		getPlugin();
