@@ -7687,7 +7687,7 @@ bool ClntAuthBlock::checkPluginName(const Firebird::PathName& nameToCheck)const
 
 	REMOTE_parseList(parsed, this->pluginList);
 
-	for (unsigned i = 0; i < parsed.getCount(); ++i)
+	for (FB_SIZE_T i = 0; i < parsed.getCount(); ++i)
 	{
 		if (parsed[i] == nameToCheck)
 		{
