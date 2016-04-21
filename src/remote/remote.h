@@ -725,25 +725,42 @@ public:
 	}
 
 	void storeDataForPlugin(unsigned int length, const unsigned char* data);
+
 	void resetDataFromPlugin();
+
 	void extractDataFromPluginTo(Firebird::ClumpletWriter& dpb, const ParametersSet* tags, int protocol);
+
 	void extractDataFromPluginTo(CSTRING* to);
+
 	void extractDataFromPluginTo(P_AUTH_CONT* to);
+
 	void loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*);
+
 	void extractDataFromPluginTo(Firebird::ClumpletWriter& user_id);
+
 	void resetClnt(const Firebird::PathName* fileName, const CSTRING* listStr = NULL);
+
 	bool checkPluginName(const Firebird::PathName& nameToCheck)const;
+
 	Firebird::PathName getPluginName();
+
 	void tryNewKeys(rem_port*);
+
 	void releaseKeys(FB_SIZE_T from);
+
 	Firebird::RefPtr<Config>* getConfig();
 
 	// Firebird::IClientBlock implementation
 	int release();
+
 	const char* getLogin();
+
 	const char* getPassword();
+
 	const unsigned char* getData(unsigned int* length);
+
 	void putData(Firebird::CheckStatusWrapper* status, unsigned int length, const void* data);
+
 	Firebird::ICryptKey* newKey(Firebird::CheckStatusWrapper* status);
 };//class ClntAuthBlock
 
