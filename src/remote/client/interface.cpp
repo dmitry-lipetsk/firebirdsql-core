@@ -7681,7 +7681,7 @@ int ClntAuthBlock::release()
 }//release
 
 //------------------------------------------------------------------------
-bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
+bool ClntAuthBlock::checkPluginName(const Firebird::PathName& nameToCheck)const
 {
 	Remote::ParsedList parsed;
 

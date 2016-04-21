@@ -729,7 +729,7 @@ public:
 	void loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*);
 	void extractDataFromPluginTo(Firebird::ClumpletWriter& user_id);
 	void resetClnt(const Firebird::PathName* fileName, const CSTRING* listStr = NULL);
-	bool checkPluginName(Firebird::PathName& nameToCheck);
+	bool checkPluginName(const Firebird::PathName& nameToCheck)const;
 	Firebird::PathName getPluginName();
 	void tryNewKeys(rem_port*);
 	void releaseKeys(unsigned from);
