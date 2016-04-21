@@ -7744,9 +7744,9 @@ void ClntAuthBlock::tryNewKeys(rem_port* const port)
 //------------------------------------------------------------------------
 void ClntAuthBlock::releaseKeys(FB_SIZE_T from)
 {
-	while (from < this->cryptKeys.getCount())
+	for (; from < this->cryptKeys.getCount(); ++from)
 	{
-		delete this->cryptKeys[from++];
+		delete this->cryptKeys[from];
 	}
 }//releaseKeys
 
