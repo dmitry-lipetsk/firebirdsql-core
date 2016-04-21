@@ -746,10 +746,13 @@ public:
 
 	void tryNewKeys(rem_port*);
 
+private:
 	void releaseKeys(FB_SIZE_T from);
 
+public:
 	Firebird::RefPtr<Config>* getConfig();
 
+public:
 	// Firebird::IClientBlock implementation
 	virtual int release() override final;
 
