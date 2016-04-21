@@ -7429,6 +7429,9 @@ static void cleanDpb(Firebird::ClumpletWriter& dpb, const ParametersSet* tags)
 
 } //namespace Remote
 
+////////////////////////////////////////////////////////////////////////////////
+//class ClntAuthBlock
+
 ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* const fileName,
                              Firebird::ClumpletReader* const dpb,
 							 const ParametersSet*      const tags)
@@ -7454,11 +7457,13 @@ ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* const fileName,
 	this->resetClnt(fileName);
 }
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::resetDataFromPlugin()
 {
 	this->dataFromPlugin.clear();
 }
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
 									        const ParametersSet* const tags,
 									        int                  const protocol)
@@ -7521,6 +7526,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
                     this->dataFromPlugin.getCount());
 }
 
+//------------------------------------------------------------------------
 static inline void makeUtfString(bool uft8Convert, Firebird::string& s)
 {
 	if (uft8Convert)
@@ -7531,6 +7537,7 @@ static inline void makeUtfString(bool uft8Convert, Firebird::string& s)
 	ISC_unescape(s);
 }//makeUtfString
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet* tags)
 {
 	bool uft8Convert = !dpb.find(tags->utf8_filename);
@@ -7575,6 +7582,7 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 	dpb.deleteWithTag(tags->password);
 }//loadClnt
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::extractDataFromPluginTo(CSTRING* to)
 {
 	to->cstr_length = (ULONG) this->dataFromPlugin.getCount();
@@ -7584,6 +7592,7 @@ void ClntAuthBlock::extractDataFromPluginTo(CSTRING* to)
 	to->cstr_allocated = 0;
 }//extractDataFromPluginTo
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 {
 	this->extractDataFromPluginTo(&to->p_data);
@@ -7621,16 +7630,19 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 	}
 }
 
+//------------------------------------------------------------------------
 const char* ClntAuthBlock::getLogin()
 {
 	return this->cliUserName.nullStr();
 }
 
+//------------------------------------------------------------------------
 const char* ClntAuthBlock::getPassword()
 {
 	return this->cliPassword.nullStr();
 }
 
+//------------------------------------------------------------------------
 const unsigned char* ClntAuthBlock::getData(unsigned int* length)
 {
 	(*length) = (ULONG) this->dataForPlugin.getCount();
@@ -7638,6 +7650,7 @@ const unsigned char* ClntAuthBlock::getData(unsigned int* length)
 	return (*length) ? this->dataForPlugin.begin() : NULL;
 }
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, const void* data)
 {
 	try
@@ -7652,6 +7665,7 @@ void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, con
 	}
 }
 
+//------------------------------------------------------------------------
 int ClntAuthBlock::release()
 {
 	if (--(this->refCounter) != 0)
@@ -7662,6 +7676,7 @@ int ClntAuthBlock::release()
 	return 0;
 }
 
+//------------------------------------------------------------------------
 bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 {
 	Remote::ParsedList parsed;
@@ -7679,6 +7694,7 @@ bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 	return false;
 }
 
+//------------------------------------------------------------------------
 Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 {
 	status->init();
@@ -7703,6 +7719,7 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 	return NULL;
 }
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::tryNewKeys(rem_port* port)
 {
 	for (unsigned k = 0; k < this->cryptKeys.getCount(); ++k)
@@ -7720,6 +7737,7 @@ void ClntAuthBlock::tryNewKeys(rem_port* port)
 	this->cryptKeys.clear();
 }
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::releaseKeys(unsigned from)
 {
 	while (from < this->cryptKeys.getCount())
@@ -7727,3 +7745,5 @@ void ClntAuthBlock::releaseKeys(unsigned from)
 		delete this->cryptKeys[from++];
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
