@@ -800,11 +800,14 @@ namespace
 		IPluginBase* getPlugin(CheckStatusWrapper* status);
 		void next(CheckStatusWrapper* status);
 
-		PluginSet(unsigned int pinterfaceType, const char* pnamesList,
+		PluginSet(unsigned int   pinterfaceType,
+                  const char*    pnamesList,
 				  IFirebirdConf* fbConf)
-			: interfaceType(pinterfaceType), namesList(getPool()),
-			  currentName(getPool()), currentPlugin(NULL),
-			  firebirdConf(fbConf)
+			: interfaceType(pinterfaceType)
+            , namesList(getPool())
+            , currentName(getPool())
+            , currentPlugin(NULL)
+            , firebirdConf(fbConf)
 		{
 			namesList.assign(pnamesList);
 			namesList.alltrim(" \t");
