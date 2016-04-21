@@ -7431,12 +7431,18 @@ static void cleanDpb(Firebird::ClumpletWriter& dpb, const ParametersSet* tags)
 
 ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* fileName, Firebird::ClumpletReader* dpb,
 							 const ParametersSet* tags)
-	: pluginList(getPool()), serverPluginList(getPool()),
-	  cliUserName(getPool()), cliPassword(getPool()), cliOrigUserName(getPool()),
-	  dataForPlugin(getPool()), dataFromPlugin(getPool()),
-	  cryptKeys(getPool()), dpbConfig(getPool()),
-	  hasCryptKey(false), plugins(IPluginManager::TYPE_AUTH_CLIENT),
-	  authComplete(false), firstTime(true)
+	: pluginList(getPool())
+    , serverPluginList(getPool())
+	, cliUserName(getPool())
+    , cliPassword(getPool())
+    , cliOrigUserName(getPool())
+    , dataForPlugin(getPool())
+    , dataFromPlugin(getPool())
+    , cryptKeys(getPool())
+    , dpbConfig(getPool())
+    , hasCryptKey(false)
+    , plugins(IPluginManager::TYPE_AUTH_CLIENT)
+    , authComplete(false), firstTime(true)
 {
 	if (dpb && tags && dpb->find(tags->config_text))
 	{
