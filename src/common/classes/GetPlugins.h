@@ -159,7 +159,8 @@ private:
 
 	void getPlugin()
 	{
-		currentPlugin = (P*) pluginSet->getPlugin(&status);
+		this->currentPlugin = (P*) this->pluginSet->getPlugin(&status);
+
 		check(&status);
 	}
 };//class GetPlugins
