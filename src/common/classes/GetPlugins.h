@@ -152,6 +152,8 @@ public:
 private:
 	void getPlugin()
 	{
+        fb_assert(this->pluginSet);
+
 		this->currentPlugin = (P*) this->pluginSet->getPlugin(&status);
 
 		check(&status);
