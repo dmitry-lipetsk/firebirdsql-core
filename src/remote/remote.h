@@ -751,17 +751,17 @@ public:
 	Firebird::RefPtr<Config>* getConfig();
 
 	// Firebird::IClientBlock implementation
-	int release();
+	virtual int release() override final;
 
-	const char* getLogin();
+	virtual const char* getLogin() override final;
 
-	const char* getPassword();
+	virtual const char* getPassword() override final;
 
-	const unsigned char* getData(unsigned int* length);
+	virtual const unsigned char* getData(unsigned int* length) override final;
 
-	void putData(Firebird::CheckStatusWrapper* status, unsigned int length, const void* data);
+	virtual void putData(Firebird::CheckStatusWrapper* status, unsigned int length, const void* data) override final;
 
-	Firebird::ICryptKey* newKey(Firebird::CheckStatusWrapper* status);
+	virtual Firebird::ICryptKey* newKey(Firebird::CheckStatusWrapper* status) override final;
 };//class ClntAuthBlock
 
 ////////////////////////////////////////////////////////////////////////////////
