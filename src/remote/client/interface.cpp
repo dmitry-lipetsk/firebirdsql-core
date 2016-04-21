@@ -7746,7 +7746,11 @@ void ClntAuthBlock::releaseKeys(FB_SIZE_T from)
 {
 	for (; from < this->cryptKeys.getCount(); ++from)
 	{
-		delete this->cryptKeys[from];
+		InternalCryptKey* const tmp=this->cryptKeys[from];
+        
+        this->cryptKeys[from]=nullptr;
+
+        delete tmp;
 	}
 }//releaseKeys
 
