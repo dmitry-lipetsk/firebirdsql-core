@@ -7448,6 +7448,7 @@ ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* fileName, Firebird::Clump
 	{
 		dpb->getString(dpbConfig);
 	}
+
 	resetClnt(fileName);
 }
 
@@ -7466,6 +7467,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 	}
 
 	PathName pluginName = getPluginName();
+
 	if (protocol >= PROTOCOL_VERSION13)
 	{
 		if (firstTime)
@@ -7478,7 +7480,9 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 			}
 
 			dpb.insertPath(tags->plugin_list, pluginList);
+
 			firstTime = false;
+
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: extractDataFromPluginTo: first time - added plugName & pluginList\n"));
 		}
@@ -7526,8 +7530,11 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 		if (t == tags->user_name)
 		{
 			dpb.getString(cliUserName);
+
 			makeUtfString(uft8Convert, cliUserName);
+
 			cliOrigUserName = cliUserName;
+
 			fb_utils::dpbItemUpper(cliUserName);
 
 			HANDSHAKE_DEBUG(fprintf(stderr, "Cli: loadClnt: Loaded from PB user = %s(was %s)\n",
@@ -7537,7 +7544,9 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
         if (t == tags->password)
 		{
 			dpb.getString(cliPassword);
+
 			makeUtfString(uft8Convert, cliPassword);
+
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: loadClnt: Loaded from PB cliPassword = %s\n", cliPassword.c_str()));
 		}
@@ -7545,6 +7554,7 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
         if (t == tags->encrypt_key)
 		{
 			hasCryptKey = true;
+
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: loadClnt: PB contains crypt key\n"));
 		}
@@ -7556,7 +7566,9 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 void ClntAuthBlock::extractDataFromPluginTo(CSTRING* to)
 {
 	to->cstr_length = (ULONG) dataFromPlugin.getCount();
+
 	to->cstr_address = dataFromPlugin.begin();
+
 	to->cstr_allocated = 0;
 }//extractDataFromPluginTo
 
@@ -7588,6 +7600,7 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 		HANDSHAKE_DEBUG(fprintf(stderr,
 			"Cli: extractDataFromPluginTo: added plugin list (%d len) to packet\n",
 			to->p_list.cstr_length));
+
 		firstTime = false;
 	}
 	else
@@ -7609,6 +7622,7 @@ const char* ClntAuthBlock::getPassword()
 const unsigned char* ClntAuthBlock::getData(unsigned int* length)
 {
 	*length = (ULONG) dataForPlugin.getCount();
+
 	return *length ? dataForPlugin.begin() : NULL;
 }
 
@@ -7638,7 +7652,9 @@ int ClntAuthBlock::release()
 bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 {
 	Remote::ParsedList parsed;
+
 	REMOTE_parseList(parsed, pluginList);
+
 	for (unsigned i = 0; i < parsed.getCount(); ++i)
 	{
 		if (parsed[i] == nameToCheck)
@@ -7658,7 +7674,9 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 		InternalCryptKey* k = FB_NEW InternalCryptKey;
 
 		fb_assert(plugins.hasData());
+
 		k->t = plugins.name();
+
 		cryptKeys.add(k);
 
 		return k;
@@ -7677,7 +7695,9 @@ void ClntAuthBlock::tryNewKeys(rem_port* port)
 		if (port->tryNewKey(cryptKeys[k]))
 		{
 			releaseKeys(k);
+
 			cryptKeys.clear();
+
 			return;
 		}
 	}
