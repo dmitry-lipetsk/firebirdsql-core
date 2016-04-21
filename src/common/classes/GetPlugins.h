@@ -39,6 +39,12 @@ namespace Firebird {
 template <typename P>
 class GetPlugins
 {
+private:
+    typedef GetPlugins<P>                   self_type;
+
+    GetPlugins(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	GetPlugins(unsigned int const interfaceType,
                const char*  const namesList = NULL)
