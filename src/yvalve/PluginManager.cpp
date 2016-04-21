@@ -798,6 +798,7 @@ namespace
 		}
 
 		IPluginBase* getPlugin(CheckStatusWrapper* status);
+
 		void next(CheckStatusWrapper* status);
 
 		PluginSet(unsigned int   pinterfaceType,
