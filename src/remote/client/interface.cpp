@@ -7514,8 +7514,8 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 	fb_assert(tags->trusted_auth);
 
 	dpb.insertBytes(tags->trusted_auth,
-                    dataFromPlugin.begin(),
-                    dataFromPlugin.getCount());
+                    this->dataFromPlugin.begin(),
+                    this->dataFromPlugin.getCount());
 }
 
 static inline void makeUtfString(bool uft8Convert, Firebird::string& s)
