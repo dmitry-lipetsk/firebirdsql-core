@@ -7471,16 +7471,20 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 		if (firstTime)
 		{
 			fb_assert(tags->plugin_name && tags->plugin_list);
+
 			if (pluginName.hasData())
 			{
 				dpb.insertPath(tags->plugin_name, pluginName);
 			}
+
 			dpb.insertPath(tags->plugin_list, pluginList);
 			firstTime = false;
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: extractDataFromPluginTo: first time - added plugName & pluginList\n"));
 		}
+
 		fb_assert(tags->specific_data);
+
 		dpb.insertBytes(tags->specific_data, dataFromPlugin.begin(), dataFromPlugin.getCount());
 
 		HANDSHAKE_DEBUG(fprintf(stderr,
@@ -7518,23 +7522,27 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 	for (dpb.rewind(); !dpb.isEof(); dpb.moveNext())
 	{
 		const UCHAR t = dpb.getClumpTag();
+
 		if (t == tags->user_name)
 		{
 			dpb.getString(cliUserName);
 			makeUtfString(uft8Convert, cliUserName);
 			cliOrigUserName = cliUserName;
 			fb_utils::dpbItemUpper(cliUserName);
+
 			HANDSHAKE_DEBUG(fprintf(stderr, "Cli: loadClnt: Loaded from PB user = %s(was %s)\n",
 				cliUserName.c_str(), cliOrigUserName.c_str()));
 		}
-		else if (t == tags->password)
+		else
+        if (t == tags->password)
 		{
 			dpb.getString(cliPassword);
 			makeUtfString(uft8Convert, cliPassword);
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: loadClnt: Loaded from PB cliPassword = %s\n", cliPassword.c_str()));
 		}
-		else if (t == tags->encrypt_key)
+		else
+        if (t == tags->encrypt_key)
 		{
 			hasCryptKey = true;
 			HANDSHAKE_DEBUG(fprintf(stderr,
@@ -7543,23 +7551,27 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 	}
 
 	dpb.deleteWithTag(tags->password);
-}
+}//loadClnt
 
 void ClntAuthBlock::extractDataFromPluginTo(CSTRING* to)
 {
 	to->cstr_length = (ULONG) dataFromPlugin.getCount();
 	to->cstr_address = dataFromPlugin.begin();
 	to->cstr_allocated = 0;
-}
+}//extractDataFromPluginTo
 
 void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 {
 	extractDataFromPluginTo(&to->p_data);
 
 	PathName pluginName = getPluginName();
+
 	to->p_name.cstr_length = (ULONG) pluginName.length();
+
 	to->p_name.cstr_address = FB_NEW_POOL(*getDefaultMemoryPool()) UCHAR[to->p_name.cstr_length];
+
 	to->p_name.cstr_allocated = to->p_name.cstr_length;
+
 	memcpy(to->p_name.cstr_address, pluginName.c_str(), to->p_name.cstr_length);
 
 	HANDSHAKE_DEBUG(fprintf(stderr, "Cli: extractDataFromPluginTo: added plugin name (%d) and data (%d)\n",
@@ -7568,8 +7580,11 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 	if (firstTime)
 	{
 		to->p_list.cstr_length = (ULONG) pluginList.length();
+
 		to->p_list.cstr_address = (UCHAR*) pluginList.c_str();
+
 		to->p_list.cstr_allocated = 0;
+
 		HANDSHAKE_DEBUG(fprintf(stderr,
 			"Cli: extractDataFromPluginTo: added plugin list (%d len) to packet\n",
 			to->p_list.cstr_length));
@@ -7602,6 +7617,7 @@ void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, con
 	try
 	{
 		void* to = dataFromPlugin.getBuffer(length);
+
 		memcpy(to, data, length);
 	}
 	catch (const Exception& ex)
@@ -7630,6 +7646,7 @@ bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 			return true;
 		}
 	}
+
 	return false;
 }
 
