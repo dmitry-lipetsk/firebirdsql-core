@@ -689,8 +689,10 @@ public:
 
 typedef Firebird::GetPlugins<Firebird::IClient> AuthClientPlugins;
 
+////////////////////////////////////////////////////////////////////////////////
 // Representation of authentication data, visible for plugin
 // Transfered in format, depending upon type of the packet (phase of handshake)
+
 class ClntAuthBlock FB_FINAL :
 	public Firebird::RefCntIface<Firebird::IClientBlockImpl<ClntAuthBlock, Firebird::CheckStatusWrapper> >
 {
@@ -742,7 +744,9 @@ public:
 	const unsigned char* getData(unsigned int* length);
 	void putData(Firebird::CheckStatusWrapper* status, unsigned int length, const void* data);
 	Firebird::ICryptKey* newKey(Firebird::CheckStatusWrapper* status);
-};
+};//class ClntAuthBlock
+
+////////////////////////////////////////////////////////////////////////////////
 
 // Representation of authentication data, visible for plugin
 // Transfered from client data in format, suitable for plugins access
