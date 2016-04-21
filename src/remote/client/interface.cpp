@@ -7501,7 +7501,10 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 	if (REMOTE_legacy_auth(pluginName.c_str(), PROTOCOL_VERSION10))	// dataFromPlugin is encrypted password
 	{
 		fb_assert(tags->password_enc);
-		dpb.insertBytes(tags->password_enc, dataFromPlugin.begin(), dataFromPlugin.getCount());
+
+		dpb.insertBytes(tags->password_enc,
+                        dataFromPlugin.begin(),
+                        dataFromPlugin.getCount());
 		return;
 	}
 
