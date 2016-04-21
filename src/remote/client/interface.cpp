@@ -7455,13 +7455,13 @@ ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* const fileName,
 	}
 
 	this->resetClnt(fileName);
-}
+}//ClntAuthBlock
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::resetDataFromPlugin()
 {
 	this->dataFromPlugin.clear();
-}
+}//resetDataFromPlugin
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
@@ -7524,7 +7524,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
 	dpb.insertBytes(tags->trusted_auth,
                     this->dataFromPlugin.begin(),
                     this->dataFromPlugin.getCount());
-}
+}//extractDataFromPluginTo
 
 //------------------------------------------------------------------------
 static inline void makeUtfString(bool uft8Convert, Firebird::string& s)
@@ -7628,19 +7628,19 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 	{
 		to->p_list.cstr_length = 0;
 	}
-}
+}//extractDataFromPluginTo
 
 //------------------------------------------------------------------------
 const char* ClntAuthBlock::getLogin()
 {
 	return this->cliUserName.nullStr();
-}
+}//getLogin
 
 //------------------------------------------------------------------------
 const char* ClntAuthBlock::getPassword()
 {
 	return this->cliPassword.nullStr();
-}
+}//getPassword
 
 //------------------------------------------------------------------------
 const unsigned char* ClntAuthBlock::getData(unsigned int* length)
@@ -7648,7 +7648,7 @@ const unsigned char* ClntAuthBlock::getData(unsigned int* length)
 	(*length) = (ULONG) this->dataForPlugin.getCount();
 
 	return (*length) ? this->dataForPlugin.begin() : NULL;
-}
+}//getData
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, const void* data)
@@ -7663,7 +7663,7 @@ void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, con
 	{
 		ex.stuffException(status);
 	}
-}
+}//putData
 
 //------------------------------------------------------------------------
 int ClntAuthBlock::release()
@@ -7674,7 +7674,7 @@ int ClntAuthBlock::release()
 	delete this;
 
 	return 0;
-}
+}//release
 
 //------------------------------------------------------------------------
 bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
@@ -7692,7 +7692,7 @@ bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 	}
 
 	return false;
-}
+}//checkPluginName
 
 //------------------------------------------------------------------------
 Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
@@ -7717,7 +7717,7 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 	}
 
 	return NULL;
-}
+}//newKey
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::tryNewKeys(rem_port* port)
@@ -7735,7 +7735,7 @@ void ClntAuthBlock::tryNewKeys(rem_port* port)
 	}
 
 	this->cryptKeys.clear();
-}
+}//tryNewKeys
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::releaseKeys(unsigned from)
@@ -7744,6 +7744,6 @@ void ClntAuthBlock::releaseKeys(unsigned from)
 	{
 		delete this->cryptKeys[from++];
 	}
-}
+}//releaseKeys
 
 ////////////////////////////////////////////////////////////////////////////////
