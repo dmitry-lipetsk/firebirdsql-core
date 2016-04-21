@@ -7449,28 +7449,28 @@ ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* fileName, Firebird::Clump
 		dpb->getString(dpbConfig);
 	}
 
-	resetClnt(fileName);
+	this->resetClnt(fileName);
 }
 
 void ClntAuthBlock::resetDataFromPlugin()
 {
-	dataFromPlugin.clear();
+	this->dataFromPlugin.clear();
 }
 
 void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 									  const ParametersSet* tags,
 									  int protocol)
 {
-	if (!dataFromPlugin.hasData())
+	if (!this->dataFromPlugin.hasData())
 	{
 		return;
 	}
 
-	PathName pluginName = getPluginName();
+	PathName pluginName = this->getPluginName();
 
 	if (protocol >= PROTOCOL_VERSION13)
 	{
-		if (firstTime)
+		if (this->firstTime)
 		{
 			fb_assert(tags->plugin_name && tags->plugin_list);
 
@@ -7481,7 +7481,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 
 			dpb.insertPath(tags->plugin_list, pluginList);
 
-			firstTime = false;
+			this->firstTime = false;
 
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: extractDataFromPluginTo: first time - added plugName & pluginList\n"));
@@ -7503,8 +7503,8 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 		fb_assert(tags->password_enc);
 
 		dpb.insertBytes(tags->password_enc,
-                        dataFromPlugin.begin(),
-                        dataFromPlugin.getCount());
+                        this->dataFromPlugin.begin(),
+                        this->dataFromPlugin.getCount());
 		return;
 	}
 
@@ -7532,11 +7532,11 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 
 		if (t == tags->user_name)
 		{
-			dpb.getString(cliUserName);
+			dpb.getString(this->cliUserName);
 
-			makeUtfString(uft8Convert, cliUserName);
+			makeUtfString(uft8Convert, this->cliUserName);
 
-			cliOrigUserName = cliUserName;
+			this->cliOrigUserName = cliUserName;
 
 			fb_utils::dpbItemUpper(cliUserName);
 
@@ -7546,9 +7546,9 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 		else
         if (t == tags->password)
 		{
-			dpb.getString(cliPassword);
+			dpb.getString(this->cliPassword);
 
-			makeUtfString(uft8Convert, cliPassword);
+			makeUtfString(uft8Convert, this->cliPassword);
 
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: loadClnt: Loaded from PB cliPassword = %s\n", cliPassword.c_str()));
@@ -7556,7 +7556,7 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 		else
         if (t == tags->encrypt_key)
 		{
-			hasCryptKey = true;
+			this->hasCryptKey = true;
 
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: loadClnt: PB contains crypt key\n"));
@@ -7568,16 +7568,16 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*
 
 void ClntAuthBlock::extractDataFromPluginTo(CSTRING* to)
 {
-	to->cstr_length = (ULONG) dataFromPlugin.getCount();
+	to->cstr_length = (ULONG) this->dataFromPlugin.getCount();
 
-	to->cstr_address = dataFromPlugin.begin();
+	to->cstr_address = this->dataFromPlugin.begin();
 
 	to->cstr_allocated = 0;
 }//extractDataFromPluginTo
 
 void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 {
-	extractDataFromPluginTo(&to->p_data);
+	this->extractDataFromPluginTo(&to->p_data);
 
 	PathName pluginName = getPluginName();
 
@@ -7592,7 +7592,7 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 	HANDSHAKE_DEBUG(fprintf(stderr, "Cli: extractDataFromPluginTo: added plugin name (%d) and data (%d)\n",
 				to->p_name.cstr_length, to->p_data.cstr_length));
 
-	if (firstTime)
+	if (this->firstTime)
 	{
 		to->p_list.cstr_length = (ULONG) pluginList.length();
 
@@ -7604,7 +7604,7 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 			"Cli: extractDataFromPluginTo: added plugin list (%d len) to packet\n",
 			to->p_list.cstr_length));
 
-		firstTime = false;
+		this->firstTime = false;
 	}
 	else
 	{
@@ -7614,26 +7614,26 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* to)
 
 const char* ClntAuthBlock::getLogin()
 {
-	return cliUserName.nullStr();
+	return this->cliUserName.nullStr();
 }
 
 const char* ClntAuthBlock::getPassword()
 {
-	return cliPassword.nullStr();
+	return this->cliPassword.nullStr();
 }
 
 const unsigned char* ClntAuthBlock::getData(unsigned int* length)
 {
-	*length = (ULONG) dataForPlugin.getCount();
+	(*length) = (ULONG) this->dataForPlugin.getCount();
 
-	return *length ? dataForPlugin.begin() : NULL;
+	return (*length) ? this->dataForPlugin.begin() : NULL;
 }
 
 void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, const void* data)
 {
 	try
 	{
-		void* to = dataFromPlugin.getBuffer(length);
+		void* to = this->dataFromPlugin.getBuffer(length);
 
 		memcpy(to, data, length);
 	}
@@ -7645,7 +7645,7 @@ void ClntAuthBlock::putData(CheckStatusWrapper* status, unsigned int length, con
 
 int ClntAuthBlock::release()
 {
-	if (--refCounter != 0)
+	if (--(this->refCounter) != 0)
 		return 1;
 
 	delete this;
@@ -7656,7 +7656,7 @@ bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 {
 	Remote::ParsedList parsed;
 
-	REMOTE_parseList(parsed, pluginList);
+	REMOTE_parseList(parsed, this->pluginList);
 
 	for (unsigned i = 0; i < parsed.getCount(); ++i)
 	{
@@ -7676,11 +7676,11 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 	{
 		InternalCryptKey* k = FB_NEW InternalCryptKey;
 
-		fb_assert(plugins.hasData());
+		fb_assert(this->plugins.hasData());
 
-		k->t = plugins.name();
+		k->t = this->plugins.name();
 
-		cryptKeys.add(k);
+		this->cryptKeys.add(k);
 
 		return k;
 	}
@@ -7693,25 +7693,25 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 
 void ClntAuthBlock::tryNewKeys(rem_port* port)
 {
-	for (unsigned k = 0; k < cryptKeys.getCount(); ++k)
+	for (unsigned k = 0; k < this->cryptKeys.getCount(); ++k)
 	{
 		if (port->tryNewKey(cryptKeys[k]))
 		{
-			releaseKeys(k);
+			this->releaseKeys(k);
 
-			cryptKeys.clear();
+			this->cryptKeys.clear();
 
 			return;
 		}
 	}
 
-	cryptKeys.clear();
+	this->cryptKeys.clear();
 }
 
 void ClntAuthBlock::releaseKeys(unsigned from)
 {
-	while (from < cryptKeys.getCount())
+	while (from < this->cryptKeys.getCount())
 	{
-		delete cryptKeys[from++];
+		delete this->cryptKeys[from++];
 	}
 }
