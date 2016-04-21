@@ -7442,7 +7442,8 @@ ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* fileName, Firebird::Clump
     , dpbConfig(getPool())
     , hasCryptKey(false)
     , plugins(IPluginManager::TYPE_AUTH_CLIENT)
-    , authComplete(false), firstTime(true)
+    , authComplete(false)
+    , firstTime(true)
 {
 	if (dpb && tags && dpb->find(tags->config_text))
 	{
@@ -7509,8 +7510,12 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
 	}
 
 	fb_assert(REMOTE_legacy_auth(pluginName.c_str(), protocol));		// dataFromPlugin must be trustedAuth
+
 	fb_assert(tags->trusted_auth);
-	dpb.insertBytes(tags->trusted_auth, dataFromPlugin.begin(), dataFromPlugin.getCount());
+
+	dpb.insertBytes(tags->trusted_auth,
+                    dataFromPlugin.begin(),
+                    dataFromPlugin.getCount());
 }
 
 static inline void makeUtfString(bool uft8Convert, Firebird::string& s)
@@ -7649,6 +7654,7 @@ int ClntAuthBlock::release()
 		return 1;
 
 	delete this;
+
 	return 0;
 }
 
@@ -7672,6 +7678,7 @@ bool ClntAuthBlock::checkPluginName(Firebird::PathName& nameToCheck)
 Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 {
 	status->init();
+
 	try
 	{
 		InternalCryptKey* k = FB_NEW InternalCryptKey;
@@ -7688,6 +7695,7 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* status)
 	{
 		ex.stuffException(status);
 	}
+
 	return NULL;
 }
 
