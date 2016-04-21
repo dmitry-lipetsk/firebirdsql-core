@@ -721,7 +721,7 @@ public:
 
 	~ClntAuthBlock()
 	{
-		releaseKeys(0);
+		this->releaseKeys(0);
 	}
 
 	void storeDataForPlugin(unsigned int length, const unsigned char* data);
