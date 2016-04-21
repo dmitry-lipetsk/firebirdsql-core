@@ -732,7 +732,7 @@ public:
 	bool checkPluginName(const Firebird::PathName& nameToCheck)const;
 	Firebird::PathName getPluginName();
 	void tryNewKeys(rem_port*);
-	void releaseKeys(unsigned from);
+	void releaseKeys(FB_SIZE_T from);
 	Firebird::RefPtr<Config>* getConfig();
 
 	// Firebird::IClientBlock implementation

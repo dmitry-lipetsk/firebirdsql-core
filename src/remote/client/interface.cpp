@@ -7726,7 +7726,7 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* const status)
 //------------------------------------------------------------------------
 void ClntAuthBlock::tryNewKeys(rem_port* const port)
 {
-	for (unsigned k = 0; k < this->cryptKeys.getCount(); ++k)
+	for (FB_SIZE_T k = 0; k < this->cryptKeys.getCount(); ++k)
 	{
 		if (port->tryNewKey(cryptKeys[k]))
 		{
@@ -7742,7 +7742,7 @@ void ClntAuthBlock::tryNewKeys(rem_port* const port)
 }//tryNewKeys
 
 //------------------------------------------------------------------------
-void ClntAuthBlock::releaseKeys(unsigned from)
+void ClntAuthBlock::releaseKeys(FB_SIZE_T from)
 {
 	while (from < this->cryptKeys.getCount())
 	{
