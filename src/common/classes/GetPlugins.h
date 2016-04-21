@@ -40,83 +40,106 @@ template <typename P>
 class GetPlugins
 {
 public:
-	GetPlugins(unsigned int interfaceType, const char* namesList = NULL)
-		: masterInterface(), pluginInterface(),
-		  pluginSet(NULL), currentPlugin(NULL),
-		  ls(*getDefaultMemoryPool()), status(&ls)
+	GetPlugins(unsigned int const interfaceType,
+               const char*  const namesList = NULL)
+		: masterInterface()
+        , pluginInterface()
+        , pluginSet(NULL)
+        , currentPlugin(NULL)
+        , ls(*getDefaultMemoryPool())
+        , status(&ls)
 	{
-		pluginSet.assignRefNoIncr(pluginInterface->getPlugins(&status, interfaceType,
+		this->pluginSet.assignRefNoIncr
+         (this->pluginInterface->getPlugins
+           (&status,
+            interfaceType,
 			(namesList ? namesList : Config::getDefaultConfig()->getPlugins(interfaceType)),
 			NULL));
+
 		check(&status);
 
-		getPlugin();
+		this->getPlugin();
 	}
 
-	GetPlugins(unsigned int interfaceType,
-			   Config* knownConfig, const char* namesList = NULL)
-		: masterInterface(), pluginInterface(),
-		  pluginSet(NULL), currentPlugin(NULL),
-		  ls(*getDefaultMemoryPool()), status(&ls)
+	GetPlugins(unsigned int const interfaceType,
+			   Config*      const knownConfig,
+               const char*  const namesList = NULL)
+		: masterInterface()
+        , pluginInterface()
+        , pluginSet(NULL)
+        , currentPlugin(NULL)
+        , ls(*getDefaultMemoryPool())
+        , status(&ls)
 	{
         /*const*/ RefPtr<IFirebirdConf>
          spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
 
-		pluginSet.assignRefNoIncr(pluginInterface->getPlugins(&status, interfaceType,
+		this->pluginSet.assignRefNoIncr
+         (this->pluginInterface->getPlugins
+           (&status,
+            interfaceType,
 			(namesList ? namesList : knownConfig->getPlugins(interfaceType)),
-			 spCfg));
+  		    spCfg));
+
 		check(&status);
 
-		getPlugin();
+		this->getPlugin();
 	}
 
 	bool hasData() const
 	{
-		return currentPlugin;
+		return this->currentPlugin;
 	}
 
 	const char* name() const
 	{
-		return hasData() ? pluginSet->getName() : NULL;
+		return this->hasData() ? this->pluginSet->getName() : NULL;
 	}
 
 	P* plugin() const
 	{
-		return currentPlugin;
+		return this->currentPlugin;
 	}
 
 	void next()
 	{
-		if (hasData())
+		if (this->hasData())
 		{
-			pluginInterface->releasePlugin(currentPlugin);
-			currentPlugin = NULL;
+			this->pluginInterface->releasePlugin(currentPlugin);
+			
+            this->currentPlugin = NULL;
 
-			pluginSet->next(&status);
+			this->pluginSet->next(&status);
+
 			check(&status);
-			getPlugin();
+
+			this->getPlugin();
 		}
 	}
 
 	void set(const char* newName)
 	{
-		if (hasData())
+		if (this->hasData())
 		{
-			pluginInterface->releasePlugin(currentPlugin);
-			currentPlugin = NULL;
+			this->pluginInterface->releasePlugin(currentPlugin);
+
+			this->currentPlugin = NULL;
 		}
 
-		pluginSet->set(&status, newName);
+		this->pluginSet->set(&status, newName);
+
 		check(&status);
-		getPlugin();
+
+		this->getPlugin();
 	}
 
 	~GetPlugins()
 	{
-		if (hasData())
+		if (this->hasData())
 		{
-			pluginInterface->releasePlugin(currentPlugin);
-			currentPlugin = NULL;
+			this->pluginInterface->releasePlugin(currentPlugin);
+
+			this->currentPlugin = NULL;
 		}
 	}
 
