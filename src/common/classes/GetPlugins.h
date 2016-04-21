@@ -59,7 +59,7 @@ public:
 		check(&status);
 
 		this->getPlugin();
-	}
+	}//GetPlugins
 
 	GetPlugins(unsigned int const interfaceType,
 			   Config*      const knownConfig,
@@ -84,7 +84,7 @@ public:
 		check(&status);
 
 		this->getPlugin();
-	}
+	}//GetPlugins
 
 	bool hasData() const
 	{
@@ -115,7 +115,7 @@ public:
 
 			this->getPlugin();
 		}
-	}
+	}//next
 
 	void set(const char* newName)
 	{
@@ -131,7 +131,7 @@ public:
 		check(&status);
 
 		this->getPlugin();
-	}
+	}//set
 
 	~GetPlugins()
 	{
@@ -141,7 +141,7 @@ public:
 
 			this->currentPlugin = NULL;
 		}
-	}
+	}//~GetPlugins()
 
 private:
 	MasterInterfacePtr masterInterface;
@@ -156,7 +156,7 @@ private:
 		currentPlugin = (P*) pluginSet->getPlugin(&status);
 		check(&status);
 	}
-};
+};//class GetPlugins
 
 } // namespace Firebird
 
