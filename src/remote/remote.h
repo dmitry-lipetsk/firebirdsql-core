@@ -715,6 +715,7 @@ public:
 	bool authComplete;						// Set as response from client that authentication accepted
 	bool firstTime;							// Invoked first time after reset
 
+public:
 	ClntAuthBlock(const Firebird::PathName* fileName, Firebird::ClumpletReader* dpb,
 		const ParametersSet* tags);
 
