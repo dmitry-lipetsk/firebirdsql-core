@@ -150,19 +150,20 @@ public:
 	}//~GetPlugins()
 
 private:
-	MasterInterfacePtr masterInterface;
-	PluginManagerInterfacePtr pluginInterface;
-	RefPtr<IPluginSet> pluginSet;
-	P* currentPlugin;
-	LocalStatus ls;
-	CheckStatusWrapper status;
-
 	void getPlugin()
 	{
 		this->currentPlugin = (P*) this->pluginSet->getPlugin(&status);
 
 		check(&status);
 	}
+
+private:
+	MasterInterfacePtr masterInterface;
+	PluginManagerInterfacePtr pluginInterface;
+	RefPtr<IPluginSet> pluginSet;
+	P* currentPlugin;
+	LocalStatus ls;
+	CheckStatusWrapper status;
 };//class GetPlugins
 
 } // namespace Firebird
