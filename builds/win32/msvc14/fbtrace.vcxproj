@@ -101,7 +101,6 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;DEV_BUILD;_WINDOWS;_USRDLL;SUPERCLIENT;FBTRACE_EXPORTS;NAMESPACE=Vulcan;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>mpr.lib;%(AdditionalDependencies)</AdditionalDependencies>
