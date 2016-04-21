@@ -147,7 +147,7 @@ public:
 
 			this->currentPlugin = NULL;
 		}
-	}//~GetPlugins()
+	}//~GetPlugins
 
 private:
 	void getPlugin()
@@ -155,7 +155,7 @@ private:
 		this->currentPlugin = (P*) this->pluginSet->getPlugin(&status);
 
 		check(&status);
-	}
+	}//getPlugin
 
 private:
 	MasterInterfacePtr masterInterface;
