@@ -7492,7 +7492,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
 
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: extractDataFromPluginTo: first time - added plugName & pluginList\n"));
-		}
+		}//if this->firstTime
 
 		fb_assert(tags->specific_data);
 
@@ -7505,7 +7505,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
 			static_cast<unsigned>(dataFromPlugin.getCount()), tags->specific_data));
 
 		return;
-	}
+	}//if protocol >= PROTOCOL_VERSION13
 
 	if (REMOTE_legacy_auth(pluginName.c_str(), PROTOCOL_VERSION10))	// dataFromPlugin is encrypted password
 	{
@@ -7515,7 +7515,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
                         this->dataFromPlugin.begin(),
                         this->dataFromPlugin.getCount());
 		return;
-	}
+	}//if REMOTE_legacy_auth
 
 	fb_assert(REMOTE_legacy_auth(pluginName.c_str(), protocol));		// dataFromPlugin must be trustedAuth
 
@@ -7579,7 +7579,7 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter&  dpb,
 			HANDSHAKE_DEBUG(fprintf(stderr,
 				"Cli: loadClnt: PB contains crypt key\n"));
 		}
-	}
+	}//for
 
 	dpb.deleteWithTag(tags->password);
 }//loadClnt
@@ -7693,7 +7693,7 @@ bool ClntAuthBlock::checkPluginName(const Firebird::PathName& nameToCheck)const
 		{
 			return true;
 		}
-	}
+	}//for
 
 	return false;
 }//checkPluginName
@@ -7736,7 +7736,7 @@ void ClntAuthBlock::tryNewKeys(rem_port* const port)
 
 			return;
 		}
-	}
+	}//for
 
 	this->cryptKeys.clear();
 }//tryNewKeys
@@ -7751,7 +7751,7 @@ void ClntAuthBlock::releaseKeys(FB_SIZE_T from)
         this->cryptKeys[from]=nullptr;
 
         delete tmp;
-	}
+	}//for
 }//releaseKeys
 
 ////////////////////////////////////////////////////////////////////////////////
