@@ -7429,8 +7429,9 @@ static void cleanDpb(Firebird::ClumpletWriter& dpb, const ParametersSet* tags)
 
 } //namespace Remote
 
-ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* fileName, Firebird::ClumpletReader* dpb,
-							 const ParametersSet* tags)
+ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* const fileName,
+                             Firebird::ClumpletReader* const dpb,
+							 const ParametersSet*      const tags)
 	: pluginList(getPool())
     , serverPluginList(getPool())
 	, cliUserName(getPool())
@@ -7458,9 +7459,9 @@ void ClntAuthBlock::resetDataFromPlugin()
 	this->dataFromPlugin.clear();
 }
 
-void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& dpb,
-									  const ParametersSet* tags,
-									  int protocol)
+void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter&  dpb,
+									        const ParametersSet* const tags,
+									        int                  const protocol)
 {
 	if (!this->dataFromPlugin.hasData())
 	{
