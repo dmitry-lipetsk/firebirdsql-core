@@ -47,12 +47,14 @@ class ConfigImpl : public Firebird::PermanentStorage
 {
 public:
 	explicit ConfigImpl(Firebird::MemoryPool& p)
-		: Firebird::PermanentStorage(p), missConf(false)
+		: Firebird::PermanentStorage(p)
+        , missConf(false)
 	{
 		try
 		{
 			ConfigFile file(fb_utils::getPrefix(Firebird::IConfigManager::DIR_CONF, CONFIG_FILE),
-				ConfigFile::ERROR_WHEN_MISS);
+				            ConfigFile::ERROR_WHEN_MISS);
+
 			defaultConfig = FB_NEW Config(file);
 		}
 		catch (const Firebird::status_exception& ex)
@@ -65,9 +67,10 @@ public:
 			missConf = true;
 
 			ConfigFile file(ConfigFile::USE_TEXT, "");
+
 			defaultConfig = FB_NEW Config(file);
-		}
-	}
+		}//catch
+	}//ConfigImpl
 
 /*	void changeDefaultConfig(Config* newConfig)
 	{
