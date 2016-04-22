@@ -90,6 +90,9 @@ namespace Firebird
 	template <typename T>
 	class RefPtr
 	{
+    private:
+        typedef RefPtr<T>                   self_type;
+
 	public:
 		RefPtr() : ptr(NULL)
 		{ }
@@ -123,21 +126,21 @@ namespace Firebird
 			}
 		}//~RefPtr
 
-		T* assignRefNoIncr(T* p)
+		self_type& assignRefNoIncr(T* p)
 		{
 			this->assign(NULL);
 
 			this->ptr = p;
 
-			return this->ptr;
+			return *this;
 		}//assignRefNoIncr
 
-		T* operator = (T* p)
+		self_type& operator = (T* p)
 		{
 			return this->assign(p);
 		}
 
-		T* operator = (const RefPtr& r)
+		self_type& operator = (const RefPtr& r)
 		{
 			return this->assign(r.ptr);
 		}
@@ -163,7 +166,7 @@ namespace Firebird
 		}
 
 	private:
-		T* assign(T* const p)
+		self_type& assign(T* const p)
 		{
 			if (this->ptr != p)
 			{
@@ -181,7 +184,7 @@ namespace Firebird
 				}
 			}//if
 
-			return this->ptr;
+			return *this;
 		}//assign
 
         template<typename T1>
