@@ -227,31 +227,38 @@ public:
         , flag(false)
 	{ }
 
-	T& operator()()
+	T& operator () ()
 	{
 		if (!this->flag)
 		{
 			MutexLockGuard guard(*StaticMutex::mutex, "InitInstance");
+
 			if (!this->flag)
 			{
 				this->instance = this->allocator.create();
+
 				this->flag = true;
+
 				// Put ourselves into linked list for cleanup.
 				// Allocated pointer is saved by InstanceList::constructor.
 				FB_NEW InstanceControl::InstanceLink<InitInstance>(this);
 			}
 		}
+
 		return *this->instance;
-	}
+	}//operator ()
 
 	void dtor()
 	{
 		MutexLockGuard guard(*StaticMutex::mutex, "InitInstance - dtor");
+
 		this->flag = false;
+
 		A::destroy(this->instance);
+
 		this->instance = NULL;
-	}
-};
+	}//dtor
+};//class InitInstance
 
 // Static - create instance of some class in static char[] buffer. Never destroy it.
 
