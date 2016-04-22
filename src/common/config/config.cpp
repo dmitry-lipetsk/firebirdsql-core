@@ -96,15 +96,17 @@ public:
 	Firebird::IFirebirdConf* getFirebirdConf()
 	{
 		Firebird::IFirebirdConf* rc = FB_NEW FirebirdConf(this->defaultConfig);
+
 		rc->addRef();
+
 		return rc;
-	}
+	}//getFirebirdConf
 
 private:
 	Firebird::RefPtr<Config> defaultConfig;
 
 	bool missConf;
-};
+};//class ConfigImpl
 
 /******************************************************************************
  *
