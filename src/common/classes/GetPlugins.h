@@ -77,7 +77,7 @@ public:
         , ls(*getDefaultMemoryPool())
         , status(&ls)
 	{
-        /*const*/ RefPtr<IFirebirdConf>
+        const RefPtr<IFirebirdConf>
          spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
 
 		this->pluginSet.assignRefNoIncr
