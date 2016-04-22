@@ -47,7 +47,7 @@ private:
 
 public:
 	GetPlugins(unsigned int const interfaceType,
-               const char*  const namesList = NULL)
+               const char*        namesList = NULL)
 		: masterInterface()
         , pluginInterface()
         , pluginSet(NULL)
@@ -55,11 +55,16 @@ public:
         , ls(*getDefaultMemoryPool())
         , status(&ls)
 	{
+        if(!namesList)
+        {
+            namesList=Config::getDefaultConfig()->getPlugins(interfaceType);
+        }//if
+
 		this->pluginSet.assignRefNoIncr
          (this->pluginInterface->getPlugins
            (&status,
             interfaceType,
-			(namesList ? namesList : Config::getDefaultConfig()->getPlugins(interfaceType)),
+			namesList,
 			NULL));
 
 		check(&status);
@@ -69,7 +74,7 @@ public:
 
 	GetPlugins(unsigned int const interfaceType,
 			   Config*      const knownConfig,
-               const char*  const namesList = NULL)
+               const char*        namesList = NULL)
 		: masterInterface()
         , pluginInterface()
         , pluginSet(NULL)
@@ -80,11 +85,18 @@ public:
         const RefPtr<IFirebirdConf>
          spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
 
+        if(!namesList)
+        {
+            fb_assert(knownConfig);
+
+            namesList=knownConfig->getPlugins(interfaceType);
+        }//if
+
 		this->pluginSet.assignRefNoIncr
          (this->pluginInterface->getPlugins
            (&status,
             interfaceType,
-			(namesList ? namesList : knownConfig->getPlugins(interfaceType)),
+			namesList,
   		    spCfg));
 
 		check(&status);
