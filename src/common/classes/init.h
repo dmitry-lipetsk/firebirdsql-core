@@ -225,7 +225,7 @@ private:
 
 public:
 	InitInstance()
-		: instance(NULL)
+		: instance(nullptr)
         , flag(false)
 	{ }
 
