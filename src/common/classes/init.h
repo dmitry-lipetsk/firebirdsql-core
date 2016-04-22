@@ -223,32 +223,33 @@ private:
 
 public:
 	InitInstance()
-		: instance(NULL), flag(false)
+		: instance(NULL)
+        , flag(false)
 	{ }
 
 	T& operator()()
 	{
-		if (!flag)
+		if (!this->flag)
 		{
 			MutexLockGuard guard(*StaticMutex::mutex, "InitInstance");
-			if (!flag)
+			if (!this->flag)
 			{
-				instance = allocator.create();
-				flag = true;
+				this->instance = this->allocator.create();
+				this->flag = true;
 				// Put ourselves into linked list for cleanup.
 				// Allocated pointer is saved by InstanceList::constructor.
 				FB_NEW InstanceControl::InstanceLink<InitInstance>(this);
 			}
 		}
-		return *instance;
+		return *this->instance;
 	}
 
 	void dtor()
 	{
 		MutexLockGuard guard(*StaticMutex::mutex, "InitInstance - dtor");
-		flag = false;
-		A::destroy(instance);
-		instance = NULL;
+		this->flag = false;
+		A::destroy(this->instance);
+		this->instance = NULL;
 	}
 };
 
