@@ -218,9 +218,9 @@ Config::Config(const ConfigFile& file)
 	{
 		this->values[i] = entries[i].default_value;
 
-		if (entries[i].data_type == TYPE_STRING && values[i])
+		if (entries[i].data_type == TYPE_STRING && this->values[i])
 		{
-			ConfigFile::String expand((const char*)values[i]);
+			ConfigFile::String expand((const char*)this->values[i]);
 
 			if (file.macroParse(expand, NULL) && expand != (const char*) values[i])
 			{
