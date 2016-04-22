@@ -98,8 +98,8 @@ public:
 				link->dtor();
 				link = NULL;
 			}
-		}
-	};
+		}//dtor
+	};//class InstanceLink
 
 public:
 	static void destructors();
