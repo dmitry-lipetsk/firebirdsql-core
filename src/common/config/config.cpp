@@ -217,13 +217,16 @@ Config::Config(const ConfigFile& file)
 	for (unsigned int i = 0; i < MAX_CONFIG_KEY; i++)
 	{
 		this->values[i] = entries[i].default_value;
+
 		if (entries[i].data_type == TYPE_STRING && values[i])
 		{
 			ConfigFile::String expand((const char*)values[i]);
 			if (file.macroParse(expand, NULL) && expand != (const char*) values[i])
 			{
 				ConfigFile::String& saved(tempStrings.add());
+
 				saved = expand;
+
 				this->values[i] = (ConfigValue) saved.c_str();
 			}
 		}
@@ -264,6 +267,7 @@ void Config::notify()
 {
 	if (!notifyDatabase.hasData())
 		return;
+
 	if (notifyDatabaseName(notifyDatabase))
 		notifyDatabase.erase();
 }
@@ -273,6 +277,7 @@ void Config::merge(Firebird::RefPtr<Config>& config, const Firebird::string* dpb
 	if (dpbConfig && dpbConfig->hasData())
 	{
 		ConfigFile txtStream(ConfigFile::USE_TEXT, dpbConfig->c_str());
+
 		config = FB_NEW Config(txtStream, *(config.hasData() ? config : getDefaultConfig()));
 	}
 }
@@ -309,12 +314,15 @@ void Config::loadValues(const ConfigFile& file)
 		if (entry.data_type == TYPE_STRING && values[i] != entry.default_value)
 		{
 			const char* src = (const char*) values[i];
+
 			char* dst = FB_NEW_POOL(getPool()) char[strlen(src) + 1];
+
 			strcpy(dst, src);
+
 			values[i] = (ConfigValue) dst;
 		}
-	}
-}
+	}//for
+}//loadValues
 
 Config::~Config()
 {
@@ -333,8 +341,8 @@ Config::~Config()
 		//case TYPE_STRING_VECTOR:
 		//	break;
 		}
-	}
-}
+	}//for
+}//~Config
 
 
 /******************************************************************************
