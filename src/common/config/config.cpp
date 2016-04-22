@@ -45,6 +45,12 @@ namespace {
 
 class ConfigImpl : public Firebird::PermanentStorage
 {
+private:
+    typedef ConfigImpl                      self_type;
+
+    ConfigImpl(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	explicit ConfigImpl(Firebird::MemoryPool& p)
 		: Firebird::PermanentStorage(p)
@@ -96,9 +102,6 @@ public:
 
 private:
 	Firebird::RefPtr<Config> defaultConfig;
-
-    ConfigImpl(const ConfigImpl&);
-    void operator=(const ConfigImpl&);
 
 	bool missConf;
 };
