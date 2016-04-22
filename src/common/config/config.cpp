@@ -837,20 +837,23 @@ const char* Config::getSecurityDatabase() const
 int Config::getWireCrypt(WireCryptMode wcMode) const
 {
 	const char* wc = get<const char*>(KEY_WIRE_CRYPT);
+
 	if (!wc)
 	{
 		return wcMode == WC_CLIENT ? WIRE_CRYPT_ENABLED : WIRE_CRYPT_REQUIRED;
 	}
 
 	Firebird::NoCaseString wireCrypt(wc);
+
 	if (wireCrypt == "DISABLED")
 		return WIRE_CRYPT_DISABLED;
+
 	if (wireCrypt == "ENABLED")
 		return WIRE_CRYPT_ENABLED;
 
 	// the safest choice
 	return WIRE_CRYPT_REQUIRED;
-}
+}//getWireCrypt
 
 //------------------------------------------------------------------------
 bool Config::getRemoteAccess() const
