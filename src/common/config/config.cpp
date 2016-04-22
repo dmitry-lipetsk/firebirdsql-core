@@ -85,7 +85,7 @@ public:
  */
 	const Firebird::RefPtr<Config>& getDefaultConfig() const
 	{
-		return defaultConfig;
+		return this->defaultConfig;
 	}
 
 	bool missFirebirdConf() const
@@ -95,7 +95,7 @@ public:
 
 	Firebird::IFirebirdConf* getFirebirdConf()
 	{
-		Firebird::IFirebirdConf* rc = FB_NEW FirebirdConf(defaultConfig);
+		Firebird::IFirebirdConf* rc = FB_NEW FirebirdConf(this->defaultConfig);
 		rc->addRef();
 		return rc;
 	}
