@@ -98,7 +98,7 @@ namespace Firebird
 		{
 			if (ptr)
 			{
-				ptr->addRef();
+				helper__addRef(ptr);
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace Firebird
 		{
 			if (ptr)
 			{
-				ptr->addRef();
+				helper__addRef(ptr);
 			}
 		}
 
@@ -119,7 +119,7 @@ namespace Firebird
 		{
 			if (ptr)
 			{
-				ptr->release();
+				helper__release(ptr);
 			}
 		}
 
@@ -140,22 +140,12 @@ namespace Firebird
 			return assign(r.ptr);
 		}
 
-		operator T*()
+		operator T*() const
 		{
 			return ptr;
 		}
 
-		T* operator->()
-		{
-			return ptr;
-		}
-
-		operator const T*() const
-		{
-			return ptr;
-		}
-
-		const T* operator->() const
+		T* operator->() const
 		{
 			return ptr;
 		}
@@ -173,22 +163,22 @@ namespace Firebird
 			return ptr ? true : false;
 		}
 
-		bool operator !() const
-		{
-			return !ptr;
-		}
+		//bool operator !() const
+		//{
+		//	return !ptr;
+		//}
 
-		bool operator ==(const RefPtr& r) const
-		{
-			return ptr == r.ptr;
-		}
+		//bool operator ==(const RefPtr& r) const
+		//{
+		//	return ptr == r.ptr;
+		//}
+        //
+		//bool operator !=(const RefPtr& r) const
+		//{
+		//	return ptr != r.ptr;
+		//}
 
-		bool operator !=(const RefPtr& r) const
-		{
-			return ptr != r.ptr;
-		}
-
-		T* getPtr()
+		T* getPtr()const
 		{
 			return ptr;
 		}
@@ -200,7 +190,7 @@ namespace Firebird
 			{
 				if (p)
 				{
-					p->addRef();
+					helper__addRef(p);
 				}
 
 				T* tmp = ptr;
@@ -208,13 +198,28 @@ namespace Firebird
 
 				if (tmp)
 				{
-					tmp->release();
+					helper__release(tmp);
 				}
 			}
 
 			return ptr;
-		}
+		}//assign
 
+        template<typename T1>
+        static void helper__addRef(T1* const p)
+        {
+            fb_assert(p);
+            p->addRef();
+        }//helper__addRef
+
+        template<typename T1>
+        static void helper__release(T1* const p)
+        {
+            fb_assert(p);
+            p->release();
+        }//helper__release
+
+    private:
 		T* ptr;
 	};
 
