@@ -216,7 +216,7 @@ Config::Config(const ConfigFile& file)
 	// Iterate through the known configuration entries
 	for (unsigned int i = 0; i < MAX_CONFIG_KEY; i++)
 	{
-		values[i] = entries[i].default_value;
+		this->values[i] = entries[i].default_value;
 		if (entries[i].data_type == TYPE_STRING && values[i])
 		{
 			ConfigFile::String expand((const char*)values[i]);
@@ -224,12 +224,12 @@ Config::Config(const ConfigFile& file)
 			{
 				ConfigFile::String& saved(tempStrings.add());
 				saved = expand;
-				values[i] = (ConfigValue) saved.c_str();
+				this->values[i] = (ConfigValue) saved.c_str();
 			}
 		}
 	}
 
-	loadValues(file);
+	this->loadValues(file);
 }
 
 Config::Config(const ConfigFile& file, const Config& base)
@@ -239,10 +239,10 @@ Config::Config(const ConfigFile& file, const Config& base)
 
 	for (unsigned int i = 0; i < MAX_CONFIG_KEY; i++)
 	{
-		values[i] = base.values[i];
+		this->values[i] = base.values[i];
 	}
 
-	loadValues(file);
+	this->loadValues(file);
 }
 
 Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathName& notify)
@@ -252,10 +252,10 @@ Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathN
 
 	for (unsigned int i = 0; i < MAX_CONFIG_KEY; i++)
 	{
-		values[i] = base.values[i];
+		this->values[i] = base.values[i];
 	}
 
-	loadValues(file);
+	this->loadValues(file);
 
 	notifyDatabase = notify;
 }
