@@ -198,7 +198,7 @@ namespace Firebird
 
     private:
 		T* ptr;
-	};
+	};//class RefPtr
 
 	template <typename T>
 	class AnyRef : public T, public RefCounted
