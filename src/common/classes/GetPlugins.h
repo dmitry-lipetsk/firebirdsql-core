@@ -47,11 +47,11 @@ private:
 
 public:
 	GetPlugins(unsigned int const interfaceType,
-               const char*        namesList = NULL)
+               const char*        namesList = nullptr)
 		: masterInterface()
         , pluginInterface()
-        , pluginSet(NULL)
-        , currentPlugin(NULL)
+        , pluginSet(nullptr)
+        , currentPlugin(nullptr)
         , ls(*getDefaultMemoryPool())
         , status(&ls)
 	{
@@ -65,7 +65,7 @@ public:
            (&status,
             interfaceType,
 			namesList,
-			NULL));
+			nullptr));
 
 		check(&status);
 
@@ -74,11 +74,11 @@ public:
 
 	GetPlugins(unsigned int const interfaceType,
 			   Config*      const knownConfig,
-               const char*        namesList = NULL)
+               const char*        namesList = nullptr)
 		: masterInterface()
         , pluginInterface()
-        , pluginSet(NULL)
-        , currentPlugin(NULL)
+        , pluginSet(nullptr)
+        , currentPlugin(nullptr)
         , ls(*getDefaultMemoryPool())
         , status(&ls)
 	{
@@ -110,7 +110,7 @@ public:
 		{
 			this->pluginInterface->releasePlugin(currentPlugin);
 
-			this->currentPlugin = NULL;
+			this->currentPlugin = nullptr;
 		}
 	}//~GetPlugins
 
@@ -121,7 +121,7 @@ public:
 
 	const char* name() const
 	{
-		return this->hasData() ? this->pluginSet->getName() : NULL;
+		return this->hasData() ? this->pluginSet->getName() : nullptr;
 	}
 
 	P* plugin() const
@@ -135,7 +135,7 @@ public:
 		{
 			this->pluginInterface->releasePlugin(currentPlugin);
 			
-            this->currentPlugin = NULL;
+            this->currentPlugin = nullptr;
 
 			this->pluginSet->next(&this->status);
 
@@ -151,7 +151,7 @@ public:
 		{
 			this->pluginInterface->releasePlugin(currentPlugin);
 
-			this->currentPlugin = NULL;
+			this->currentPlugin = nullptr;
 		}
 
 		this->pluginSet->set(&this->status, newName);
