@@ -177,7 +177,7 @@ namespace Firebird
 				{
 					helper__release(tmp);
 				}
-			}
+			}//if
 
 			return this->ptr;
 		}//assign
