@@ -130,22 +130,22 @@ namespace Firebird
 			return this->ptr;
 		}
 
-		T* operator=(T* p)
+		T* operator = (T* p)
 		{
 			return this->assign(p);
 		}
 
-		T* operator=(const RefPtr& r)
+		T* operator = (const RefPtr& r)
 		{
 			return this->assign(r.ptr);
 		}
 
-		operator T*() const
+		operator T* () const
 		{
 			return this->ptr;
 		}
 
-		T* operator->() const
+		T* operator -> () const
 		{
 			return this->ptr;
 		}
@@ -155,7 +155,7 @@ namespace Firebird
 			return this->ptr ? true : false;
 		}
 
-		T* getPtr()const
+		T* getPtr() const
 		{
 			return this->ptr;
 		}
