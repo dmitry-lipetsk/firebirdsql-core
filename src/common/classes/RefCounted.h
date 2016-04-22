@@ -100,7 +100,7 @@ namespace Firebird
 			{
 				helper__addRef(this->ptr);
 			}
-		}
+		}//RefPtr
 
 		// This special form of ctor is used to create refcounted ptr from interface,
 		// returned by a function (which increments counter on return)
@@ -113,7 +113,7 @@ namespace Firebird
 			{
 				helper__addRef(this->ptr);
 			}
-		}
+		}//RefPtr
 
 		~RefPtr()
 		{
@@ -121,14 +121,16 @@ namespace Firebird
 			{
 				helper__release(this->ptr);
 			}
-		}
+		}//~RefPtr
 
 		T* assignRefNoIncr(T* p)
 		{
 			this->assign(NULL);
+
 			this->ptr = p;
+
 			return this->ptr;
-		}
+		}//assignRefNoIncr
 
 		T* operator = (T* p)
 		{
