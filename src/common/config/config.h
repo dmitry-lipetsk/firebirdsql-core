@@ -197,6 +197,7 @@ public:
 	// cases firebird.conf may be also used to specify root.
 
 	static void setRootDirectoryFromCommandLine(const Firebird::PathName& newRoot);
+
 	static const Firebird::PathName* getCommandLineRootDirectory();
 
 	// Master config - needed to provide per-database config
@@ -207,9 +208,12 @@ public:
 
 	// reports key to be used by the following functions
 	static unsigned int getKeyByName(ConfigName name);
+
 	// helpers to build interface for firebird.conf file
 	SINT64 getInt(unsigned int key) const;
+
 	const char* getString(unsigned int key) const;
+
 	bool getBoolean(unsigned int key) const;
 
 	// Static functions apply to instance-wide values,
@@ -346,7 +350,7 @@ public:
 	bool getRemoteAccess() const;
 
 	bool getWireCompression() const;
-};
+};//class Config
 
 // Implementation of interface to access master configuration file
 class FirebirdConf FB_FINAL :
