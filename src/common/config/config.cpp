@@ -232,7 +232,7 @@ Config::Config(const ConfigFile& file)
 	}//for
 
 	this->loadValues(file);
-}
+}//Config
 
 //------------------------------------------------------------------------
 Config::Config(const ConfigFile& file, const Config& base)
@@ -246,7 +246,7 @@ Config::Config(const ConfigFile& file, const Config& base)
 	}
 
 	this->loadValues(file);
-}
+}//Config
 
 //------------------------------------------------------------------------
 Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathName& notify)
@@ -262,7 +262,7 @@ Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathN
 	this->loadValues(file);
 
 	this->notifyDatabase = notify;
-}
+}//Config
 
 //------------------------------------------------------------------------
 void Config::notify()
@@ -272,7 +272,7 @@ void Config::notify()
 
 	if (notifyDatabaseName(this->notifyDatabase))
 		this->notifyDatabase.erase();
-}
+}//notify
 
 //------------------------------------------------------------------------
 void Config::merge(Firebird::RefPtr<Config>& config, const Firebird::string* dpbConfig)
@@ -283,7 +283,7 @@ void Config::merge(Firebird::RefPtr<Config>& config, const Firebird::string* dpb
 
 		config = FB_NEW Config(txtStream, *(config.hasData() ? config : getDefaultConfig()));
 	}
-}
+}//merge
 
 //------------------------------------------------------------------------
 void Config::loadValues(const ConfigFile& file)
@@ -348,7 +348,6 @@ Config::~Config()
 		}
 	}//for
 }//~Config
-
 
 //Public interface -------------------------------------------------------
 const Firebird::RefPtr<Config>& Config::getDefaultConfig()
