@@ -176,9 +176,12 @@ private:
 
 public:
 	explicit Config(const ConfigFile& file);				// use to build default config
+
 	Config(const ConfigFile& file, const Config& base);		// use to build db-specific config
+
 	Config(const ConfigFile& file, const Config& base, const Firebird::PathName& notify);	// use to build db-specific config with notifucation
-	~Config();
+
+   ~Config();
 
 	// Call it when database with given config is created
 
