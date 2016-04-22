@@ -86,7 +86,7 @@ public:
 	const Firebird::RefPtr<Config>& getDefaultConfig() const
 	{
 		return this->defaultConfig;
-	}
+	}//getDefaultConfig
 
 	bool missFirebirdConf() const
 	{
