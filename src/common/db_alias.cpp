@@ -554,10 +554,10 @@ bool expandDatabaseName(Firebird::PathName alias,
 		}
 #endif
 		*config = (db && db->config.hasData()) ? db->config : Config::getDefaultConfig();
-	}
+	}//if config
 
 	return false;
-}
+}//expandDatabaseName
 
 // Probably file arrived on the disk
 bool notifyDatabaseName(const Firebird::PathName& file)
