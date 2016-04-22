@@ -237,14 +237,29 @@ public:
 
 			if (!this->flag)
 			{
-				this->instance = this->allocator.create(); //throw
+                this->instance = this->allocator.create(); //throw
+
+                fb_assert(this->instance);
+
+				try
+                {
+				    // Put ourselves into linked list for cleanup.
+				    // Allocated pointer is saved by InstanceList::constructor.
+				    FB_NEW InstanceControl::InstanceLink<InitInstance>(this); //throw
+                }
+                catch(...)
+                {
+                    T* const tmp=this->instance;
+
+		            this->instance=nullptr;
+
+                    A::destroy(tmp);
+
+                    throw;
+                }//catch
 
 				this->flag = true;
-
-				// Put ourselves into linked list for cleanup.
-				// Allocated pointer is saved by InstanceList::constructor.
-				FB_NEW InstanceControl::InstanceLink<InitInstance>(this); //throw
-			}
+			}//if
 		}//if
 
 		return *this->instance;
