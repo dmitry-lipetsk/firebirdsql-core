@@ -261,16 +261,16 @@ Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathN
 
 	this->loadValues(file);
 
-	notifyDatabase = notify;
+	this->notifyDatabase = notify;
 }
 
 void Config::notify()
 {
-	if (!notifyDatabase.hasData())
+	if (!this->notifyDatabase.hasData())
 		return;
 
-	if (notifyDatabaseName(notifyDatabase))
-		notifyDatabase.erase();
+	if (notifyDatabaseName(this->notifyDatabase))
+		this->notifyDatabase.erase();
 }
 
 void Config::merge(Firebird::RefPtr<Config>& config, const Firebird::string* dpbConfig)
