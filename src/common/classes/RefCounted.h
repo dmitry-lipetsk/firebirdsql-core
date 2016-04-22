@@ -125,7 +125,7 @@ namespace Firebird
 
 		T* assignRefNoIncr(T* p)
 		{
-			assign(NULL);
+			this->assign(NULL);
 			this->ptr = p;
 			return this->ptr;
 		}
