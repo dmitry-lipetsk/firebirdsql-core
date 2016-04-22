@@ -137,7 +137,7 @@ namespace Firebird
 
 		T* operator=(const RefPtr& r)
 		{
-			return assign(r.ptr);
+			return this->assign(r.ptr);
 		}
 
 		operator T*() const
