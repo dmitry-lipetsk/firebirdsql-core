@@ -90,7 +90,7 @@ public:
 			fb_assert(link);
 		}
 
-		void dtor()
+		virtual void dtor() override final
 		{
 			fb_assert(link);
 			if (link)
