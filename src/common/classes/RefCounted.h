@@ -120,17 +120,29 @@ namespace Firebird
 
 		~RefPtr()
 		{
-			if (this->ptr)
-			{
-				helper__release(this->ptr);
-			}
+            T* const tmp=this->ptr;
+
+            this->ptr=nullptr;
+
+            if(tmp)
+            {
+                helper__release(tmp);
+            }
 		}//~RefPtr
 
 		self_type& assignRefNoIncr(T* p)
 		{
-			this->assign(NULL);
+			if(p != this->ptr)
+            {
+                 T* const tmp=this->ptr;
 
-			this->ptr = p;
+                 this->ptr=p;
+
+                 if(tmp)
+                 {
+                     helper__release(tmp);
+                 }
+            }//if
 
 			return *this;
 		}//assignRefNoIncr
