@@ -221,6 +221,7 @@ Config::Config(const ConfigFile& file)
 		if (entries[i].data_type == TYPE_STRING && values[i])
 		{
 			ConfigFile::String expand((const char*)values[i]);
+
 			if (file.macroParse(expand, NULL) && expand != (const char*) values[i])
 			{
 				ConfigFile::String& saved(tempStrings.add());
@@ -228,9 +229,9 @@ Config::Config(const ConfigFile& file)
 				saved = expand;
 
 				this->values[i] = (ConfigValue) saved.c_str();
-			}
-		}
-	}
+			}//if
+		}//if
+	}//for
 
 	this->loadValues(file);
 }
