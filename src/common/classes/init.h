@@ -88,16 +88,17 @@ public:
 			: InstanceControl::InstanceList(P)
             , link(l)
 		{
-			fb_assert(link);
+			fb_assert(this->link);
 		}
 
 		virtual void dtor() override final
 		{
-			fb_assert(link);
-			if (link)
+			fb_assert(this->link);
+
+			if (this->link)
 			{
-				link->dtor();
-				link = NULL;
+				this->link->dtor();
+				this->link = NULL;
 			}
 		}//dtor
 	};//class InstanceLink
