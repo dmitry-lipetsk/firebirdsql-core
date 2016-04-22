@@ -94,12 +94,12 @@ public:
 
 		this->pluginSet.assignRefNoIncr
          (this->pluginInterface->getPlugins
-           (&status,
+           (&this->status,
             interfaceType,
 			namesList,
   		    spCfg));
 
-		check(&status);
+		check(&this->status);
 
 		this->getPlugin();
 	}//GetPlugins
@@ -137,9 +137,9 @@ public:
 			
             this->currentPlugin = NULL;
 
-			this->pluginSet->next(&status);
+			this->pluginSet->next(&this->status);
 
-			check(&status);
+			check(&this->status);
 
 			this->getPlugin();
 		}
@@ -154,9 +154,9 @@ public:
 			this->currentPlugin = NULL;
 		}
 
-		this->pluginSet->set(&status, newName);
+		this->pluginSet->set(&this->status, newName);
 
-		check(&status);
+		check(&this->status);
 
 		this->getPlugin();
 	}//set
@@ -166,9 +166,9 @@ private:
 	{
         fb_assert(this->pluginSet);
 
-		this->currentPlugin = (P*) this->pluginSet->getPlugin(&status);
+		this->currentPlugin = (P*) this->pluginSet->getPlugin(&this->status);
 
-		check(&status);
+		check(&this->status);
 	}//getPlugin
 
 private:
