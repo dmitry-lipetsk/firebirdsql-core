@@ -262,6 +262,8 @@ public:
 			}//if
 		}//if
 
+        fb_assert(this->instance);
+
 		return *this->instance;
 	}//operator ()
 
