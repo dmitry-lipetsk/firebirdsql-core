@@ -243,7 +243,7 @@ public:
 				// Allocated pointer is saved by InstanceList::constructor.
 				FB_NEW InstanceControl::InstanceLink<InitInstance>(this);
 			}
-		}
+		}//if
 
 		return *this->instance;
 	}//operator ()
