@@ -83,6 +83,12 @@ const char* const CONFIG_FILE = "firebird.conf";
 
 class Config : public Firebird::RefCounted, public Firebird::GlobalStorage
 {
+private:
+    typedef Config                          self_type;
+
+    Config(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	typedef IPTR ConfigValue;
 
