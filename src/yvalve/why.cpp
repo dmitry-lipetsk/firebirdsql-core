@@ -5645,6 +5645,8 @@ YAttachment* Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* st
 			expandedFilename = orgFilename;
 		}
 
+        fb_assert(config);
+
 		if (newDpb.find(isc_dpb_config))
 		{
 			string dpb_config;
