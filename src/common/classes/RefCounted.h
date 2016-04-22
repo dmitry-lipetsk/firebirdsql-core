@@ -96,9 +96,9 @@ namespace Firebird
 
 		explicit RefPtr(T* p) : ptr(p)
 		{
-			if (ptr)
+			if (this->ptr)
 			{
-				helper__addRef(ptr);
+				helper__addRef(this->ptr);
 			}
 		}
 
@@ -109,30 +109,30 @@ namespace Firebird
 
 		RefPtr(const RefPtr& r) : ptr(r.ptr)
 		{
-			if (ptr)
+			if (this->ptr)
 			{
-				helper__addRef(ptr);
+				helper__addRef(this->ptr);
 			}
 		}
 
 		~RefPtr()
 		{
-			if (ptr)
+			if (this->ptr)
 			{
-				helper__release(ptr);
+				helper__release(this->ptr);
 			}
 		}
 
 		T* assignRefNoIncr(T* p)
 		{
 			assign(NULL);
-			ptr = p;
-			return ptr;
+			this->ptr = p;
+			return this->ptr;
 		}
 
 		T* operator=(T* p)
 		{
-			return assign(p);
+			return this->assign(p);
 		}
 
 		T* operator=(const RefPtr& r)
@@ -142,36 +142,36 @@ namespace Firebird
 
 		operator T*() const
 		{
-			return ptr;
+			return this->ptr;
 		}
 
 		T* operator->() const
 		{
-			return ptr;
+			return this->ptr;
 		}
 
 		bool hasData() const
 		{
-			return ptr ? true : false;
+			return this->ptr ? true : false;
 		}
 
 		T* getPtr()const
 		{
-			return ptr;
+			return this->ptr;
 		}
 
 	private:
 		T* assign(T* const p)
 		{
-			if (ptr != p)
+			if (this->ptr != p)
 			{
 				if (p)
 				{
 					helper__addRef(p);
 				}
 
-				T* tmp = ptr;
-				ptr = p;
+				T* tmp = this->ptr;
+				this->ptr = p;
 
 				if (tmp)
 				{
@@ -179,7 +179,7 @@ namespace Firebird
 				}
 			}
 
-			return ptr;
+			return this->ptr;
 		}//assign
 
         template<typename T1>
