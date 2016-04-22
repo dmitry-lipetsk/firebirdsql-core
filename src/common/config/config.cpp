@@ -201,10 +201,8 @@ const Config::ConfigEntry Config::entries[MAX_CONFIG_KEY] =
 	{TYPE_BOOLEAN,		"WireCompression",			(ConfigValue) false}
 };
 
-/******************************************************************************
- *
- *	Config routines
- */
+////////////////////////////////////////////////////////////////////////////////
+//class Config
 
 Config::Config(const ConfigFile& file)
 	: notifyDatabase(*getDefaultMemoryPool())
@@ -236,6 +234,7 @@ Config::Config(const ConfigFile& file)
 	this->loadValues(file);
 }
 
+//------------------------------------------------------------------------
 Config::Config(const ConfigFile& file, const Config& base)
 	: notifyDatabase(*getDefaultMemoryPool())
 {
@@ -249,6 +248,7 @@ Config::Config(const ConfigFile& file, const Config& base)
 	this->loadValues(file);
 }
 
+//------------------------------------------------------------------------
 Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathName& notify)
 	: notifyDatabase(*getDefaultMemoryPool())
 {
@@ -264,6 +264,7 @@ Config::Config(const ConfigFile& file, const Config& base, const Firebird::PathN
 	this->notifyDatabase = notify;
 }
 
+//------------------------------------------------------------------------
 void Config::notify()
 {
 	if (!this->notifyDatabase.hasData())
@@ -273,6 +274,7 @@ void Config::notify()
 		this->notifyDatabase.erase();
 }
 
+//------------------------------------------------------------------------
 void Config::merge(Firebird::RefPtr<Config>& config, const Firebird::string* dpbConfig)
 {
 	if (dpbConfig && dpbConfig->hasData())
@@ -283,6 +285,7 @@ void Config::merge(Firebird::RefPtr<Config>& config, const Firebird::string* dpb
 	}
 }
 
+//------------------------------------------------------------------------
 void Config::loadValues(const ConfigFile& file)
 {
 	// Iterate through the known configuration entries
@@ -325,6 +328,7 @@ void Config::loadValues(const ConfigFile& file)
 	}//for
 }//loadValues
 
+//------------------------------------------------------------------------
 Config::~Config()
 {
 	// Free allocated memory
@@ -346,40 +350,43 @@ Config::~Config()
 }//~Config
 
 
-/******************************************************************************
- *
- *	Public interface
- */
-
+//Public interface -------------------------------------------------------
 const Firebird::RefPtr<Config>& Config::getDefaultConfig()
 {
 	return firebirdConf().getDefaultConfig();
 }
 
+//------------------------------------------------------------------------
 bool Config::missFirebirdConf()
 {
 	return firebirdConf().missFirebirdConf();
 }
 
+//------------------------------------------------------------------------
 const char* Config::getInstallDirectory()
 {
 	return Firebird::fb_get_master_interface()->getConfigManager()->getInstallDirectory();
 }
 
+//------------------------------------------------------------------------
 static Firebird::PathName* rootFromCommandLine = 0;
 
+//------------------------------------------------------------------------
 void Config::setRootDirectoryFromCommandLine(const Firebird::PathName& newRoot)
 {
 	delete rootFromCommandLine;
+
 	rootFromCommandLine = FB_NEW_POOL(*getDefaultMemoryPool())
 		Firebird::PathName(*getDefaultMemoryPool(), newRoot);
 }
 
+//------------------------------------------------------------------------
 const Firebird::PathName* Config::getCommandLineRootDirectory()
 {
 	return rootFromCommandLine;
 }
 
+//------------------------------------------------------------------------
 const char* Config::getRootDirectory()
 {
 	// must check it here - command line must override any other root settings
@@ -391,7 +398,7 @@ const char* Config::getRootDirectory()
 	return Firebird::fb_get_master_interface()->getConfigManager()->getRootDirectory();
 }
 
-
+//------------------------------------------------------------------------
 unsigned int Config::getKeyByName(ConfigName nm)
 {
 	ConfigFile::KeyType name(nm);
@@ -406,6 +413,7 @@ unsigned int Config::getKeyByName(ConfigName nm)
 	return ~0;
 }
 
+//------------------------------------------------------------------------
 SINT64 Config::getInt(unsigned int key) const
 {
 	if (key >= MAX_CONFIG_KEY)
@@ -413,6 +421,7 @@ SINT64 Config::getInt(unsigned int key) const
 	return get<SINT64>(static_cast<ConfigKey>(key));
 }
 
+//------------------------------------------------------------------------
 const char* Config::getString(unsigned int key) const
 {
 	if (key >= MAX_CONFIG_KEY)
@@ -420,6 +429,7 @@ const char* Config::getString(unsigned int key) const
 	return get<const char*>(static_cast<ConfigKey>(key));
 }
 
+//------------------------------------------------------------------------
 bool Config::getBoolean(unsigned int key) const
 {
 	if (key >= MAX_CONFIG_KEY)
@@ -427,12 +437,13 @@ bool Config::getBoolean(unsigned int key) const
 	return get<bool>(static_cast<ConfigKey>(key));
 }
 
-
+//------------------------------------------------------------------------
 int Config::getTempBlockSize()
 {
 	return (int) getDefaultConfig()->values[KEY_TEMP_BLOCK_SIZE];
 }
 
+//------------------------------------------------------------------------
 FB_UINT64 Config::getTempCacheLimit()
 {
 	SINT64 v = (SINT64) getDefaultConfig()->values[KEY_TEMP_CACHE_LIMIT];
@@ -443,21 +454,25 @@ FB_UINT64 Config::getTempCacheLimit()
 	return v;
 }
 
+//------------------------------------------------------------------------
 bool Config::getRemoteFileOpenAbility()
 {
 	return fb_utils::bootBuild() ? true : ((bool) getDefaultConfig()->values[KEY_REMOTE_FILE_OPEN_ABILITY]);
 }
 
+//------------------------------------------------------------------------
 int Config::getGuardianOption()
 {
 	return (int) getDefaultConfig()->values[KEY_GUARDIAN_OPTION];
 }
 
+//------------------------------------------------------------------------
 int Config::getCpuAffinityMask()
 {
 	return (int) getDefaultConfig()->values[KEY_CPU_AFFINITY_MASK];
 }
 
+//------------------------------------------------------------------------
 int Config::getTcpRemoteBufferSize()
 {
 	int rc = (int) getDefaultConfig()->values[KEY_TCP_REMOTE_BUFFER_SIZE];
@@ -468,16 +483,19 @@ int Config::getTcpRemoteBufferSize()
 	return rc;
 }
 
+//------------------------------------------------------------------------
 bool Config::getTcpNoNagle() const
 {
 	return get<bool>(KEY_TCP_NO_NAGLE);
 }
 
+//------------------------------------------------------------------------
 bool Config::getIPv6V6Only() const
 {
 	return get<bool>(KEY_IPV6_V6ONLY);
 }
 
+//------------------------------------------------------------------------
 int Config::getDefaultDbCachePages() const
 {
 	int rc = get<int>(KEY_DEFAULT_DB_CACHE_PAGES);
@@ -488,16 +506,19 @@ int Config::getDefaultDbCachePages() const
 	return rc;
 }
 
+//------------------------------------------------------------------------
 int Config::getConnectionTimeout() const
 {
 	return get<int>(KEY_CONNECTION_TIMEOUT);
 }
 
+//------------------------------------------------------------------------
 int Config::getDummyPacketInterval() const
 {
 	return get<int>(KEY_DUMMY_PACKET_INTERVAL);
 }
 
+//------------------------------------------------------------------------
 int Config::getLockMemSize() const
 {
 	int size = get<int>(KEY_LOCK_MEM_SIZE);
@@ -506,81 +527,97 @@ int Config::getLockMemSize() const
 	return size;
 }
 
+//------------------------------------------------------------------------
 int Config::getLockHashSlots() const
 {
 	return get<int>(KEY_LOCK_HASH_SLOTS);
 }
 
+//------------------------------------------------------------------------
 int Config::getLockAcquireSpins() const
 {
 	return get<int>(KEY_LOCK_ACQUIRE_SPINS);
 }
 
+//------------------------------------------------------------------------
 int Config::getEventMemSize() const
 {
 	return get<int>(KEY_EVENT_MEM_SIZE);
 }
 
+//------------------------------------------------------------------------
 int Config::getDeadlockTimeout() const
 {
 	return get<int>(KEY_DEADLOCK_TIMEOUT);
 }
 
+//------------------------------------------------------------------------
 const char *Config::getRemoteServiceName() const
 {
 	return get<const char*>(KEY_REMOTE_SERVICE_NAME);
 }
 
+//------------------------------------------------------------------------
 unsigned short Config::getRemoteServicePort() const
 {
 	return get<unsigned short>(KEY_REMOTE_SERVICE_PORT);
 }
 
+//------------------------------------------------------------------------
 const char *Config::getRemotePipeName() const
 {
 	return get<const char*>(KEY_REMOTE_PIPE_NAME);
 }
 
+//------------------------------------------------------------------------
 const char *Config::getIpcName() const
 {
 	return get<const char*>(KEY_IPC_NAME);
 }
 
+//------------------------------------------------------------------------
 int Config::getMaxUnflushedWrites() const
 {
 	return get<int>(KEY_MAX_UNFLUSHED_WRITES);
 }
 
+//------------------------------------------------------------------------
 int Config::getMaxUnflushedWriteTime() const
 {
 	return get<int>(KEY_MAX_UNFLUSHED_WRITE_TIME);
 }
 
+//------------------------------------------------------------------------
 int Config::getProcessPriorityLevel()
 {
 	return (int) getDefaultConfig()->values[KEY_PROCESS_PRIORITY_LEVEL];
 }
 
+//------------------------------------------------------------------------
 int Config::getRemoteAuxPort() const
 {
 	return get<int>(KEY_REMOTE_AUX_PORT);
 }
 
+//------------------------------------------------------------------------
 const char *Config::getRemoteBindAddress()
 {
 	return (const char*) getDefaultConfig()->values[KEY_REMOTE_BIND_ADDRESS];
 }
 
+//------------------------------------------------------------------------
 const char *Config::getExternalFileAccess() const
 {
 	return get<const char*>(KEY_EXTERNAL_FILE_ACCESS);
 }
 
+//------------------------------------------------------------------------
 const char *Config::getDatabaseAccess()
 {
 	return (const char*) getDefaultConfig()->values[KEY_DATABASE_ACCESS];
 }
 
+//------------------------------------------------------------------------
 const char *Config::getUdfAccess()
 {
 	static Firebird::GlobalPtr<Firebird::Mutex> udfMutex;
@@ -613,26 +650,31 @@ const char *Config::getUdfAccess()
 	return value;
 }
 
+//------------------------------------------------------------------------
 const char *Config::getTempDirectories()
 {
 	return (const char*) getDefaultConfig()->values[KEY_TEMP_DIRECTORIES];
 }
 
+//------------------------------------------------------------------------
 bool Config::getBugcheckAbort()
 {
 	return (bool) getDefaultConfig()->values[KEY_BUGCHECK_ABORT];
 }
 
+//------------------------------------------------------------------------
 int Config::getTraceDSQL()
 {
 	return (int) getDefaultConfig()->values[KEY_TRACE_DSQL];
 }
 
+//------------------------------------------------------------------------
 bool Config::getLegacyHash()
 {
 	return (bool) getDefaultConfig()->values[KEY_LEGACY_HASH];
 }
 
+//------------------------------------------------------------------------
 const char *Config::getGCPolicy() const
 {
 	const char* rc = get<const char*>(KEY_GC_POLICY);
@@ -656,42 +698,50 @@ const char *Config::getGCPolicy() const
 	return rc;
 }
 
+//------------------------------------------------------------------------
 bool Config::getRedirection()
 {
 	return (bool) getDefaultConfig()->values[KEY_REDIRECTION];
 }
 
+//------------------------------------------------------------------------
 int Config::getDatabaseGrowthIncrement() const
 {
 	return get<int>(KEY_DATABASE_GROWTH_INCREMENT);
 }
 
+//------------------------------------------------------------------------
 int Config::getFileSystemCacheThreshold() const
 {
 	int rc = get<int>(KEY_FILESYSTEM_CACHE_THRESHOLD);
 	return rc < 0 ? 0 : rc;
 }
 
+//------------------------------------------------------------------------
 bool Config::getRelaxedAliasChecking()
 {
 	return (bool) getDefaultConfig()->values[KEY_RELAXED_ALIAS_CHECKING];
 }
 
+//------------------------------------------------------------------------
 FB_UINT64 Config::getFileSystemCacheSize()
 {
 	return (FB_UINT64)(SINT64) getDefaultConfig()->values[KEY_FILESYSTEM_CACHE_SIZE];
 }
 
+//------------------------------------------------------------------------
 const char *Config::getAuditTraceConfigFile()
 {
 	return (const char*) getDefaultConfig()->values[KEY_TRACE_CONFIG];
 }
 
+//------------------------------------------------------------------------
 FB_UINT64 Config::getMaxUserTraceLogSize()
 {
 	return (FB_UINT64)(SINT64) getDefaultConfig()->values[KEY_MAX_TRACELOG_SIZE];
 }
 
+//------------------------------------------------------------------------
 int Config::getServerMode()
 {
 	static int rc = -1;
@@ -716,6 +766,7 @@ int Config::getServerMode()
 	return rc;
 }
 
+//------------------------------------------------------------------------
 const char* Config::getPlugins(unsigned int type) const
 {
 	switch (type)
@@ -740,26 +791,31 @@ const char* Config::getPlugins(unsigned int type) const
 	return NULL;		// compiler warning silencer
 }
 
+//------------------------------------------------------------------------
 unsigned int FirebirdConf::getKey(const char* name)
 {
 	return Config::getKeyByName(name);
 }
 
+//------------------------------------------------------------------------
 ISC_INT64 FirebirdConf::asInteger(unsigned int key)
 {
 	return config->getInt(key);
 }
 
+//------------------------------------------------------------------------
 const char* FirebirdConf::asString(unsigned int key)
 {
 	return config->getString(key);
 }
 
+//------------------------------------------------------------------------
 FB_BOOLEAN FirebirdConf::asBoolean(unsigned int key)
 {
 	return config->getBoolean(key);
 }
 
+//------------------------------------------------------------------------
 int FirebirdConf::release()
 {
 	if (--refCounter == 0)
@@ -771,11 +827,13 @@ int FirebirdConf::release()
 	return 1;
 }
 
+//------------------------------------------------------------------------
 const char* Config::getSecurityDatabase() const
 {
 	return get<const char*>(KEY_SECURITY_DATABASE);
 }
 
+//------------------------------------------------------------------------
 int Config::getWireCrypt(WireCryptMode wcMode) const
 {
 	const char* wc = get<const char*>(KEY_WIRE_CRYPT);
@@ -794,12 +852,16 @@ int Config::getWireCrypt(WireCryptMode wcMode) const
 	return WIRE_CRYPT_REQUIRED;
 }
 
+//------------------------------------------------------------------------
 bool Config::getRemoteAccess() const
 {
 	return get<bool>(KEY_REMOTE_ACCESS);
 }
 
+//------------------------------------------------------------------------
 bool Config::getWireCompression() const
 {
 	return get<bool>(KEY_WIRE_COMPRESSION);
 }
+
+////////////////////////////////////////////////////////////////////////////////
