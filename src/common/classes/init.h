@@ -237,13 +237,13 @@ public:
 
 			if (!this->flag)
 			{
-				this->instance = this->allocator.create();
+				this->instance = this->allocator.create(); //throw
 
 				this->flag = true;
 
 				// Put ourselves into linked list for cleanup.
 				// Allocated pointer is saved by InstanceList::constructor.
-				FB_NEW InstanceControl::InstanceLink<InitInstance>(this);
+				FB_NEW InstanceControl::InstanceLink<InitInstance>(this); //throw
 			}
 		}//if
 
