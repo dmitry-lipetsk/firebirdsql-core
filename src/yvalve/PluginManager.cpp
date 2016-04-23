@@ -685,16 +685,22 @@ class MapKey : public AutoStorage
 {
 	public:
 		MapKey(unsigned int ptype, const PathName& pname)
-			: type(ptype), name(getPool(), pname)
+			: type(ptype)
+            , name(getPool(), pname)
 		{ }
 
 		MapKey(MemoryPool& p, const MapKey& mk)
-			: AutoStorage(p), type(mk.type), name(getPool(), mk.name)
+			: AutoStorage(p)
+            , type(mk.type)
+            , name(getPool(), mk.name)
 		{ }
 
 		bool operator<(const MapKey& c) const	{	return type < c.type || (type == c.type && name < c.name);	}
+
 		bool operator==(const MapKey& c) const	{	return type == c.type && name == c.name;					}
+
 		bool operator>(const MapKey& c) const	{	return type > c.type || (type == c.type && name > c.name);	}
+
 	private:
 		unsigned int type;
 		PathName name;
