@@ -545,7 +545,7 @@ bool expandDatabaseName(Firebird::PathName alias,
 	// Search for correct config in databases.conf
 	if (config)
 	{
-		DbName* db = aliasesConf().dbHash.lookup(file);
+		const DbName* db = aliasesConf().dbHash.lookup(file);
 #ifdef HAVE_ID_BY_NAME
 		if (!db)
 		{
