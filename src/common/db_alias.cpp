@@ -370,7 +370,6 @@ namespace
 	private:
 		void clear()
 		{
-			// clean old data
 			for (FB_SIZE_T n = 0; n < this->aliases.getCount(); ++n)
 			{
 				delete this->aliases[n];
