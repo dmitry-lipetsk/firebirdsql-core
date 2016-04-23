@@ -258,6 +258,12 @@ namespace
 
 	class AliasesConf : public ConfigCache
 	{
+    private:
+        typedef AliasesConf                 self_type;
+
+        AliasesConf(const self_type&);
+        self_type& operator = (const self_type&);
+
 	public:
 		explicit AliasesConf(MemoryPool& p)
 			: ConfigCache(p, fb_utils::getPrefix(Firebird::IConfigManager::DIR_CONF, ALIAS_FILE))
