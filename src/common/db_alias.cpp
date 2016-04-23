@@ -347,7 +347,7 @@ namespace
 				aliases.add(alias);
 				aliasHash.add(alias);
 			}
-		}
+		}//loadConfig
 
 #ifdef HAVE_ID_BY_NAME
 		void linkId(DbName* db, const UCharBuffer& id)
@@ -358,7 +358,7 @@ namespace
 			ids.add(i);
 			idHash.add(i);
 			db->id = i;
-		}
+		}//linkId
 #endif
 
 	private:
@@ -386,8 +386,9 @@ namespace
 			}
 			ids.clear();
 #endif
-		}
+		}//clear
 
+	private:
 		HalfStaticArray<DbName*, 100> databases;
 		HalfStaticArray<AliasName*, 200> aliases;
 #ifdef HAVE_ID_BY_NAME
@@ -400,10 +401,10 @@ namespace
 #ifdef HAVE_ID_BY_NAME
 		IdHash idHash;
 #endif
-	};
+	};//class AliasesConf
 
 	InitInstance<AliasesConf> aliasesConf;
-}
+}//namespace
 
 // Checks that argument doesn't contain colon or directory separator
 static inline bool hasSeparator(const PathName& name)
