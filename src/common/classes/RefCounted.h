@@ -28,224 +28,239 @@
 #include "../common/classes/fb_atomic.h"
 #include "../common/gdsassert.h"
 
-namespace Firebird
+namespace Firebird{
+////////////////////////////////////////////////////////////////////////////////
+//class RefCounted
+
+class RefCounted
 {
-	class RefCounted
+public:
+	virtual int addRef()
 	{
-	public:
-		virtual int addRef()
-		{
-			return ++m_refCnt;
-		}
+		return ++m_refCnt;
+	}
 
-		virtual int release()
-		{
-			fb_assert(m_refCnt.value() > 0);
-			const int refCnt = --m_refCnt;
-			if (!refCnt)
-				delete this;
-			return refCnt;
-		}
-
-	protected:
-		RefCounted() : m_refCnt(0) {}
-
-		virtual ~RefCounted()
-		{
-			fb_assert(m_refCnt.value() == 0);
-		}
-
-	private:
-		AtomicCounter m_refCnt;
-	};
-
-	// reference counted object guard
-	class Reference
+	virtual int release()
 	{
-	public:
-		explicit Reference(RefCounted& refCounted) :
-			r(refCounted)
-		{
-			r.addRef();
-		}
+		fb_assert(m_refCnt.value() > 0);
+		const int refCnt = --m_refCnt;
+		if (!refCnt)
+			delete this;
+		return refCnt;
+	}
 
-		~Reference()
-		{
-			try {
-				r.release();
-			}
-			catch (const Exception&)
-			{
-				DtorException::devHalt();
-			}
-		}
+protected:
+	RefCounted() : m_refCnt(0) {}
 
-	private:
-		RefCounted& r;
-	};
-
-	enum NoIncrement {REF_NO_INCR};
-
-	// controls reference counter of the object where points
-	template <typename T>
-	class RefPtr
+	virtual ~RefCounted()
 	{
-    private:
-        typedef RefPtr<T>                   self_type;
+		fb_assert(m_refCnt.value() == 0);
+	}
 
-	public:
-		RefPtr() : ptr(NULL)
-		{ }
+private:
+	AtomicCounter m_refCnt;
+};//class RefCounted
 
-		explicit RefPtr(T* p) : ptr(p)
-		{
-			if (this->ptr)
-			{
-				helper__addRef(this->ptr);
-			}
-		}//RefPtr
+////////////////////////////////////////////////////////////////////////////////
+//class Reference
 
-		// This special form of ctor is used to create refcounted ptr from interface,
-		// returned by a function (which increments counter on return)
-		RefPtr(NoIncrement x, T* p) : ptr(p)
-		{ }
+// reference counted object guard
 
-		RefPtr(const RefPtr& r) : ptr(r.ptr)
-		{
-			if (this->ptr)
-			{
-				helper__addRef(this->ptr);
-			}
-		}//RefPtr
-
-		~RefPtr()
-		{
-            T* const tmp=this->ptr;
-
-            this->ptr=nullptr;
-
-            if(tmp)
-            {
-                helper__release(tmp);
-            }
-		}//~RefPtr
-
-		self_type& assignRefNoIncr(T* p)
-		{
-			if(p != this->ptr)
-            {
-                 T* const tmp=this->ptr;
-
-                 this->ptr=p;
-
-                 if(tmp)
-                 {
-                     helper__release(tmp);
-                 }
-            }//if
-
-			return *this;
-		}//assignRefNoIncr
-
-		self_type& operator = (T* p)
-		{
-			return this->assign(p);
-		}
-
-		self_type& operator = (const RefPtr& r)
-		{
-			return this->assign(r.ptr);
-		}
-
-		operator T* () const
-		{
-			return this->ptr;
-		}
-
-		T* operator -> () const
-		{
-			return this->ptr;
-		}
-
-		bool hasData() const
-		{
-			return this->ptr ? true : false;
-		}
-
-		T* getPtr() const
-		{
-			return this->ptr;
-		}
-
-	private:
-		self_type& assign(T* const p)
-		{
-			if (this->ptr != p)
-			{
-				if (p)
-				{
-					helper__addRef(p);
-				}
-
-				T* tmp = this->ptr;
-				this->ptr = p;
-
-				if (tmp)
-				{
-					helper__release(tmp);
-				}
-			}//if
-
-			return *this;
-		}//assign
-
-    private:
-        template<typename T1>
-        static void helper__addRef(T1* const p)
-        {
-            fb_assert(p);
-            p->addRef();
-        }//helper__addRef
-
-        template<typename T1>
-        static void helper__release(T1* const p)
-        {
-            fb_assert(p);
-            p->release();
-        }//helper__release
-
-    private:
-        template<typename T1>
-        static void helper__addRef(const T1* const p)
-        {
-            fb_assert(p);
-            const_cast<T1*>(p)->addRef();
-        }//helper__addRef - const version
-
-        template<typename T1>
-        static void helper__release(const T1* const p)
-        {
-            fb_assert(p);
-            const_cast<T1*>(p)->release();
-        }//helper__release - const version
-
-    private:
-		T* ptr;
-	};//class RefPtr
-
-	template <typename T>
-	class AnyRef : public T
-                 , public RefCounted
+class Reference
+{
+public:
+	explicit Reference(RefCounted& refCounted) :
+		r(refCounted)
 	{
-	public:
-		inline AnyRef() : T() {}
+		r.addRef();
+	}
 
-		inline AnyRef(const T& v) : T(v) {}
+	~Reference()
+	{
+		try {
+			r.release();
+		}
+		catch (const Exception&)
+		{
+			DtorException::devHalt();
+		}
+	}
 
-		inline explicit AnyRef(MemoryPool& p) : T(p) {}
+private:
+	RefCounted& r;
+};//class Reference
 
-		inline AnyRef(MemoryPool& p, const T& v) : T(p, v) {}
-	};
-} // namespace
+////////////////////////////////////////////////////////////////////////////////
 
+enum NoIncrement {REF_NO_INCR};
+
+////////////////////////////////////////////////////////////////////////////////
+//class RefPtr
+
+// controls reference counter of the object where points
+template <typename T>
+class RefPtr
+{
+private:
+    typedef RefPtr<T>                   self_type;
+
+public:
+	RefPtr() : ptr(NULL)
+	{ }
+
+	explicit RefPtr(T* p) : ptr(p)
+	{
+		if (this->ptr)
+		{
+			helper__addRef(this->ptr);
+		}
+	}//RefPtr
+
+	// This special form of ctor is used to create refcounted ptr from interface,
+	// returned by a function (which increments counter on return)
+	RefPtr(NoIncrement x, T* p) : ptr(p)
+	{ }
+
+	RefPtr(const RefPtr& r) : ptr(r.ptr)
+	{
+		if (this->ptr)
+		{
+			helper__addRef(this->ptr);
+		}
+	}//RefPtr
+
+	~RefPtr()
+	{
+        T* const tmp=this->ptr;
+
+        this->ptr=nullptr;
+
+        if(tmp)
+        {
+            helper__release(tmp);
+        }
+	}//~RefPtr
+
+	self_type& assignRefNoIncr(T* p)
+	{
+		if(p != this->ptr)
+        {
+             T* const tmp=this->ptr;
+
+             this->ptr=p;
+
+             if(tmp)
+             {
+                 helper__release(tmp);
+             }
+        }//if
+
+		return *this;
+	}//assignRefNoIncr
+
+	self_type& operator = (T* p)
+	{
+		return this->assign(p);
+	}
+
+	self_type& operator = (const RefPtr& r)
+	{
+		return this->assign(r.ptr);
+	}
+
+	operator T* () const
+	{
+		return this->ptr;
+	}
+
+	T* operator -> () const
+	{
+		return this->ptr;
+	}
+
+	bool hasData() const
+	{
+		return this->ptr ? true : false;
+	}
+
+	T* getPtr() const
+	{
+		return this->ptr;
+	}
+
+private:
+	self_type& assign(T* const p)
+	{
+		if (this->ptr != p)
+		{
+			if (p)
+			{
+				helper__addRef(p);
+			}
+
+			T* tmp = this->ptr;
+			this->ptr = p;
+
+			if (tmp)
+			{
+				helper__release(tmp);
+			}
+		}//if
+
+		return *this;
+	}//assign
+
+private:
+    template<typename T1>
+    static void helper__addRef(T1* const p)
+    {
+        fb_assert(p);
+        p->addRef();
+    }//helper__addRef
+
+    template<typename T1>
+    static void helper__release(T1* const p)
+    {
+        fb_assert(p);
+        p->release();
+    }//helper__release
+
+private:
+    template<typename T1>
+    static void helper__addRef(const T1* const p)
+    {
+        fb_assert(p);
+        const_cast<T1*>(p)->addRef();
+    }//helper__addRef - const version
+
+    template<typename T1>
+    static void helper__release(const T1* const p)
+    {
+        fb_assert(p);
+        const_cast<T1*>(p)->release();
+    }//helper__release - const version
+
+private:
+	T* ptr;
+};//class RefPtr
+
+////////////////////////////////////////////////////////////////////////////////
+//class AnyRef
+
+template <typename T>
+class AnyRef : public T
+             , public RefCounted
+{
+public:
+	inline AnyRef() : T() {}
+
+	inline AnyRef(const T& v) : T(v) {}
+
+	inline explicit AnyRef(MemoryPool& p) : T(p) {}
+
+	inline AnyRef(MemoryPool& p, const T& v) : T(p, v) {}
+};//class AnyRef
+
+////////////////////////////////////////////////////////////////////////////////
+}//namespace Firebird
 #endif // COMMON_REF_COUNTED_H
