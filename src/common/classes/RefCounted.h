@@ -133,6 +133,12 @@ public:
 		}
 	}//RefPtr
 
+	RefPtr(self_type&& rr)
+     : ptr(std::move(rr.ptr))
+    {
+        rr.ptr=nullptr;
+    }//move constructor
+
    ~RefPtr()
 	{
         T* const tmp=this->ptr;
@@ -171,6 +177,18 @@ public:
 	{
 		return this->assign(r.ptr);
 	}
+
+	self_type& operator = (self_type&& rr)
+    {
+        if(&rr!=this)
+        {
+            this->ptr=std::move(rr.ptr);
+
+            rr.ptr=nullptr;
+        }
+
+        return *this;
+    }//move operator
 
 	operator T* () const
 	{
