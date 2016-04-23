@@ -188,7 +188,8 @@ namespace
 	struct Id : public IdHash::Entry
 	{
 		Id(MemoryPool& p, const UCharBuffer& x, DbName* d)
-			: id(p, x), db(d)
+			: id(p, x)
+            , db(d)
 		{ }
 
 		Id* get()
@@ -212,7 +213,7 @@ namespace
 		DbName(MemoryPool& p, const PathName& db)
 			: name(p, db)
 #ifdef HAVE_ID_BY_NAME
-			  , id(NULL)
+			, id(NULL)
 #endif
 		{ }
 
@@ -239,7 +240,8 @@ namespace
 	struct AliasName : public AliasHash::Entry
 	{
 		AliasName(MemoryPool& p, const PathName& al, DbName* db)
-			: name(p, al), database(db)
+			: name(p, al)
+            , database(db)
 		{ }
 
 		AliasName* get()
