@@ -805,19 +805,19 @@ unsigned int FirebirdConf::getKey(const char* name)
 //------------------------------------------------------------------------
 ISC_INT64 FirebirdConf::asInteger(unsigned int key)
 {
-	return config->getInt(key);
+	return this->config->getInt(key);
 }
 
 //------------------------------------------------------------------------
 const char* FirebirdConf::asString(unsigned int key)
 {
-	return config->getString(key);
+	return this->config->getString(key);
 }
 
 //------------------------------------------------------------------------
 FB_BOOLEAN FirebirdConf::asBoolean(unsigned int key)
 {
-	return config->getBoolean(key);
+	return this->config->getBoolean(key);
 }
 
 //------------------------------------------------------------------------
