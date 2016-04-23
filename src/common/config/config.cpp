@@ -76,6 +76,8 @@ public:
 
 			this->defaultConfig = FB_NEW Config(file); //throw
 		}//catch
+
+        fb_assert(this->defaultConfig);
 	}//ConfigImpl
 
 /*	void changeDefaultConfig(Config* newConfig)
