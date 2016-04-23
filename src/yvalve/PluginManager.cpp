@@ -1136,8 +1136,14 @@ IConfig* PluginManager::getConfig(CheckStatusWrapper* status,
 {
 	try
 	{
-		IConfig* rc = FB_NEW ConfigAccess(RefPtr<ConfigFile>(
-			FB_NEW_POOL(*getDefaultMemoryPool()) ConfigFile(*getDefaultMemoryPool(), filename)));
+        Firebird::MemoryPool* const pDMP=getDefaultMemoryPool();
+        
+        fb_assert(pDMP);
+        
+        RefPtr<ConfigFile> xc(FB_NEW_POOL(*pDMP) ConfigFile(*pDMP,
+                                                            filename));
+
+		IConfig* rc = FB_NEW ConfigAccess(std::move(xc));
 		rc->addRef();
 		return rc;
 	}
