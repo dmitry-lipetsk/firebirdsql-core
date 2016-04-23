@@ -220,14 +220,14 @@ namespace Firebird
         {
             fb_assert(p);
             const_cast<T1*>(p)->addRef();
-        }//helper__addRef
+        }//helper__addRef - const version
 
         template<typename T1>
         static void helper__release(const T1* const p)
         {
             fb_assert(p);
             const_cast<T1*>(p)->release();
-        }//helper__release
+        }//helper__release - const version
 
     private:
 		T* ptr;
