@@ -105,10 +105,12 @@ private:
     typedef RefPtr<T>                   self_type;
 
 public:
-	RefPtr() : ptr(NULL)
+	RefPtr()
+     : ptr(NULL)
 	{ }
 
-	explicit RefPtr(T* p) : ptr(p)
+	explicit RefPtr(T* p)
+     : ptr(p)
 	{
 		if (this->ptr)
 		{
@@ -118,10 +120,12 @@ public:
 
 	// This special form of ctor is used to create refcounted ptr from interface,
 	// returned by a function (which increments counter on return)
-	RefPtr(NoIncrement x, T* p) : ptr(p)
+	RefPtr(NoIncrement x, T* p)
+     : ptr(p)
 	{ }
 
-	RefPtr(const RefPtr& r) : ptr(r.ptr)
+	RefPtr(const RefPtr& r)
+     : ptr(r.ptr)
 	{
 		if (this->ptr)
 		{
