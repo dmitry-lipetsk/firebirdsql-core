@@ -420,10 +420,13 @@ static inline bool hasSeparator(const PathName& name)
 static bool resolveAlias(const PathName& alias, PathName& file, RefPtr<Config>* config)
 {
 	PathName correctedAlias = alias;
+
 	replace_dir_sep(correctedAlias);
 
 	AliasName* a = aliasesConf().aliasHash.lookup(correctedAlias);
-	DbName* db = a ? a->database : NULL;
+
+ 	DbName* db = a ? a->database : NULL;
+
 	if (db)
 	{
 		file = db->name;
@@ -433,10 +436,10 @@ static bool resolveAlias(const PathName& alias, PathName& file, RefPtr<Config>* 
 		}
 
 		return true;
-	}
+	}//if
 
 	return false;
-}
+}//resolveAlias
 
 // Search for filenames, containing no path component, in dirs from DatabaseAccess list
 // of firebird.conf. If not found try first entry in that list as default entry.
