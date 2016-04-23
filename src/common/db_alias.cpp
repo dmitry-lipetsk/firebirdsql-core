@@ -306,7 +306,7 @@ namespace
 
 				if (! db)
 				{
-					db = FB_NEW_POOL(getPool()) DbName(getPool(), file);
+					db = FB_NEW_POOL(getPool()) DbName(getPool(), file); //throw
 #ifdef HAVE_ID_BY_NAME
 					UCharBuffer id;
 					os_utils::getUniqueFileId(db->name.c_str(), id);
@@ -323,8 +323,8 @@ namespace
 						linkId(db, id);
 					}
 #endif
-					this->databases.add(db);
-					this->dbHash.add(db);
+					this->databases.add(db); //throw
+					this->dbHash.add(db); //throw?
 				}
 				else
 				{
@@ -362,7 +362,7 @@ namespace
 
 				this->aliases.add(alias); //throw
 
-				this->aliasHash.add(alias); //throw
+				this->aliasHash.add(alias); //throw?
 			}//for
 		}//loadConfig
 
