@@ -430,10 +430,11 @@ static bool resolveAlias(const PathName& alias, PathName& file, RefPtr<Config>* 
 	if (db)
 	{
 		file = db->name;
+
 		if (config)
 		{
 			*config = db->config.hasData() ? db->config : Config::getDefaultConfig();
-		}
+		}//if
 
 		return true;
 	}//if
