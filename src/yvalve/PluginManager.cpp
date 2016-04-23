@@ -1089,12 +1089,15 @@ IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* status,
 	try
 	{
 		static InitMutex<BuiltinRegister> registerBuiltinPlugins("RegisterBuiltinPlugins");
+
 		registerBuiltinPlugins.init();
 
 		MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
 		IPluginSet* rc = FB_NEW PluginSet(interfaceType, namesList, firebirdConf);
+
 		rc->addRef();
+
 		return rc;
 	}
 	catch (const Exception& ex)
