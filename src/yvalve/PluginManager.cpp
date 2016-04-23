@@ -1081,10 +1081,10 @@ void PluginManager::unregisterModule(IPluginModule* cleanup)
 }//unregisterModule
 
 //------------------------------------------------------------------------------
-IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* status,
-                                      unsigned int        interfaceType,
-	                                  const char*         namesList,
-                                      IFirebirdConf*      firebirdConf)
+IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* const status,
+                                      unsigned int        const interfaceType,
+	                                  const char*         const namesList,
+                                      IFirebirdConf*      const firebirdConf)
 {
 	try
 	{
