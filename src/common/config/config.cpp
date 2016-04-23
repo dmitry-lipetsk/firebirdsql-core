@@ -772,7 +772,7 @@ int Config::getServerMode()
 }
 
 //------------------------------------------------------------------------
-const char* Config::getPlugins(unsigned int type) const
+const char* Config::getPlugins(unsigned int const type) const
 {
 	switch (type)
 	{
