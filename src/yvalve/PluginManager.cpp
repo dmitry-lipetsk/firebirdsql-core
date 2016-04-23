@@ -1144,13 +1144,16 @@ IConfig* PluginManager::getConfig(CheckStatusWrapper* status,
                                                             filename));
 
 		IConfig* rc = FB_NEW ConfigAccess(std::move(xc));
+
 		rc->addRef();
+
 		return rc;
 	}
 	catch (const Firebird::Exception& ex)
 	{
 		ex.stuffException(status);
 	}
+
 	return NULL;
 }//getConfig
 
