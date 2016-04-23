@@ -106,7 +106,7 @@ private:
 
 public:
 	RefPtr()
-     : ptr(NULL)
+     : ptr(nullptr)
 	{ }
 
 	explicit RefPtr(T* p)
