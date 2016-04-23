@@ -1015,12 +1015,15 @@ void PluginManager::registerPluginFactory(unsigned int    const interfaceType,
 	if (!current)
 	{
 		// not good time to call this function - ignore request
-		gds__log("Unexpected call to register plugin %s, type %d - ignored\n", defaultName, interfaceType);
+		gds__log("Unexpected call to register plugin %s, type %d - ignored\n",
+                 defaultName,
+                 interfaceType);
 		return;
 	}//if
 
-	const unsigned int r = current->addPlugin(RegisteredPlugin(factory, defaultName, interfaceType));
-
+	const unsigned int r = current->addPlugin(RegisteredPlugin(factory,
+                                                               defaultName,
+                                                               interfaceType));
 	if (current == builtin)
 	{
 		PathName plugConfigFile
