@@ -481,9 +481,12 @@ public:
 	ConfiguredPlugin(RefPtr<PluginModule> pmodule, unsigned int preg,
 					 RefPtr<ConfigFile> pconfig, const PathName& pconfName,
 					 const PathName& pplugName)
-		: module(pmodule), regPlugin(preg), defaultConfig(pconfig),
-		  confName(getPool(), pconfName), plugName(getPool(), pplugName),
-		  delay(DEFAULT_DELAY)
+		: module(pmodule)
+        , regPlugin(preg)
+        , defaultConfig(pconfig)
+        , confName(getPool(), pconfName)
+        , plugName(getPool(), pplugName)
+        , delay(DEFAULT_DELAY)
 	{
 		if (defaultConfig.hasData())
 		{
@@ -556,7 +559,7 @@ private:
 
 	static const FB_UINT64 DEFAULT_DELAY = 1000000 * 60;		// 1 min
 	FB_UINT64 delay;
-};
+};//class ConfiguredPlugin
 
 ////////////////////////////////////////////////////////////////////////////////
 //class FactoryParameter
