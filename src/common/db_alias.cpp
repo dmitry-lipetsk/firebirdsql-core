@@ -559,7 +559,7 @@ bool expandDatabaseName(Firebird::PathName alias,
 			}
 		}
 #endif
-		*config = (db && db->config.hasData()) ? db->config : Config::getDefaultConfig();
+		(*config) = (db && db->config.hasData()) ? db->config : Config::getDefaultConfig();
 	}//if config
 
 	return false;
