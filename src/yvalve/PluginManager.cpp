@@ -739,6 +739,8 @@ public:
 
 GlobalPtr<PluginsMap> plugins;
 
+////////////////////////////////////////////////////////////////////////////////
+
 ConfiguredPlugin::~ConfiguredPlugin()
 {
 	if (!destroyingPluginsMap)
@@ -760,9 +762,13 @@ ConfiguredPlugin::~ConfiguredPlugin()
 #endif
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 PluginModule* modules = NULL;
 
 PluginModule* current = NULL;
+
+////////////////////////////////////////////////////////////////////////////////
 
 PluginModule::PluginModule(ModuleLoader::Module* pmodule, const PathName& pname)
 	: name(getPool(), pname), module(pmodule), cleanup(NULL), regPlugins(getPool()),
@@ -773,7 +779,9 @@ PluginModule::PluginModule(ModuleLoader::Module* pmodule, const PathName& pname)
 		next->prev = &next;
 	}
 	*prev = this;
-}
+}//PluginModule
+
+////////////////////////////////////////////////////////////////////////////////
 
 int ConfiguredPlugin::release()
 {
@@ -792,7 +800,7 @@ int ConfiguredPlugin::release()
 	}
 
 	return 1;
-}
+}//release
 
 ////////////////////////////////////////////////////////////////////////////////
 //struct PluginLoadInfo
@@ -982,7 +990,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 	{
 		ex.stuffException(status);
 	}
-}
+}//next
 
 RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 {
@@ -1023,7 +1031,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 
 	loadError(Arg::Gds(isc_pman_entrypoint_notfound) << fixedModuleName);
 	return RefPtr<PluginModule>(NULL);	// compiler warning silencer
-}
+}//loadModule
 
 IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 {
@@ -1046,7 +1054,7 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 	}
 
 	return NULL;
-}
+}//getPlugin
 
 /////////////////////////////////////////////////////////////////////////////////
 //class BuiltinRegister
@@ -1063,7 +1071,7 @@ public:
 	static void cleanup()
 	{
 	}
-};
+};//class BuiltinRegister
 
 /////////////////////////////////////////////////////////////////////////////////
 } // anonymous namespace
