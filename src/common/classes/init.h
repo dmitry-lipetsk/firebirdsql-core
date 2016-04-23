@@ -275,6 +275,8 @@ public:
 
 	void dtor()
 	{
+        //! \todo
+        //!  [BUG] This lock not prevent the access to this->instance
 		MutexLockGuard guard(*StaticMutex::mutex, "InitInstance - dtor");
 
 		this->flag = false;
