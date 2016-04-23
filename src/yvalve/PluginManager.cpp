@@ -1023,7 +1023,8 @@ void PluginManager::registerPluginFactory(unsigned int    const interfaceType,
 
 	if (current == builtin)
 	{
-		PathName plugConfigFile = fb_utils::getPrefix(IConfigManager::DIR_PLUGINS, defaultName);
+		PathName plugConfigFile
+         = fb_utils::getPrefix(IConfigManager::DIR_PLUGINS, defaultName);
 
 		changeExtension(plugConfigFile, "conf");
 
