@@ -270,12 +270,12 @@ namespace
 
 		~AliasesConf()
 		{
-			clear();
+			this->clear();
 		}
 
 		void loadConfig()
 		{
-			clear();
+			this->clear();
 
 			ConfigFile aliasConfig(getFileName(), ConfigFile::HAS_SUB_CONF, this);
 			const ConfigFile::Parameters& params = aliasConfig.getParameters();
