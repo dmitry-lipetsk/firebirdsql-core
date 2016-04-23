@@ -371,7 +371,9 @@ private:
 public:
 	FirebirdConf(Config* existingConfig)
 		: config(existingConfig)
-	{ }
+	{
+		fb_assert(this->config);
+	}//FirebirdConf
 
 	// IFirebirdConf implementation
 	virtual unsigned int getKey(const char* name)override final;
@@ -385,6 +387,7 @@ public:
 	virtual int release()override final;
 
 private:
+	//Not null.
 	Firebird::RefPtr<Config> config;
 };//class FirebirdConf
 
