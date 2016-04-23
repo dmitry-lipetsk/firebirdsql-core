@@ -790,11 +790,12 @@ const char* Config::getPlugins(unsigned int const type) const
 			return (const char*) this->values[KEY_PLUG_WIRE_CRYPT];
 		case Firebird::IPluginManager::TYPE_KEY_HOLDER:
 			return (const char*) this->values[KEY_PLUG_KEY_HOLDER];
-	}
+	}//switch
 
 	(Firebird::Arg::Gds(isc_random) << "Internal error in Config::getPlugins(): unknown plugin type requested").raise();
+
 	return NULL;		// compiler warning silencer
-}
+}//getPlugins
 
 //------------------------------------------------------------------------
 unsigned int FirebirdConf::getKey(const char* name)
