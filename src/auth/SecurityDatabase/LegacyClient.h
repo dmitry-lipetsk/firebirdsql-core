@@ -44,7 +44,8 @@ public:
 	}
 
 	// IClient implementation
-	int authenticate(Firebird::CheckStatusWrapper*, Firebird::IClientBlock* data);
+	int authenticate(Firebird::CheckStatusWrapper* status,
+                     Firebird::IClientBlock*       data);
 
     int release();
 };//class SecurityDatabaseClient 
