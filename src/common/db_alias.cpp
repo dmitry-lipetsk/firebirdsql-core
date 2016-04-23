@@ -291,7 +291,9 @@ namespace
 				const ConfigFile::Parameter* par = &params[n];
 
 				PathName file(par->value.ToPathName());
+
 				replace_dir_sep(file);
+
 				if (PathUtils::isRelative(file))
 				{
 					gds__log("Value %s configured for alias %s "
@@ -299,7 +301,9 @@ namespace
 								file.c_str(), par->name.c_str());
 					continue;
 				}
+
 				DbName* db = this->dbHash.lookup(file);
+
 				if (! db)
 				{
 					db = FB_NEW_POOL(getPool()) DbName(getPool(), file);
@@ -343,16 +347,20 @@ namespace
 				}
 
 				PathName correctedAlias(par->name.ToPathName());
+
 				AliasName* alias = this->aliasHash.lookup(correctedAlias);
+
 				if (alias)
 				{
 					fatal_exception::raiseFmt("Duplicated alias %s\n", correctedAlias.c_str());
 				}
 
 				alias = FB_NEW_POOL(getPool()) AliasName(getPool(), correctedAlias, db);
+
 				this->aliases.add(alias);
+
 				this->aliasHash.add(alias);
-			}
+			}//for
 		}//loadConfig
 
 #ifdef HAVE_ID_BY_NAME
