@@ -777,19 +777,19 @@ const char* Config::getPlugins(unsigned int type) const
 	switch (type)
 	{
 		case Firebird::IPluginManager::TYPE_PROVIDER:
-			return (const char*) values[KEY_PLUG_PROVIDERS];
+			return (const char*) this->values[KEY_PLUG_PROVIDERS];
 		case Firebird::IPluginManager::TYPE_AUTH_SERVER:
-			return (const char*) values[KEY_PLUG_AUTH_SERVER];
+			return (const char*) this->values[KEY_PLUG_AUTH_SERVER];
 		case Firebird::IPluginManager::TYPE_AUTH_CLIENT:
-			return (const char*) values[KEY_PLUG_AUTH_CLIENT];
+			return (const char*) this->values[KEY_PLUG_AUTH_CLIENT];
 		case Firebird::IPluginManager::TYPE_AUTH_USER_MANAGEMENT:
-			return (const char*) values[KEY_PLUG_AUTH_MANAGE];
+			return (const char*) this->values[KEY_PLUG_AUTH_MANAGE];
 		case Firebird::IPluginManager::TYPE_TRACE:
-			return (const char*) values[KEY_PLUG_TRACE];
+			return (const char*) this->values[KEY_PLUG_TRACE];
 		case Firebird::IPluginManager::TYPE_WIRE_CRYPT:
-			return (const char*) values[KEY_PLUG_WIRE_CRYPT];
+			return (const char*) this->values[KEY_PLUG_WIRE_CRYPT];
 		case Firebird::IPluginManager::TYPE_KEY_HOLDER:
-			return (const char*) values[KEY_PLUG_KEY_HOLDER];
+			return (const char*) this->values[KEY_PLUG_KEY_HOLDER];
 	}
 
 	(Firebird::Arg::Gds(isc_random) << "Internal error in Config::getPlugins(): unknown plugin type requested").raise();
