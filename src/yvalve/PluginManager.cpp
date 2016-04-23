@@ -649,9 +649,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
+IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* const firebirdConf)
 {
-	FactoryParameter* par = FB_NEW FactoryParameter(this, firebirdConf);
+	FactoryParameter* const par = FB_NEW FactoryParameter(this, firebirdConf);
 
 	par->addRef();
 
@@ -659,7 +659,7 @@ IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
 
 	CheckStatusWrapper s(&ls);
 
-	IPluginBase* plugin
+	IPluginBase* const plugin
      = module->getPlugin(regPlugin).factory->createPlugin(&s, par);
 
 	if (!(s.getState() & Firebird::IStatus::STATE_ERRORS))
