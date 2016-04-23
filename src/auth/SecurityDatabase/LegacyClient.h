@@ -44,10 +44,10 @@ public:
 	}
 
 	// IClient implementation
-	int authenticate(Firebird::CheckStatusWrapper* status,
-                     Firebird::IClientBlock*       data);
+	virtual int authenticate(Firebird::CheckStatusWrapper* status,
+                             Firebird::IClientBlock*       data) override final;
 
-    int release();
+    virtual int release() override final;
 };//class SecurityDatabaseClient 
 
 void registerLegacyClient(Firebird::IPluginManager* iPlugin);
