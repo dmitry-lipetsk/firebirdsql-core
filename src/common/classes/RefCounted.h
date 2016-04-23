@@ -124,7 +124,7 @@ public:
      : ptr(p)
 	{ }
 
-	RefPtr(const RefPtr& r)
+	RefPtr(const self_type& r)
      : ptr(r.ptr)
 	{
 		if (this->ptr)
@@ -167,7 +167,7 @@ public:
 		return this->assign(p);
 	}
 
-	self_type& operator = (const RefPtr& r)
+	self_type& operator = (const self_type& r)
 	{
 		return this->assign(r.ptr);
 	}
