@@ -368,15 +368,15 @@ public:
 	{ }
 
 	// IFirebirdConf implementation
-	unsigned int getKey(const char* name);
+	virtual unsigned int getKey(const char* name)override final;
 
-	SINT64 asInteger(unsigned int key);
+	virtual SINT64 asInteger(unsigned int key)override final;
 
-	const char* asString(unsigned int key);
+	virtual const char* asString(unsigned int key)override final;
 
-	FB_BOOLEAN asBoolean(unsigned int key);
+	virtual FB_BOOLEAN asBoolean(unsigned int key)override final;
 
-	int release();
+	virtual int release()override final;
 
 private:
 	Firebird::RefPtr<Config> config;
