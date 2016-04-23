@@ -370,29 +370,27 @@ namespace
 	private:
 		void clear()
 		{
-			FB_SIZE_T n;
-
 			// clean old data
-			for (n = 0; n < aliases.getCount(); ++n)
+			for (FB_SIZE_T n = 0; n < this->aliases.getCount(); ++n)
 			{
-				delete aliases[n];
+				delete this->aliases[n];
 			}
 
-			aliases.clear();
+			this->aliases.clear();
 
-			for (n = 0; n < databases.getCount(); ++n)
+			for (FB_SIZE_T n = 0; n < this->databases.getCount(); ++n)
 			{
-				delete databases[n];
+				delete this->databases[n];
 			}
 
-			databases.clear();
+			this->databases.clear();
 
 #ifdef HAVE_ID_BY_NAME
-			for (n = 0; n < ids.getCount(); ++n)
+			for (FB_SIZE_T n = 0; n < this->ids.getCount(); ++n)
 			{
-				delete ids[n];
+				delete this->ids[n];
 			}
-			ids.clear();
+			this->ids.clear();
 #endif
 		}//clear
 
