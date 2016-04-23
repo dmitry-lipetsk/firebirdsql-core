@@ -1324,8 +1324,11 @@ namespace Firebird {
 
 InitInstance<ConfigRoot> rootDetector;
 
+////////////////////////////////////////////////////////////////////////////////
+//class ConfigManager
 
 // Generic access to all config interfaces
+
 class ConfigManager : public AutoIface<IConfigManagerImpl<ConfigManager, CheckStatusWrapper> >
 {
 public:
@@ -1394,9 +1397,12 @@ public:
 	{
 		return rootDetector().getRootDirectory();
 	}
-};
+};//class ConfigManager
+
+////////////////////////////////////////////////////////////////////////////////
 
 static ConfigManager configManager;
 IConfigManager* iConfigManager(&configManager);
 
-}	// namespace Firebird
+////////////////////////////////////////////////////////////////////////////////
+}// namespace Firebird
