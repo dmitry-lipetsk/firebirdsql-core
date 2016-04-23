@@ -81,7 +81,11 @@ const int MODE_CLASSIC = 2;
 
 const char* const CONFIG_FILE = "firebird.conf";
 
-class Config : public Firebird::RefCounted, public Firebird::GlobalStorage
+////////////////////////////////////////////////////////////////////////////////
+//class Config
+
+class Config : public Firebird::RefCounted
+             , public Firebird::GlobalStorage
 {
 private:
     typedef Config                          self_type;
@@ -358,9 +362,13 @@ public:
 	bool getWireCompression() const;
 };//class Config
 
+////////////////////////////////////////////////////////////////////////////////
+//class FirebirdConf
+
 // Implementation of interface to access master configuration file
-class FirebirdConf FB_FINAL :
-	public Firebird::RefCntIface<Firebird::IFirebirdConfImpl<FirebirdConf, Firebird::CheckStatusWrapper> >
+
+class FirebirdConf FB_FINAL
+	: public Firebird::RefCntIface<Firebird::IFirebirdConfImpl<FirebirdConf, Firebird::CheckStatusWrapper> >
 {
 private:
     typedef FirebirdConf                    self_type;
@@ -391,7 +399,10 @@ private:
 	Firebird::RefPtr<Config> config;
 };//class FirebirdConf
 
+////////////////////////////////////////////////////////////////////////////////
+
 // Create default instance of IFirebirdConf interface
 Firebird::IFirebirdConf* getFirebirdConfig();
 
+////////////////////////////////////////////////////////////////////////////////
 #endif // COMMON_CONFIG_H
