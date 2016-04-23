@@ -45,8 +45,9 @@ public:
 
 	// IClient implementation
 	int authenticate(Firebird::CheckStatusWrapper*, Firebird::IClientBlock* data);
+
     int release();
-};
+};//class SecurityDatabaseClient 
 
 void registerLegacyClient(Firebird::IPluginManager* iPlugin);
 
