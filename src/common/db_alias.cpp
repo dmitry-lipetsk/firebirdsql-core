@@ -355,11 +355,11 @@ namespace
 					fatal_exception::raiseFmt("Duplicated alias %s\n", correctedAlias.c_str());
 				}
 
-				alias = FB_NEW_POOL(getPool()) AliasName(getPool(), correctedAlias, db);
+				alias = FB_NEW_POOL(getPool()) AliasName(getPool(), correctedAlias, db); //throw
 
-				this->aliases.add(alias);
+				this->aliases.add(alias); //throw
 
-				this->aliasHash.add(alias);
+				this->aliasHash.add(alias); //throw
 			}//for
 		}//loadConfig
 
