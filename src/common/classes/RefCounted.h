@@ -109,7 +109,7 @@ public:
      : ptr(nullptr)
 	{ }
 
-	explicit RefPtr(T* p)
+	explicit RefPtr(T* const p)
      : ptr(p)
 	{
 		if (this->ptr)
@@ -120,7 +120,7 @@ public:
 
 	// This special form of ctor is used to create refcounted ptr from interface,
 	// returned by a function (which increments counter on return)
-	RefPtr(NoIncrement /*x*/, T* p)
+	RefPtr(NoIncrement /*x*/, T* const p)
      : ptr(p)
 	{ }
 
@@ -145,7 +145,7 @@ public:
         }
 	}//~RefPtr
 
-	self_type& assignRefNoIncr(T* p)
+	self_type& assignRefNoIncr(T* const p)
 	{
 		if(p != this->ptr)
         {
@@ -162,7 +162,7 @@ public:
 		return *this;
 	}//assignRefNoIncr
 
-	self_type& operator = (T* p)
+	self_type& operator = (T* const p)
 	{
 		return this->assign(p);
 	}
@@ -202,7 +202,7 @@ private:
 				helper__addRef(p);
 			}
 
-			T* tmp = this->ptr;
+			T* const tmp = this->ptr;
 			this->ptr = p;
 
 			if (tmp)
