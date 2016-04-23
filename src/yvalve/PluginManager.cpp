@@ -1006,9 +1006,9 @@ PluginManager::PluginManager()
 }//PluginManager
 
 //------------------------------------------------------------------------------
-void PluginManager::registerPluginFactory(unsigned int    interfaceType,
-                                          const char*     defaultName,
-                                          IPluginFactory* factory)
+void PluginManager::registerPluginFactory(unsigned int    const interfaceType,
+                                          const char*     const defaultName,
+                                          IPluginFactory* const factory)
 {
 	MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
