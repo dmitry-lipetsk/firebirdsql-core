@@ -377,12 +377,14 @@ namespace
 			{
 				delete aliases[n];
 			}
+
 			aliases.clear();
 
 			for (n = 0; n < databases.getCount(); ++n)
 			{
 				delete databases[n];
 			}
+
 			databases.clear();
 
 #ifdef HAVE_ID_BY_NAME
