@@ -209,7 +209,7 @@ public:
 		return FB_NEW_POOL(*getDefaultMemoryPool()) T(*getDefaultMemoryPool());
 	}
 
-	static void destroy(T* inst)
+	static void destroy(T* const inst)
 	{
 		delete inst;
 	}
