@@ -307,6 +307,7 @@ namespace
 				if (! db)
 				{
 					db = FB_NEW_POOL(getPool()) DbName(getPool(), file); //throw
+
 #ifdef HAVE_ID_BY_NAME
 					UCharBuffer id;
 					os_utils::getUniqueFileId(db->name.c_str(), id);
@@ -324,6 +325,7 @@ namespace
 					}
 #endif
 					this->databases.add(db); //throw
+
 					this->dbHash.add(db); //throw?
 				}
 				else
