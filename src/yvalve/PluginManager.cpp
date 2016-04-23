@@ -258,7 +258,7 @@ private:
 		}
 
 		return NULL;
-	}
+	}//newParam
 };//class ConfigAccess
 
 IConfig* ConfigParameterAccess::getSubConfig(CheckStatusWrapper* status)
