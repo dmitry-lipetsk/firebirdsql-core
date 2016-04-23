@@ -425,21 +425,21 @@ static bool resolveAlias(const PathName&       alias,
 
 	replace_dir_sep(correctedAlias);
 
-	AliasName* const a = aliasesConf().aliasHash.lookup(correctedAlias);
-
- 	DbName* const db = a ? a->database : NULL;
-
-	if (db)
+	if(const AliasName* const a = aliasesConf().aliasHash.lookup(correctedAlias))
 	{
-		file = db->name;
-
-		if (config)
+		// [2015-04-23] I can't exactly understand why VC14 allows the >>>const<<< DbName* :)
+		if (const DbName* const db = a->database)
 		{
-			(*config) = db->config.hasData() ? db->config : Config::getDefaultConfig();
-		}//if
+			file = db->name;
 
-		return true;
-	}//if
+			if (config)
+			{
+				(*config) = db->config.hasData() ? db->config : Config::getDefaultConfig();
+			}//if
+
+			return true;
+		}//if db
+	}//if a
 
 	return false;
 }//resolveAlias
