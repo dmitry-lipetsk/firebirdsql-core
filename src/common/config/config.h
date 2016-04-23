@@ -369,15 +369,18 @@ public:
 
 	// IFirebirdConf implementation
 	unsigned int getKey(const char* name);
+
 	SINT64 asInteger(unsigned int key);
+
 	const char* asString(unsigned int key);
+
 	FB_BOOLEAN asBoolean(unsigned int key);
 
 	int release();
 
 private:
 	Firebird::RefPtr<Config> config;
-};
+};//class FirebirdConf
 
 // Create default instance of IFirebirdConf interface
 Firebird::IFirebirdConf* getFirebirdConfig();
