@@ -539,8 +539,8 @@ bool expandDatabaseName(Firebird::PathName alias,
 			ISC_systemToUtf8(file);
 			ISC_escape(file);
 			ISC_utf8ToSystem(file);
-		}
-	}
+		}//if
+	}//if
 
 	// Search for correct config in databases.conf
 	if (config)
