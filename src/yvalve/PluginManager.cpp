@@ -74,9 +74,13 @@ void changeExtension(PathName& file, const char* newExt)
 	}
 
 	file += newExt;
-}
+}//changeExtension
+
+////////////////////////////////////////////////////////////////////////////////
+//class StaticConfHolder
 
 // Holds a reference to plugins.conf file
+
 class StaticConfHolder
 {
 public:
@@ -93,8 +97,11 @@ public:
 
 private:
 	RefPtr<ConfigFile> confFile;
-};
+};//class StaticConfHolder
+
 InitInstance<StaticConfHolder> pluginsConf;
+
+////////////////////////////////////////////////////////////////////////////////
 
 RefPtr<ConfigFile> findConfig(const char* param, const char* pluginName)
 {
@@ -109,9 +116,12 @@ RefPtr<ConfigFile> findConfig(const char* param, const char* pluginName)
 	}
 
 	return RefPtr<ConfigFile>(NULL);
-}
+}//findConfig
 
 bool flShutdown = false;
+
+////////////////////////////////////////////////////////////////////////////////
+//class ConfigParameterAccess
 
 class ConfigParameterAccess FB_FINAL :
 	public RefCntIface<IConfigEntryImpl<ConfigParameterAccess, CheckStatusWrapper> >
@@ -156,7 +166,10 @@ public:
 private:
 	RefPtr<IReferenceCounted> cf;
 	const ConfigFile::Parameter* par;
-};
+};//class ConfigParameterAccess
+
+////////////////////////////////////////////////////////////////////////////////
+//class ConfigAccess
 
 class ConfigAccess FB_FINAL :
 	public RefCntIface<IConfigImpl<ConfigAccess, CheckStatusWrapper> >
@@ -246,7 +259,7 @@ private:
 
 		return NULL;
 	}
-};
+};//class ConfigAccess
 
 IConfig* ConfigParameterAccess::getSubConfig(CheckStatusWrapper* status)
 {
@@ -267,6 +280,8 @@ IConfig* ConfigParameterAccess::getSubConfig(CheckStatusWrapper* status)
 	return NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 IConfig* findDefConfig(ConfigFile* defaultConfig, const PathName& confName)
 {
 	LocalStatus ls;
@@ -282,11 +297,14 @@ IConfig* findDefConfig(ConfigFile* defaultConfig, const PathName& confName)
 	IConfig* rc = PluginManagerInterfacePtr()->getConfig(&s, confName.nullStr());
 	check(&s);
 	return rc;
-}
+}//findDefConfig
 
+////////////////////////////////////////////////////////////////////////////////
+//struct RegisteredPlugin
 
 // Plugins registered when loading plugin module.
 // This is POD object - no dtor, only simple data types inside.
+
 struct RegisteredPlugin
 {
 	RegisteredPlugin(IPluginFactory* f, const char* nm, unsigned int t)
@@ -300,9 +318,13 @@ struct RegisteredPlugin
 	IPluginFactory* factory;
 	const char* name;
 	unsigned int type;
-};
+};//struct RegisteredPlugin
+
+////////////////////////////////////////////////////////////////////////////////
+//class PluginModule
 
 // Controls module, containing plugins.
+
 class PluginModule : public Firebird::RefCounted, public GlobalStorage
 {
 public:
@@ -404,7 +426,10 @@ private:
 	HalfStaticArray<RegisteredPlugin, 2> regPlugins;
 	PluginModule* next;
 	PluginModule** prev;
-};
+};//class PluginModule
+
+////////////////////////////////////////////////////////////////////////////////
+//struct CountByType
 
 struct CountByType
 {
@@ -414,7 +439,10 @@ struct CountByType
 	CountByType()
 		: counter(0), waitsOn(NULL)
 	{ }
-};
+};//struct CountByType
+
+////////////////////////////////////////////////////////////////////////////////
+//struct CountByTypeArray
 
 struct CountByTypeArray
 {
@@ -428,11 +456,14 @@ struct CountByTypeArray
 		fb_assert(t < PluginManager::TYPE_COUNT);
 		return values[t];
 	}
-};
+};//struct CountByTypeArray
 
 GlobalPtr<CountByTypeArray> byTypeCounters;
 
 PluginModule* builtin = NULL;
+
+////////////////////////////////////////////////////////////////////////////////
+//class ConfiguredPlugin
 
 // Provides most of configuration services for plugins,
 // except per-database configuration in databases.conf
@@ -519,6 +550,9 @@ private:
 	static const FB_UINT64 DEFAULT_DELAY = 1000000 * 60;		// 1 min
 	FB_UINT64 delay;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+//class FactoryParameter
 
 // Provides per-database configuration from databases.conf.
 class FactoryParameter FB_FINAL :
@@ -621,6 +655,8 @@ IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
 	return NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//class MapKey
 
 class MapKey : public AutoStorage
 {
@@ -639,9 +675,12 @@ class MapKey : public AutoStorage
 	private:
 		unsigned int type;
 		PathName name;
-};
+};//class MapKey
 
 static bool destroyingPluginsMap = false;
+
+////////////////////////////////////////////////////////////////////////////////
+//class PluginsMap
 
 class PluginsMap : public GenericMap<Pair<Left<MapKey, ConfiguredPlugin*> > >
 {
@@ -667,7 +706,7 @@ public:
 
 	Mutex mutex; // locked by this class' destructor and by objects that use the plugins var below.
 	Semaphore* wakeIt;
-};
+};//class PluginsMap
 
 GlobalPtr<PluginsMap> plugins;
 
@@ -726,6 +765,9 @@ int ConfiguredPlugin::release()
 	return 1;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//struct PluginLoadInfo
+
 struct PluginLoadInfo
 {
 	PathName curModule, regName, plugConfigFile;
@@ -766,10 +808,13 @@ struct PluginLoadInfo
 		plugConfigFile = curModule;
 		changeExtension(plugConfigFile, "conf");
 	}
-};
+};//struct PluginLoadInfo
 
+////////////////////////////////////////////////////////////////////////////////
+//class PluginSet
 
 // Provides access to plugins of given type / name.
+
 class PluginSet FB_FINAL : public RefCntIface<IPluginSetImpl<PluginSet, CheckStatusWrapper> >
 {
 public:
@@ -851,7 +896,7 @@ private:
 	{
 		status->setErrors(Arg::Gds(isc_wish_list).value());
 	}
-};
+};//class PluginSet
 
 // ************************************* //
 // ** next() - core of plugin manager ** //
@@ -974,6 +1019,9 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 	return NULL;
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+//class BuiltinRegister
+
 class BuiltinRegister
 {
 public:
@@ -990,7 +1038,6 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////////
 } // anonymous namespace
-
 
 namespace Firebird {
 ////////////////////////////////////////////////////////////////////////////////
