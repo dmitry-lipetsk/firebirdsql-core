@@ -377,7 +377,7 @@ private:
     self_type& operator = (const self_type&);
 
 public:
-	FirebirdConf(Config* existingConfig)
+	FirebirdConf(Config* const existingConfig)
 		: config(existingConfig)
 	{
 		fb_assert(this->config);
