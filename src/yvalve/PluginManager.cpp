@@ -659,7 +659,8 @@ IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
 
 	CheckStatusWrapper s(&ls);
 
-	IPluginBase* plugin = module->getPlugin(regPlugin).factory->createPlugin(&s, par);
+	IPluginBase* plugin
+     = module->getPlugin(regPlugin).factory->createPlugin(&s, par);
 
 	if (!(s.getState() & Firebird::IStatus::STATE_ERRORS))
 	{
