@@ -1019,7 +1019,7 @@ void PluginManager::registerPluginFactory(unsigned int    const interfaceType,
 		return;
 	}
 
-	unsigned int r = current->addPlugin(RegisteredPlugin(factory, defaultName, interfaceType));
+	const unsigned int r = current->addPlugin(RegisteredPlugin(factory, defaultName, interfaceType));
 
 	if (current == builtin)
 	{
