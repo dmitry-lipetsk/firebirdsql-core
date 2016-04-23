@@ -189,7 +189,7 @@ public:
 			ex.stuffException(status);
 		}
 		return NULL;
-	}
+	}//find
 
 	IConfigEntry* findValue(CheckStatusWrapper* status, const char* name, const char* value)
 	{
@@ -202,7 +202,7 @@ public:
 			ex.stuffException(status);
 		}
 		return NULL;
-	}
+	}//findValue
 
 	IConfigEntry* findPos(CheckStatusWrapper* status, const char* name, unsigned int n)
 	{
@@ -232,7 +232,7 @@ public:
 			ex.stuffException(status);
 		}
 		return NULL;
-	}
+	}//findPos
 
 	int release()
 	{
@@ -243,7 +243,7 @@ public:
 		}
 
 		return 1;
-	}
+	}//release
 
 private:
 	RefPtr<ConfigFile> confFile;
