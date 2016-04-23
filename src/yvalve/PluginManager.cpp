@@ -1017,20 +1017,27 @@ void PluginManager::registerPluginFactory(unsigned int    const interfaceType,
 		// not good time to call this function - ignore request
 		gds__log("Unexpected call to register plugin %s, type %d - ignored\n", defaultName, interfaceType);
 		return;
-	}
+	}//if
 
 	const unsigned int r = current->addPlugin(RegisteredPlugin(factory, defaultName, interfaceType));
 
 	if (current == builtin)
 	{
 		PathName plugConfigFile = fb_utils::getPrefix(IConfigManager::DIR_PLUGINS, defaultName);
+
 		changeExtension(plugConfigFile, "conf");
 
-		ConfiguredPlugin* p = FB_NEW ConfiguredPlugin(RefPtr<PluginModule>(builtin), r,
-									findConfig("Plugin", defaultName), plugConfigFile, defaultName);
+		ConfiguredPlugin* p = FB_NEW ConfiguredPlugin
+                                      (RefPtr<PluginModule>(builtin),
+                                       r,
+									   findConfig("Plugin", defaultName),
+                                       plugConfigFile,
+                                       defaultName);
+
 		p->addRef();  // Will never be unloaded
+
 		plugins->put(MapKey(interfaceType, defaultName), p);
-	}
+	}//if
 }//registerPluginFactory
 
 //------------------------------------------------------------------------------
