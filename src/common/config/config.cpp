@@ -61,7 +61,7 @@ public:
 			ConfigFile file(fb_utils::getPrefix(Firebird::IConfigManager::DIR_CONF, CONFIG_FILE),
 				            ConfigFile::ERROR_WHEN_MISS);
 
-			this->defaultConfig = FB_NEW Config(file);
+			this->defaultConfig = FB_NEW Config(file); //throw
 		}
 		catch (const Firebird::status_exception& ex)
 		{
@@ -74,7 +74,7 @@ public:
 
 			ConfigFile file(ConfigFile::USE_TEXT, "");
 
-			this->defaultConfig = FB_NEW Config(file);
+			this->defaultConfig = FB_NEW Config(file); //throw
 		}//catch
 	}//ConfigImpl
 
