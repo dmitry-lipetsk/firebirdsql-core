@@ -390,6 +390,7 @@ namespace
 			{
 				delete this->ids[n];
 			}
+
 			this->ids.clear();
 #endif
 		}//clear
