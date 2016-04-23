@@ -283,7 +283,7 @@ public:
 
 		A::destroy(this->instance);
 
-		this->instance = NULL;
+		this->instance = nullptr;
 	}//dtor
 };//class InitInstance
 
