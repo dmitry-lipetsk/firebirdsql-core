@@ -1094,8 +1094,9 @@ IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* const status,
 
 		MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
-		IPluginSet* const rc = FB_NEW PluginSet(interfaceType, namesList, firebirdConf);
-
+		IPluginSet* const rc = FB_NEW PluginSet(interfaceType,
+                                                namesList,
+                                                firebirdConf);
 		rc->addRef();
 
 		return rc;
