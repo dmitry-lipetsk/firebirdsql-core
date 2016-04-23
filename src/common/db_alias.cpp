@@ -357,6 +357,9 @@ namespace
 
 				alias = FB_NEW_POOL(getPool()) AliasName(getPool(), correctedAlias, db); //throw
 
+                //! \todo
+                //!  BUG - no fault tollerance. memory leaks.
+
 				this->aliases.add(alias); //throw
 
 				this->aliasHash.add(alias); //throw
