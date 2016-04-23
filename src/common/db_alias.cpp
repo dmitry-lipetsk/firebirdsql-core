@@ -324,6 +324,9 @@ namespace
 						linkId(db, id);
 					}
 #endif
+                    //! \todo
+                    //!  BUG - no fault tollerance. memory leaks.
+
 					this->databases.add(db); //throw
 
 					this->dbHash.add(db); //throw?
