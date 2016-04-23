@@ -133,7 +133,7 @@ public:
 		}
 	}//RefPtr
 
-	~RefPtr()
+   ~RefPtr()
 	{
         T* const tmp=this->ptr;
 
