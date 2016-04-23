@@ -1027,12 +1027,12 @@ void PluginManager::registerPluginFactory(unsigned int    const interfaceType,
 
 		changeExtension(plugConfigFile, "conf");
 
-		ConfiguredPlugin* p = FB_NEW ConfiguredPlugin
-                                      (RefPtr<PluginModule>(builtin),
-                                       r,
-									   findConfig("Plugin", defaultName),
-                                       plugConfigFile,
-                                       defaultName);
+		ConfiguredPlugin* const p = FB_NEW ConfiguredPlugin
+                                             (RefPtr<PluginModule>(builtin),
+                                              r,
+									          findConfig("Plugin", defaultName),
+                                              plugConfigFile,
+                                              defaultName);
 
 		p->addRef();  // Will never be unloaded
 
