@@ -652,10 +652,13 @@ private:
 IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
 {
 	FactoryParameter* par = FB_NEW FactoryParameter(this, firebirdConf);
+
 	par->addRef();
 
 	LocalStatus ls;
+
 	CheckStatusWrapper s(&ls);
+
 	IPluginBase* plugin = module->getPlugin(regPlugin).factory->createPlugin(&s, par);
 
 	if (!(s.getState() & Firebird::IStatus::STATE_ERRORS))
@@ -665,9 +668,11 @@ IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
 	}
 
 	par->release();
+
 	check(&s);
+
 	return NULL;
-}
+}//factory
 
 ////////////////////////////////////////////////////////////////////////////////
 //class MapKey
