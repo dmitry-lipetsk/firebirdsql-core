@@ -284,10 +284,13 @@ IConfig* ConfigParameterAccess::getSubConfig(CheckStatusWrapper* status)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IConfig* findDefConfig(ConfigFile* defaultConfig, const PathName& confName)
+IConfig* findDefConfig(ConfigFile*     defaultConfig,
+                       const PathName& confName)
 {
 	LocalStatus ls;
+
 	CheckStatusWrapper s(&ls);
+
 	if (defaultConfig)
 	{
 		const ConfigFile::Parameter* p = defaultConfig->findParameter("Config");
@@ -297,7 +300,9 @@ IConfig* findDefConfig(ConfigFile* defaultConfig, const PathName& confName)
 	}
 
 	IConfig* rc = PluginManagerInterfacePtr()->getConfig(&s, confName.nullStr());
+
 	check(&s);
+
 	return rc;
 }//findDefConfig
 
