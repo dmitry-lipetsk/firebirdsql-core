@@ -1131,8 +1131,8 @@ void PluginManager::releasePlugin(IPluginBase* plugin)
 }//releasePlugin
 
 //------------------------------------------------------------------------------
-IConfig* PluginManager::getConfig(CheckStatusWrapper* status,
-                                  const char*         filename)
+IConfig* PluginManager::getConfig(CheckStatusWrapper* const status,
+                                  const char*         const filename)
 {
 	try
 	{
@@ -1143,7 +1143,7 @@ IConfig* PluginManager::getConfig(CheckStatusWrapper* status,
         RefPtr<ConfigFile> xc(FB_NEW_POOL(*pDMP) ConfigFile(*pDMP,
                                                             filename));
 
-		IConfig* rc = FB_NEW ConfigAccess(std::move(xc));
+		IConfig* const rc = FB_NEW ConfigAccess(std::move(xc));
 
 		rc->addRef();
 
@@ -1154,7 +1154,7 @@ IConfig* PluginManager::getConfig(CheckStatusWrapper* status,
 		ex.stuffException(status);
 	}
 
-	return NULL;
+	return nullptr;
 }//getConfig
 
 //------------------------------------------------------------------------------
