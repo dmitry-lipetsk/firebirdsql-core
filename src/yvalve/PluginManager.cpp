@@ -651,6 +651,9 @@ private:
 
 IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* const firebirdConf)
 {
+    //! \todo
+    //!  Really - very unshapely design
+
 	FactoryParameter* const par = FB_NEW FactoryParameter(this, firebirdConf);
 
 	par->addRef();
