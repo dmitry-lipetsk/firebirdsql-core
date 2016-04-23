@@ -990,6 +990,8 @@ namespace
 
 
 namespace Firebird {
+////////////////////////////////////////////////////////////////////////////////
+//class PluginManager
 
 PluginManager::PluginManager()
 {
@@ -1001,9 +1003,9 @@ PluginManager::PluginManager()
 		builtin->addRef();	// Will never be unloaded
 		current = builtin;
 	}
-}
+}//PluginManager
 
-
+//------------------------------------------------------------------------------
 void PluginManager::registerPluginFactory(unsigned int interfaceType, const char* defaultName, IPluginFactory* factory)
 {
 	MutexLockGuard g(plugins->mutex, FB_FUNCTION);
@@ -1027,9 +1029,9 @@ void PluginManager::registerPluginFactory(unsigned int interfaceType, const char
 		p->addRef();  // Will never be unloaded
 		plugins->put(MapKey(interfaceType, defaultName), p);
 	}
-}
+}//registerPluginFactory
 
-
+//------------------------------------------------------------------------------
 void PluginManager::registerModule(IPluginModule* cleanup)
 {
 	MutexLockGuard g(plugins->mutex, FB_FUNCTION);
@@ -1042,8 +1044,9 @@ void PluginManager::registerModule(IPluginModule* cleanup)
 	}
 
 	current->setCleanup(cleanup);
-}
+}//registerModule
 
+//------------------------------------------------------------------------------
 void PluginManager::unregisterModule(IPluginModule* cleanup)
 {
 	{	// guard scope
@@ -1062,8 +1065,9 @@ void PluginManager::unregisterModule(IPluginModule* cleanup)
 #endif
 
 	fb_shutdown(5000, fb_shutrsn_exit_called);
-}
+}//unregisterModule
 
+//------------------------------------------------------------------------------
 IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* status, unsigned int interfaceType,
 	const char* namesList, IFirebirdConf* firebirdConf)
 {
@@ -1083,9 +1087,9 @@ IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* status, unsigned int i
 		ex.stuffException(status);
 		return NULL;
 	}
-}
+}//getPlugins
 
-
+//------------------------------------------------------------------------------
 void PluginManager::releasePlugin(IPluginBase* plugin)
 {
 	MutexLockGuard g(plugins->mutex, FB_FUNCTION);
@@ -1105,9 +1109,9 @@ void PluginManager::releasePlugin(IPluginBase* plugin)
 			}
 		}
 	}
-}
+}//releasePlugin
 
-
+//------------------------------------------------------------------------------
 IConfig* PluginManager::getConfig(CheckStatusWrapper* status, const char* filename)
 {
 	try
@@ -1122,14 +1126,15 @@ IConfig* PluginManager::getConfig(CheckStatusWrapper* status, const char* filena
 		ex.stuffException(status);
 	}
 	return NULL;
-}
+}//getConfig
 
-
+//------------------------------------------------------------------------------
 void PluginManager::shutdown()
 {
 	flShutdown = true;
-}
+}//shutdown
 
+//------------------------------------------------------------------------------
 void PluginManager::waitForType(unsigned int typeThatMustGoAway)
 {
 	fb_assert(typeThatMustGoAway < PluginManager::TYPE_COUNT);
@@ -1160,9 +1165,10 @@ void PluginManager::waitForType(unsigned int typeThatMustGoAway)
 	{
 		semPtr->enter();
 	}
-}
+}//waitForType
 
-}	// namespace Firebird
+////////////////////////////////////////////////////////////////////////////////
+}// namespace Firebird
 
 namespace {
 
