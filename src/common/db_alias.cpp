@@ -423,9 +423,9 @@ static bool resolveAlias(const PathName& alias, PathName& file, RefPtr<Config>* 
 
 	replace_dir_sep(correctedAlias);
 
-	AliasName* a = aliasesConf().aliasHash.lookup(correctedAlias);
+	AliasName* const a = aliasesConf().aliasHash.lookup(correctedAlias);
 
- 	DbName* db = a ? a->database : NULL;
+ 	DbName* const db = a ? a->database : NULL;
 
 	if (db)
 	{
@@ -433,7 +433,7 @@ static bool resolveAlias(const PathName& alias, PathName& file, RefPtr<Config>* 
 
 		if (config)
 		{
-			*config = db->config.hasData() ? db->config : Config::getDefaultConfig();
+			(*config) = db->config.hasData() ? db->config : Config::getDefaultConfig();
 		}//if
 
 		return true;
