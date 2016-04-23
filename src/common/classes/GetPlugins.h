@@ -82,13 +82,14 @@ public:
         , ls(*getDefaultMemoryPool())
         , status(&ls)
 	{
+		//[2016-04-23] FirebirdConf requires the not null pointer to config object.
+		fb_assert(knownConfig);
+
         const RefPtr<IFirebirdConf>
          spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
 
         if(!namesList)
         {
-            fb_assert(knownConfig);
-
             namesList=knownConfig->getPlugins(interfaceType);
         }//if
 
