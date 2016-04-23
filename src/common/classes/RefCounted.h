@@ -120,7 +120,7 @@ public:
 
 	// This special form of ctor is used to create refcounted ptr from interface,
 	// returned by a function (which increments counter on return)
-	RefPtr(NoIncrement x, T* p)
+	RefPtr(NoIncrement /*x*/, T* p)
      : ptr(p)
 	{ }
 
