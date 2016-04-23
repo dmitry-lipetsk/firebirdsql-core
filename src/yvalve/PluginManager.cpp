@@ -261,6 +261,8 @@ private:
 	}//newParam
 };//class ConfigAccess
 
+////////////////////////////////////////////////////////////////////////////////
+
 IConfig* ConfigParameterAccess::getSubConfig(CheckStatusWrapper* status)
 {
 	try
@@ -278,7 +280,7 @@ IConfig* ConfigParameterAccess::getSubConfig(CheckStatusWrapper* status)
 	}
 
 	return NULL;
-}
+}//getSubConfig
 
 ////////////////////////////////////////////////////////////////////////////////
 
