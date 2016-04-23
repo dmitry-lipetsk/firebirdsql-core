@@ -1006,7 +1006,9 @@ PluginManager::PluginManager()
 }//PluginManager
 
 //------------------------------------------------------------------------------
-void PluginManager::registerPluginFactory(unsigned int interfaceType, const char* defaultName, IPluginFactory* factory)
+void PluginManager::registerPluginFactory(unsigned int    interfaceType,
+                                          const char*     defaultName,
+                                          IPluginFactory* factory)
 {
 	MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
@@ -1068,8 +1070,10 @@ void PluginManager::unregisterModule(IPluginModule* cleanup)
 }//unregisterModule
 
 //------------------------------------------------------------------------------
-IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* status, unsigned int interfaceType,
-	const char* namesList, IFirebirdConf* firebirdConf)
+IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* status,
+                                      unsigned int        interfaceType,
+	                                  const char*         namesList,
+                                      IFirebirdConf*      firebirdConf)
 {
 	try
 	{
@@ -1112,7 +1116,8 @@ void PluginManager::releasePlugin(IPluginBase* plugin)
 }//releasePlugin
 
 //------------------------------------------------------------------------------
-IConfig* PluginManager::getConfig(CheckStatusWrapper* status, const char* filename)
+IConfig* PluginManager::getConfig(CheckStatusWrapper* status,
+                                  const char*         filename)
 {
 	try
 	{
