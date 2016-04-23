@@ -198,7 +198,8 @@ public:
 };
 #undef FB_LOCKED_FROM
 
-// InitInstance - allocate instance of class T on first request.
+////////////////////////////////////////////////////////////////////////////////
+//class DefaultInstanceAllocator
 
 template <typename T>
 class DefaultInstanceAllocator
@@ -207,13 +208,18 @@ public:
 	static T* create()
 	{
 		return FB_NEW_POOL(*getDefaultMemoryPool()) T(*getDefaultMemoryPool());
-	}
+	}//create
 
 	static void destroy(T* const inst)
 	{
 		delete inst;
-	}
-};
+	}//destroy
+};//class DefaultInstanceAllocator
+
+////////////////////////////////////////////////////////////////////////////////
+//class InitInstance
+
+// InitInstance - allocate instance of class T on first request.
 
 template <typename T, class A = DefaultInstanceAllocator<T> >
 class InitInstance : private InstanceControl
