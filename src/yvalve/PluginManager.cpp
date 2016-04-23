@@ -565,12 +565,14 @@ private:
 //class FactoryParameter
 
 // Provides per-database configuration from databases.conf.
+
 class FactoryParameter FB_FINAL :
 	public RefCntIface<IPluginConfigImpl<FactoryParameter, CheckStatusWrapper> >
 {
 public:
 	FactoryParameter(ConfiguredPlugin* cp, IFirebirdConf* fc)
-		: configuredPlugin(cp), firebirdConf(fc)
+		: configuredPlugin(cp)
+        , firebirdConf(fc)
 	{ }
 
 	// IPluginConfig implementation
@@ -590,7 +592,7 @@ public:
 			ex.stuffException(status);
 			return NULL;
 		}
-	}
+	}//getDefaultConfig
 
 	IFirebirdConf* getFirebirdConf(CheckStatusWrapper* status)
 	{
@@ -610,7 +612,7 @@ public:
 			ex.stuffException(status);
 			return NULL;
 		}
-	}
+	}//getFirebirdConf
 
 	void setReleaseDelay(CheckStatusWrapper*, ISC_UINT64 microSeconds)
 	{
@@ -643,7 +645,9 @@ private:
 
 	RefPtr<ConfiguredPlugin> configuredPlugin;
 	RefPtr<IFirebirdConf> firebirdConf;
-};
+};//class FactoryParameter
+
+////////////////////////////////////////////////////////////////////////////////
 
 IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* firebirdConf)
 {
