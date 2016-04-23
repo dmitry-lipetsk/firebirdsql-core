@@ -362,6 +362,12 @@ public:
 class FirebirdConf FB_FINAL :
 	public Firebird::RefCntIface<Firebird::IFirebirdConfImpl<FirebirdConf, Firebird::CheckStatusWrapper> >
 {
+private:
+    typedef FirebirdConf                    self_type;
+
+    FirebirdConf(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	FirebirdConf(Config* existingConfig)
 		: config(existingConfig)
