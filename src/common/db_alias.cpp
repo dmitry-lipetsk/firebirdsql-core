@@ -417,9 +417,9 @@ static inline bool hasSeparator(const PathName& name)
 
 // Search for 'alias' in databases.conf, return its value in 'file' if found. Else set file to alias.
 // Returns true if alias is found in databases.conf.
-static bool resolveAlias(const PathName& alias,
-                         PathName&       file,
-                         RefPtr<Config>* config)
+static bool resolveAlias(const PathName&       alias,
+                         PathName&             file,
+                         RefPtr<Config>* const config)
 {
 	PathName correctedAlias = alias;
 
