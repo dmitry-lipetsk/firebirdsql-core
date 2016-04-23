@@ -199,6 +199,7 @@ namespace Firebird
 			return *this;
 		}//assign
 
+    private:
         template<typename T1>
         static void helper__addRef(T1* const p)
         {
@@ -211,6 +212,21 @@ namespace Firebird
         {
             fb_assert(p);
             p->release();
+        }//helper__release
+
+    private:
+        template<typename T1>
+        static void helper__addRef(const T1* const p)
+        {
+            fb_assert(p);
+            const_cast<T1*>(p)->addRef();
+        }//helper__addRef
+
+        template<typename T1>
+        static void helper__release(const T1* const p)
+        {
+            fb_assert(p);
+            const_cast<T1*>(p)->release();
         }//helper__release
 
     private:
