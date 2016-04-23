@@ -299,7 +299,7 @@ namespace
 								file.c_str(), par->name.c_str());
 					continue;
 				}
-				DbName* db = dbHash.lookup(file);
+				DbName* db = this->dbHash.lookup(file);
 				if (! db)
 				{
 					db = FB_NEW_POOL(getPool()) DbName(getPool(), file);
@@ -319,8 +319,8 @@ namespace
 						linkId(db, id);
 					}
 #endif
-					databases.add(db);
-					dbHash.add(db);
+					this->databases.add(db);
+					this->dbHash.add(db);
 				}
 				else
 				{
@@ -343,15 +343,15 @@ namespace
 				}
 
 				PathName correctedAlias(par->name.ToPathName());
-				AliasName* alias = aliasHash.lookup(correctedAlias);
+				AliasName* alias = this->aliasHash.lookup(correctedAlias);
 				if (alias)
 				{
 					fatal_exception::raiseFmt("Duplicated alias %s\n", correctedAlias.c_str());
 				}
 
 				alias = FB_NEW_POOL(getPool()) AliasName(getPool(), correctedAlias, db);
-				aliases.add(alias);
-				aliasHash.add(alias);
+				this->aliases.add(alias);
+				this->aliasHash.add(alias);
 			}
 		}//loadConfig
 
