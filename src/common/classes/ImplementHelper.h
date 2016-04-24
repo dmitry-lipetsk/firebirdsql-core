@@ -137,7 +137,8 @@ template <class P>
 class SimpleFactoryBase : public AutoIface<IPluginFactoryImpl<SimpleFactoryBase<P>, CheckStatusWrapper> >
 {
 public:
-	virtual IPluginBase* createPlugin(CheckStatusWrapper* status, IPluginConfig* factoryParameter) override final
+	virtual IPluginBase* createPlugin(CheckStatusWrapper* status,
+                                      IPluginConfig*      factoryParameter) override final
 	{
 		try
 		{
@@ -151,7 +152,7 @@ public:
 		}
 		return NULL;
 	}
-};
+};//class SimpleFactoryBase
 
 template <class P>
 class SimpleFactory : public Static<SimpleFactoryBase<P> >
