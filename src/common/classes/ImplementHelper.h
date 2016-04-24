@@ -136,7 +136,7 @@ public:
 
 // Trivial factory
 
-template <class P>
+template<class P>
 class SimpleFactoryBase : public AutoIface<IPluginFactoryImpl<SimpleFactoryBase<P>, CheckStatusWrapper> >
 {
 public:
@@ -147,7 +147,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 //class SimpleFactoryBase - implementation
 
-template <class P>
+template<class P>
 IPluginBase* SimpleFactoryBase<P>::createPlugin(CheckStatusWrapper* const status,
                                                 IPluginConfig*      const factoryParameter)
 {
