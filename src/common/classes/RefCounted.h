@@ -179,6 +179,18 @@ public:
 		return this->assign(p);
 	}
 
+    self_type& operator = (std::nullptr_t)
+    {
+        if(T* const tmp=this->ptr)
+        {
+            this->ptr=nullptr;
+
+            helper__release(tmp);
+        }//if tmp
+
+        return *this;
+    }//operator = nullptr
+
 	self_type& operator = (const self_type& r)
 	{
 		return this->assign(r.ptr);
