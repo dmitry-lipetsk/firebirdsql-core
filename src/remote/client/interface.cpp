@@ -668,6 +668,9 @@ void RProvider::setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallback
 	cryptCallback = callback;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//class Loopback
+
 class Loopback : public IProviderBaseImpl<Loopback, CheckStatusWrapper, RProvider>
 {
 public:
