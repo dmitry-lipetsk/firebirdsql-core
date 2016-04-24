@@ -856,17 +856,17 @@ class PluginSet FB_FINAL : public RefCntIface<IPluginSetImpl<PluginSet, CheckSta
 {
 public:
 	// IPluginSet implementation
-	const char* getName() const
+	virtual const char* getName() const override final
 	{
 		return currentPlugin.hasData() ? currentName.c_str() : NULL;
 	}
 
-	const char* getModuleName() const
+	virtual const char* getModuleName() const override final
 	{
 		return currentPlugin.hasData() ? currentPlugin->getPluggedModule()->getName() : NULL;
 	}
 
-	void set(CheckStatusWrapper* status, const char* newName)
+	virtual void set(CheckStatusWrapper* status, const char* newName) override final
 	{
 		try
 		{
@@ -880,9 +880,9 @@ public:
 		}
 	}
 
-	IPluginBase* getPlugin(CheckStatusWrapper* status);
+	virtual IPluginBase* getPlugin(CheckStatusWrapper* status) override final;
 
-	void next(CheckStatusWrapper* status);
+	virtual void next(CheckStatusWrapper* status) override final;
 
 public:
 	PluginSet(unsigned int   pinterfaceType,
@@ -907,7 +907,7 @@ public:
 		check(&statusWrapper);
 	}
 
-	int release()
+	virtual int release() override final
 	{
 		if (--refCounter == 0)
 		{
