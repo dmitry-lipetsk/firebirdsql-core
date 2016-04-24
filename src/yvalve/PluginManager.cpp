@@ -980,7 +980,7 @@ void PluginSet::set(CheckStatusWrapper* status, const char* newName)
 }//set
 
 //------------------------------------------------------------------------
-void PluginSet::next(CheckStatusWrapper* status)
+void PluginSet::next(CheckStatusWrapper* const status)
 {
 	try
 	{
