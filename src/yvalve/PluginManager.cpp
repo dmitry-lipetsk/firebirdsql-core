@@ -115,7 +115,7 @@ RefPtr<ConfigFile> findConfig(const char* param, const char* pluginName)
 		}
 	}
 
-	return RefPtr<ConfigFile>(NULL);
+	return RefPtr<ConfigFile>(nullptr);
 }//findConfig
 
 bool flShutdown = false;
