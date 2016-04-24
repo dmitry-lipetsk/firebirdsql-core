@@ -5611,11 +5611,12 @@ YAttachment* Dispatcher::createDatabase(CheckStatusWrapper* status, const char* 
 	return attachOrCreateDatabase(status, true, filename, dpbLength, dpb);
 }
 
-YAttachment* Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* const status,
-                                                bool                          const createFlag,
-	                                            const char*                   const filename,
-                                                unsigned int                  const dpbLength,
-                                                const unsigned char*          const dpb)
+YAttachment*
+ Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* const status,
+                                    bool                          const createFlag,
+	                                const char*                   const filename,
+                                    unsigned int                  const dpbLength,
+                                    const unsigned char*          const dpb)
 {
 	RefDeb(DEB_AR_JATT, "Dispatcher::attachOrCreateDatabase");
 	try
