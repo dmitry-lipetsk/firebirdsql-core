@@ -1019,11 +1019,14 @@ void PluginSet::next(CheckStatusWrapper* status)
 			}
 
 			int r = m->findPlugin(interfaceType, info.regName);
+
 			if (r < 0)
 			{
-				loadError(Arg::Gds(isc_pman_plugin_notfound) <<
-						  info.curModule << info.regName << Arg::Num(interfaceType));
-			}
+				loadError(Arg::Gds(isc_pman_plugin_notfound)
+                           << info.curModule
+                           << info.regName
+                           << Arg::Num(interfaceType));
+			}//if
 
 			currentPlugin = FB_NEW ConfiguredPlugin(m, r, info.conf, info.plugConfigFile, currentName);
 
