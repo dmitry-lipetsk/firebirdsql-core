@@ -629,7 +629,7 @@ public:
 		}
 
 		return 1;
-	}
+	}//release
 
 protected:
 	IAttachment* attach(CheckStatusWrapper* status, const char* filename, unsigned int dpb_length,
