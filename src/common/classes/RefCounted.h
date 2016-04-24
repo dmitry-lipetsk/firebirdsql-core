@@ -120,7 +120,7 @@ public:
 	{
 		if (this->ptr)
 		{
-			helper__addRef(this->ptr);
+			helper__call_addRef(this->ptr);
 		}
 	}//RefPtr
 
@@ -135,7 +135,7 @@ public:
 	{
 		if (this->ptr)
 		{
-			helper__addRef(this->ptr);
+			helper__call_addRef(this->ptr);
 		}
 	}//RefPtr
 
@@ -151,7 +151,7 @@ public:
         {
             this->ptr=nullptr;
 
-            helper__release(tmp);
+            helper__call_release(tmp);
         }//if tmp
 	}//~RefPtr
 
@@ -165,7 +165,7 @@ public:
 
              if(tmp)
              {
-                 helper__release(tmp);
+                 helper__call_release(tmp);
              }
         }//if
 
@@ -183,7 +183,7 @@ public:
         {
             this->ptr=nullptr;
 
-            helper__release(tmp);
+            helper__call_release(tmp);
         }//if tmp
 
         return *this;
@@ -233,7 +233,7 @@ private:
 		{
 			if (p)
 			{
-				helper__addRef(p);
+				helper__call_addRef(p);
 			}
 
 			T* const tmp = this->ptr;
@@ -242,7 +242,7 @@ private:
 
 			if (tmp)
 			{
-				helper__release(tmp);
+				helper__call_release(tmp);
 			}
 		}//if
 
@@ -251,33 +251,33 @@ private:
 
 private:
     template<typename T1>
-    static void helper__addRef(T1* const p)
+    static void helper__call_addRef(T1* const p)
     {
         fb_assert(p);
         p->addRef();
-    }//helper__addRef
+    }//helper__call_addRef
 
     template<typename T1>
-    static void helper__release(T1* const p)
+    static void helper__call_release(T1* const p)
     {
         fb_assert(p);
         p->release();
-    }//helper__release
+    }//helper__call_release
 
 private:
     template<typename T1>
-    static void helper__addRef(const T1* const p)
+    static void helper__call_addRef(const T1* const p)
     {
         fb_assert(p);
         const_cast<T1*>(p)->addRef();
-    }//helper__addRef - const version
+    }//helper__call_addRef - const version
 
     template<typename T1>
-    static void helper__release(const T1* const p)
+    static void helper__call_release(const T1* const p)
     {
         fb_assert(p);
         const_cast<T1*>(p)->release();
-    }//helper__release - const version
+    }//helper__call_release - const version
 
 private:
 	T* ptr;
