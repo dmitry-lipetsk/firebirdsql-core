@@ -56,7 +56,7 @@ protected:
 
 	explicit InternalConnection(InternalProvider& prov) :
 	  Connection(prov),
-	  m_attachment(0),
+	  m_attachment(nullptr),
 	  m_isCurrent(false)
 	{}
 
