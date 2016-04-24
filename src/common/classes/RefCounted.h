@@ -147,12 +147,7 @@ public:
 
    ~RefPtr()
 	{
-        if(T* const tmp=this->ptr)
-        {
-            this->ptr=nullptr;
-
-            helper__call_release(tmp);
-        }//if tmp
+        this->helper__release();
 	}//~RefPtr
 
 	self_type& assignRefNoIncr(T* const p)
@@ -179,12 +174,7 @@ public:
 
     self_type& operator = (std::nullptr_t)
     {
-        if(T* const tmp=this->ptr)
-        {
-            this->ptr=nullptr;
-
-            helper__call_release(tmp);
-        }//if tmp
+        this->helper__release();
 
         return *this;
     }//operator = nullptr
@@ -248,6 +238,16 @@ private:
 
 		return *this;
 	}//helper__assign
+
+    void helper__release()
+    {
+        if(T* const tmp=this->ptr)
+        {
+            this->ptr=nullptr;
+
+            helper__call_release(tmp);
+        }//if tmp
+    }//helper__release
 
 private:
     template<typename T1>
