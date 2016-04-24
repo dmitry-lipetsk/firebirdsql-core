@@ -5675,7 +5675,7 @@ YAttachment* Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* st
 			 providerIterator.hasData();
 			 providerIterator.next())
 		{
-			IProvider* provider = providerIterator.plugin();
+			IProvider* const provider = providerIterator.plugin();
 
 			if (cryptCallback)
 			{
@@ -5684,7 +5684,7 @@ YAttachment* Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* st
 					continue;
 			}
 
-			IAttachment* attachment = createFlag ?
+			IAttachment* const attachment = createFlag ?
 				provider->createDatabase(currentStatus,	expandedFilename.c_str(),
 					newDpb.getBufferLength(), newDpb.getBuffer()) :
 				provider->attachDatabase(currentStatus,	expandedFilename.c_str(),
