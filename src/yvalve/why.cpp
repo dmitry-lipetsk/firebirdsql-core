@@ -5610,7 +5610,7 @@ YAttachment* Dispatcher::attachDatabase(CheckStatusWrapper*  const status,
                                         const unsigned char* const dpb)
 {
 	return attachOrCreateDatabase(status, false, filename, dpbLength, dpb);
-}
+}//attachDatabase
 
 //------------------------------------------------------------------------
 
@@ -5622,7 +5622,7 @@ YAttachment* Dispatcher::createDatabase(CheckStatusWrapper*  const status,
                                         const unsigned char* const dpb)
 {
 	return attachOrCreateDatabase(status, true, filename, dpbLength, dpb);
-}
+}//createDatabase
 
 //------------------------------------------------------------------------
 YAttachment*
