@@ -5757,7 +5757,7 @@ YAttachment*
 	}
 
 	return NULL;
-}
+}//attachOrCreateDatabase
 
 //------------------------------------------------------------------------
 
@@ -5865,7 +5865,7 @@ YService* Dispatcher::attachServiceManager(CheckStatusWrapper* status, const cha
 	}
 
 	return NULL;
-}
+}//attachServiceManager
 
 //------------------------------------------------------------------------
 void Dispatcher::shutdown(CheckStatusWrapper* userStatus, unsigned int timeout, const int reason)
@@ -6027,7 +6027,7 @@ void Dispatcher::shutdown(CheckStatusWrapper* userStatus, unsigned int timeout, 
 		e.stuffException(userStatus);
 		iscLogStatus(NULL, userStatus);
 	}
-}
+}//shutdown
 
 //------------------------------------------------------------------------
 void Dispatcher::setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallback* callback)
@@ -6037,4 +6037,4 @@ void Dispatcher::setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallbac
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-} // namespace Why
+}//namespace Why
