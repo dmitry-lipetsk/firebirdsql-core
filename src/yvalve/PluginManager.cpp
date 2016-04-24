@@ -1015,7 +1015,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 			loadError(Arg::Gds(isc_pman_module_notfound) << fixedModuleName);
 		}
 
-		return RefPtr<PluginModule>(NULL);
+		return RefPtr<PluginModule>(nullptr);
 	}
 
 	RefPtr<PluginModule> rc(FB_NEW PluginModule(module, info.curModule));
