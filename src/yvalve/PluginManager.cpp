@@ -854,6 +854,12 @@ struct PluginLoadInfo
 
 class PluginSet FB_FINAL : public RefCntIface<IPluginSetImpl<PluginSet, CheckStatusWrapper> >
 {
+private:
+    typedef PluginSet                       self_type;
+
+    PluginSet(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	// IPluginSet implementation
 	virtual const char* getName() const override final;
