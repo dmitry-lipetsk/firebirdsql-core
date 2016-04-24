@@ -50,6 +50,7 @@ public:
 
 	// IClient implementation
 	int authenticate(CheckStatusWrapper*, IClientBlock* cb);
+
     int release();
 
 private:
