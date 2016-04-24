@@ -147,14 +147,12 @@ public:
 
    ~RefPtr()
 	{
-        T* const tmp=this->ptr;
-
-        this->ptr=nullptr;
-
-        if(tmp)
+        if(T* const tmp=this->ptr)
         {
+            this->ptr=nullptr;
+
             helper__release(tmp);
-        }
+        }//if tmp
 	}//~RefPtr
 
 	self_type& assignRefNoIncr(T* const p)
