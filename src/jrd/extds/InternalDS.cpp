@@ -363,8 +363,8 @@ InternalStatement::InternalStatement(InternalConnection& conn) :
 	Statement(conn),
 	m_intConnection(conn),
 	m_intTransaction(0),
-	m_request(0),
-	m_cursor(0),
+	m_request(nullptr),
+	m_cursor(nullptr),
 	m_inMetadata(FB_NEW MsgMetadata),
 	m_outMetadata(FB_NEW MsgMetadata)
 {
