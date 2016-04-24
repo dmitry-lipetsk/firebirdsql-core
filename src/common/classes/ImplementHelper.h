@@ -131,28 +131,40 @@ public:
 	}
 };
 
+////////////////////////////////////////////////////////////////////////////////
+//class SimpleFactoryBase
 
 // Trivial factory
+
 template <class P>
 class SimpleFactoryBase : public AutoIface<IPluginFactoryImpl<SimpleFactoryBase<P>, CheckStatusWrapper> >
 {
 public:
 	virtual IPluginBase* createPlugin(CheckStatusWrapper* status,
-                                      IPluginConfig*      factoryParameter) override final
-	{
-		try
-		{
-			P* p = FB_NEW P(factoryParameter);
-			p->addRef();
-			return p;
-		}
-		catch (const Firebird::Exception& ex)
-		{
-			ex.stuffException(status);
-		}
-		return NULL;
-	}
+                                      IPluginConfig*      factoryParameter) override final;
 };//class SimpleFactoryBase
+
+////////////////////////////////////////////////////////////////////////////////
+//class SimpleFactoryBase - implementation
+
+template <class P>
+IPluginBase* SimpleFactoryBase<P>::createPlugin(CheckStatusWrapper* const status,
+                                                IPluginConfig*      const factoryParameter)
+{
+	try
+	{
+		P* p = FB_NEW P(factoryParameter);
+		p->addRef();
+		return p;
+	}
+	catch (const Firebird::Exception& ex)
+	{
+		ex.stuffException(status);
+	}
+	return NULL;
+}//createPlugin
+
+////////////////////////////////////////////////////////////////////////////////
 
 template <class P>
 class SimpleFactory : public Static<SimpleFactoryBase<P> >
