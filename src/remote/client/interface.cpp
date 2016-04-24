@@ -586,6 +586,9 @@ int Service::release()
 	return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//class RProvider
+
 class RProvider : public StdPlugin<IProviderImpl<RProvider, CheckStatusWrapper> >
 {
 public:
