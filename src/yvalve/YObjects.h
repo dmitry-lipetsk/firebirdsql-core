@@ -39,9 +39,8 @@ namespace Firebird
 	class ClumpletWriter;
 }
 
-namespace Why
-{
-
+namespace Why{
+////////////////////////////////////////////////////////////////////////////////
 
 class YAttachment;
 class YBlob;
@@ -164,7 +163,7 @@ public:
 	}
 
 	Firebird::RefPtr<NextInterface> next;
-};
+};//class YHelper
 
 class YEvents FB_FINAL :
 	public YHelper<YEvents, Firebird::IEventsImpl<YEvents, Firebird::CheckStatusWrapper> >
@@ -186,7 +185,7 @@ public:
 
 private:
 	Firebird::AtomicCounter destroyed;
-};
+};//class YEvents
 
 class YRequest FB_FINAL :
 	public YHelper<YRequest, Firebird::IRequestImpl<YRequest, Firebird::CheckStatusWrapper> >
@@ -215,7 +214,7 @@ public:
 public:
 	YAttachment* attachment;
 	FB_API_HANDLE* userHandle;
-};
+};//class YRequest
 
 class YTransaction FB_FINAL :
 	public YHelper<YTransaction, Firebird::ITransactionImpl<YTransaction, Firebird::CheckStatusWrapper> >
@@ -266,7 +265,7 @@ private:
 		cleanupHandlers.assign(from->cleanupHandlers);
 		from->cleanupHandlers.clear();
 	}
-};
+};//class YTransaction
 
 typedef Firebird::RefPtr<Firebird::ITransaction> NextTransaction;
 
@@ -293,7 +292,7 @@ public:
 public:
 	YAttachment* attachment;
 	YTransaction* transaction;
-};
+};//class YBlob
 
 class YResultSet FB_FINAL :
 	public YHelper<YResultSet, Firebird::IResultSetImpl<YResultSet, Firebird::CheckStatusWrapper> >
@@ -324,7 +323,7 @@ public:
 	YAttachment* attachment;
 	YTransaction* transaction;
 	YStatement* statement;
-};
+};//class YResultSet
 
 class YMetadata
 {
@@ -339,7 +338,7 @@ private:
 	Firebird::RefPtr<Firebird::MsgMetadata> metadata;
 	volatile bool flag;
 	bool input;
-};
+};//class YMetadata
 
 class YStatement FB_FINAL :
 	public YHelper<YStatement, Firebird::IStatementImpl<YStatement, Firebird::CheckStatusWrapper> >
@@ -379,7 +378,7 @@ public:
 
 private:
 	YMetadata input, output;
-};
+};//class YStatement
 
 class EnterCount
 {
@@ -395,7 +394,7 @@ public:
 
 	int enterCount;
 	Firebird::Mutex enterMutex;
-};
+};//class EnterCount
 
 class YAttachment FB_FINAL :
 	public YHelper<YAttachment, Firebird::IAttachmentImpl<YAttachment, Firebird::CheckStatusWrapper> >,
@@ -471,7 +470,7 @@ public:
 	HandleArray<YTransaction> childTransactions;
 	Firebird::Array<CleanupCallback*> cleanupHandlers;
 	Firebird::StatusHolder savedStatus;	// Do not use raise() method of this class in yValve.
-};
+};//class YAttachment
 
 class YService FB_FINAL :
 	public YHelper<YService, Firebird::IServiceImpl<YService, Firebird::CheckStatusWrapper> >,
@@ -503,7 +502,7 @@ public:
 private:
 	Firebird::IProvider* provider;
 	bool utf8Connection;		// Client talks to us using UTF8, else - system default charset
-};
+};//class YService
 
 class Dispatcher FB_FINAL :
 	public Firebird::StdPlugin<Firebird::IProviderImpl<Dispatcher, Firebird::CheckStatusWrapper> >
@@ -540,7 +539,7 @@ private:
 		const char* filename, unsigned int dpbLength, const unsigned char* dpb);
 
 	Firebird::ICryptKeyCallback* cryptCallback;
-};
+};//class Dispatcher
 
 class UtilInterface FB_FINAL :
 	public Firebird::AutoIface<Firebird::IUtilImpl<UtilInterface, Firebird::CheckStatusWrapper> >
@@ -569,8 +568,8 @@ public:
 		unsigned kind, const unsigned char* buf, unsigned len);
 	unsigned setOffsets(Firebird::CheckStatusWrapper* status, Firebird::IMessageMetadata* metadata,
 		Firebird::IOffsetsCallback* callback);
-};
+};//class UtilInterface
 
-}	// namespace Why
-
+////////////////////////////////////////////////////////////////////////////////
+}// namespace Why
 #endif	// YVALVE_Y_OBJECTS_H
