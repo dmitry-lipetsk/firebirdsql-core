@@ -227,6 +227,7 @@ private:
 			}
 
 			T* const tmp = this->ptr;
+
 			this->ptr = p;
 
 			if (tmp)
