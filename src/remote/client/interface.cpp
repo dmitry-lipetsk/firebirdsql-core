@@ -802,13 +802,13 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
 
 		ClntAuthBlock cBlock(&expanded_name, &newDpb, &dpbParam);
 
-		rem_port* port = analyze(cBlock,
-                                 expanded_name,
-                                 flags,
-                                 newDpb,
-                                 dpbParam,
-                                 node_name,
-                                 NULL);
+		rem_port* const port = analyze(cBlock,
+                                       expanded_name,
+                                       flags,
+                                       newDpb,
+                                       dpbParam,
+                                       node_name,
+                                       NULL);
 		if (!port)
 		{
 			Arg::Gds(isc_unavailable).copyTo(status);
@@ -830,7 +830,7 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
 
 		init(status, cBlock, port, op_attach, expanded_name, newDpb, intl, cryptCallback);
 
-		Attachment* a = FB_NEW Attachment(port->port_context, filename);
+		Attachment* const a = FB_NEW Attachment(port->port_context, filename);
 
 		a->addRef();
 
