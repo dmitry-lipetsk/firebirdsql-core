@@ -872,11 +872,11 @@ IAttachment* Loopback::attachDatabase(CheckStatusWrapper*  const status,
 }//attachDatabase
 
 //------------------------------------------------------------------------
-void Blob::getInfo(CheckStatusWrapper*  status,
-                   unsigned int         itemsLength,
-                   const unsigned char* items,
-                   unsigned int         bufferLength,
-                   unsigned char*       buffer)
+void Blob::getInfo(CheckStatusWrapper*  const status,
+                   unsigned int         const itemsLength,
+                   const unsigned char* const items,
+                   unsigned int         const bufferLength,
+                   unsigned char*       const buffer)
 {
 /**************************************
  *
