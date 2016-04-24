@@ -868,7 +868,7 @@ IAttachment* Loopback::attachDatabase(CheckStatusWrapper*  const status,
  *
  **************************************/
 
-	return attach(status, filename, dpb_length, dpb, true);
+	return this->attach(status, filename, dpb_length, dpb, true);
 }//attachDatabase
 
 //------------------------------------------------------------------------
