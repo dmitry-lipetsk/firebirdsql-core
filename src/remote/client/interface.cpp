@@ -852,10 +852,10 @@ IAttachment* RProvider::attachDatabase(CheckStatusWrapper*  const status,
 }//attachDatabase
 
 //------------------------------------------------------------------------
-IAttachment* Loopback::attachDatabase(CheckStatusWrapper*  status,
-                                      const char*          filename,
-                                      unsigned int         dpb_length,
-                                      const unsigned char* dpb)
+IAttachment* Loopback::attachDatabase(CheckStatusWrapper*  const status,
+                                      const char*          const filename,
+                                      unsigned int         const dpb_length,
+                                      const unsigned char* const dpb)
 {
 /**************************************
  *
