@@ -860,7 +860,14 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
 
 		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: call init for DB='%s'\n", expanded_name.c_str()));
 
-		init(status, cBlock, port, op_attach, expanded_name, newDpb, intl, cryptCallback);
+		init(status,
+             cBlock,
+             port,
+             op_attach,
+             expanded_name,
+             newDpb,
+             intl,
+             cryptCallback);
 
 		Attachment* const a = FB_NEW Attachment(port->port_context, filename);
 
