@@ -888,16 +888,21 @@ public:
               const char*    pnamesList,
 			  IFirebirdConf* fbConf)
 		: interfaceType(pinterfaceType)
-           , namesList(getPool())
-           , currentName(getPool())
-           , currentPlugin(nullptr)
-           , firebirdConf(fbConf)
+        , namesList(getPool())
+        , currentName(getPool())
+        , currentPlugin(nullptr)
+        , firebirdConf(fbConf)
 	{
 		namesList.assign(pnamesList);
+
 		namesList.alltrim(" \t");
+
 		Firebird::LocalStatus s;
+
 		Firebird::CheckStatusWrapper statusWrapper(&s);
+
 		next(&statusWrapper);
+
 		check(&statusWrapper);
 	}
 
