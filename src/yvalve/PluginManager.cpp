@@ -1008,7 +1008,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 			RefPtr<PluginModule> m(modules->findModule(info.curModule));
 			if (!m.hasData() && !flShutdown)
 			{
-				m = loadModule(info);
+				m = this->loadModule(info);
 			}
 			if (!m.hasData())
 			{
