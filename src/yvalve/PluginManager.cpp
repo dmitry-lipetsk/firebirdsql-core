@@ -905,7 +905,7 @@ public:
 		next(&statusWrapper);
 
 		check(&statusWrapper);
-	}
+	}//PluginSet
 
 	virtual int release() override final
 	{
@@ -916,7 +916,7 @@ public:
 		}
 
 		return 1;
-	}
+	}//release
 
 private:
 	unsigned int interfaceType;
