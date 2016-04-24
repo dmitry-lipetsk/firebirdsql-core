@@ -167,7 +167,9 @@ private:
 	{
         fb_assert(this->pluginSet);
 
-		this->currentPlugin = (P*) this->pluginSet->getPlugin(&this->status);
+		// [2016-04-24]
+        //  As I understand, it is plus one to IUnknown score.
+        this->currentPlugin = (P*) this->pluginSet->getPlugin(&this->status);
 
 		check(&this->status);
 	}//getPlugin
