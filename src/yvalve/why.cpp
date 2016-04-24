@@ -5716,7 +5716,7 @@ YAttachment*
                                          newDpb.getBufferLength(),
                                          newDpb.getBuffer());
 
-            fb_assert(attachment);
+            //fb_assert(attachment);
 
 			if (!(currentStatus->getState() & Firebird::IStatus::STATE_ERRORS))
 			{
