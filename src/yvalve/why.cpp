@@ -5604,10 +5604,10 @@ void YService::start(CheckStatusWrapper* status, unsigned int spbLength, const u
 
 // Attach a database through the first subsystem that recognizes it.
 
-YAttachment* Dispatcher::attachDatabase(CheckStatusWrapper*  status,
-                                        const char*          filename,
-	                                    unsigned int         dpbLength,
-                                        const unsigned char* dpb)
+YAttachment* Dispatcher::attachDatabase(CheckStatusWrapper*  const status,
+                                        const char*          const filename,
+	                                    unsigned int         const dpbLength,
+                                        const unsigned char* const dpb)
 {
 	return attachOrCreateDatabase(status, false, filename, dpbLength, dpb);
 }
@@ -5616,10 +5616,10 @@ YAttachment* Dispatcher::attachDatabase(CheckStatusWrapper*  status,
 
 // Create new database using the first subsystem that can do it.
 
-YAttachment* Dispatcher::createDatabase(CheckStatusWrapper*  status,
-                                        const char*          filename,
-	                                    unsigned int         dpbLength,
-                                        const unsigned char* dpb)
+YAttachment* Dispatcher::createDatabase(CheckStatusWrapper*  const status,
+                                        const char*          const filename,
+	                                    unsigned int         const dpbLength,
+                                        const unsigned char* const dpb)
 {
 	return attachOrCreateDatabase(status, true, filename, dpbLength, dpb);
 }
@@ -5767,10 +5767,10 @@ YAttachment*
 
 // Attach a service through the first subsystem that recognizes it.
 
-YService* Dispatcher::attachServiceManager(CheckStatusWrapper*  status,
-                                           const char*          serviceName,
-	                                       unsigned int         spbLength,
-                                           const unsigned char* spb)
+YService* Dispatcher::attachServiceManager(CheckStatusWrapper*  const status,
+                                           const char*          const serviceName,
+	                                       unsigned int         const spbLength,
+                                           const unsigned char* const spb)
 {
 	IService* service = NULL;
 	status->init();
@@ -5874,9 +5874,9 @@ YService* Dispatcher::attachServiceManager(CheckStatusWrapper*  status,
 }//attachServiceManager
 
 //------------------------------------------------------------------------
-void Dispatcher::shutdown(CheckStatusWrapper* userStatus,
-                          unsigned int        timeout,
-                          const int           reason)
+void Dispatcher::shutdown(CheckStatusWrapper* const userStatus,
+                          unsigned int              timeout,
+                          const int                 reason)
 {
 	// can't syncronize with already killed threads, just exit
 	if (MasterInterfacePtr()->getProcessExiting())
@@ -6038,8 +6038,8 @@ void Dispatcher::shutdown(CheckStatusWrapper* userStatus,
 }//shutdown
 
 //------------------------------------------------------------------------
-void Dispatcher::setDbCryptCallback(CheckStatusWrapper* status,
-                                    ICryptKeyCallback*  callback)
+void Dispatcher::setDbCryptCallback(CheckStatusWrapper* const status,
+                                    ICryptKeyCallback*  const callback)
 {
 	status->init();
 
