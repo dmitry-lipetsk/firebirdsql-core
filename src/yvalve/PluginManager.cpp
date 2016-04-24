@@ -884,6 +884,7 @@ public:
 
 	void next(CheckStatusWrapper* status);
 
+public:
 	PluginSet(unsigned int   pinterfaceType,
               const char*    pnamesList,
 			  IFirebirdConf* fbConf)
