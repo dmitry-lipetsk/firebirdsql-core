@@ -49,9 +49,9 @@ public:
 	}
 
 	// IClient implementation
-	int authenticate(CheckStatusWrapper*, IClientBlock* cb);
+	virtual int authenticate(CheckStatusWrapper*, IClientBlock* cb) override final;
 
-    int release();
+    virtual int release() override final;
 
 private:
 	RemotePassword* client;
