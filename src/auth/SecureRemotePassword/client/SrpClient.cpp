@@ -38,8 +38,9 @@ class SrpClient FB_FINAL : public StdPlugin<IClientImpl<SrpClient, CheckStatusWr
 {
 public:
 	explicit SrpClient(IPluginConfig*)
-		: client(NULL), data(getPool()),
-		  sessionKey(getPool())
+		: client(NULL)
+        , data(getPool())
+        , sessionKey(getPool())
 	{ }
 
 	~SrpClient()
@@ -55,7 +56,7 @@ private:
 	RemotePassword* client;
 	string data;
 	UCharBuffer sessionKey;
-};
+};//class SrpClient
 
 int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 {
