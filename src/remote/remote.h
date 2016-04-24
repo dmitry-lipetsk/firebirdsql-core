@@ -276,9 +276,15 @@ struct Rvnt : public Firebird::GlobalStorage, public TypedHandle<rem_type_rev>
 	Firebird::AtomicCounter rvnt_destroyed;
 
 public:
-	Rvnt() :
-		rvnt_next(NULL), rvnt_rdb(NULL), rvnt_callback(NULL), rvnt_iface(NULL),
-		rvnt_port(NULL), rvnt_id(0), rvnt_length(0), rvnt_self(NULL)
+	Rvnt()
+     : rvnt_next(NULL)
+     , rvnt_rdb(NULL)
+     , rvnt_callback(NULL)
+     , rvnt_iface(NULL)
+     , rvnt_port(NULL)
+     , rvnt_id(0)
+     , rvnt_length(0)
+     , rvnt_self(NULL)
 	{ }
 
 	~Rvnt()
