@@ -867,7 +867,7 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
              expanded_name,
              newDpb,
              intl,
-             cryptCallback);
+             this->cryptCallback);
 
 		Attachment* const a = FB_NEW Attachment(port->port_context, filename);
 
