@@ -848,7 +848,11 @@ IAttachment* RProvider::attachDatabase(CheckStatusWrapper*  const status,
  *
  **************************************/
 
-	return this->attach(status, filename, dpb_length, dpb, false);
+	return this->attach(status,
+                        filename,
+                        dpb_length,
+                        dpb,
+                        /*loopback*/false);
 }//attachDatabase
 
 //------------------------------------------------------------------------
