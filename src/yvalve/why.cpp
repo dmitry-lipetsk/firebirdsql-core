@@ -1243,7 +1243,8 @@ namespace Why
 
 	template <>
 	YEntry<YAttachment>::YEntry(CheckStatusWrapper* aStatus, YAttachment* aAttachment, int checkAttachment)
-		: ref(aAttachment), nextRef(nullptr)
+		: ref(aAttachment)
+        , nextRef(nullptr)
 	{
 		aStatus->init();
 		init(aAttachment->next);
