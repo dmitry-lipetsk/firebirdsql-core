@@ -666,7 +666,7 @@ void RProvider::setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallback
 {
 	status->init();
 
-	cryptCallback = callback;
+	this->cryptCallback = callback;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
