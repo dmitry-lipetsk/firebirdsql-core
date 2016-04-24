@@ -1450,7 +1450,7 @@ static bool internal_enqueue(thread_db* tdbb, CheckStatusWrapper* statusVector, 
 
 Lock::Lock(thread_db* tdbb, USHORT length, lck_t type, void* object, lock_ast_t ast)
 :	lck_dbb(tdbb->getDatabase()),
- 	lck_attachment(NULL),
+	lck_attachment(nullptr),
 	lck_compatible(NULL),
 	lck_compatible2(NULL),
 	lck_ast(ast),
