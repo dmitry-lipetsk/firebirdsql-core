@@ -598,29 +598,29 @@ public:
 	{ }
 
 	// IProvider implementation
-	IAttachment* attachDatabase(CheckStatusWrapper*  status,
-                                const char*          fileName,
-                                unsigned int         dpbLength,
-                                const unsigned char* dpb);
+	virtual IAttachment* attachDatabase(CheckStatusWrapper*  status,
+                                        const char*          fileName,
+                                        unsigned int         dpbLength,
+                                        const unsigned char* dpb)override /*final*/;
 
-	IAttachment* createDatabase(CheckStatusWrapper*  status,
-                                const char*          fileName,
-                                unsigned int         dpbLength,
-                                const unsigned char* dpb);
+	virtual IAttachment* createDatabase(CheckStatusWrapper*  status,
+                                        const char*          fileName,
+                                        unsigned int         dpbLength,
+                                        const unsigned char* dpb)override /*final*/;
 
-	IService* attachServiceManager(CheckStatusWrapper*  status,
-                                   const char*          service,
-                                   unsigned int         spbLength,
-                                   const unsigned char* spb);
+	virtual IService* attachServiceManager(CheckStatusWrapper*  status,
+                                          const char*          service,
+                                          unsigned int         spbLength,
+                                          const unsigned char* spb)override /*final*/;
 
-	void shutdown(CheckStatusWrapper* status,
-                  unsigned int        timeout,
-                  const int           reason);
+	virtual void shutdown(CheckStatusWrapper* status,
+                          unsigned int        timeout,
+                          const int           reason)override final;
 
-	void setDbCryptCallback(CheckStatusWrapper* status,
-                            ICryptKeyCallback*  cryptCallback);
+	virtual void setDbCryptCallback(CheckStatusWrapper* status,
+                                    ICryptKeyCallback*  cryptCallback)override final;
 
-	int release()
+	virtual int release()override final
 	{
 		if (--refCounter == 0)
 		{
