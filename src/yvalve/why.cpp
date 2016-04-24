@@ -5707,11 +5707,15 @@ YAttachment* Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* st
 				}
 
 				status->setErrors(currentStatus->getErrors());
+
 				status->setWarnings(currentStatus->getWarnings());
+
 				YAttachment* r = FB_NEW YAttachment(provider, attachment, expandedFilename);
+
 				r->addRef();
+
 				return r;
-			}
+			}//if
 
 			switch (currentStatus->getErrors()[1])
 			{
