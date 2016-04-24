@@ -890,7 +890,7 @@ public:
 		: interfaceType(pinterfaceType)
            , namesList(getPool())
            , currentName(getPool())
-           , currentPlugin(NULL)
+           , currentPlugin(nullptr)
            , firebirdConf(fbConf)
 	{
 		namesList.assign(pnamesList);
