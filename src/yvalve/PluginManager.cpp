@@ -864,7 +864,7 @@ public:
         }
 
 		return nullptr;
-	}
+	}//getName
 
 	virtual const char* getModuleName() const override final
 	{
@@ -874,7 +874,7 @@ public:
         }
 
         return nullptr;
-	}
+	}//getModuleName
 
 	virtual void set(CheckStatusWrapper* status, const char* newName) override final
 	{
