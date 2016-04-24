@@ -101,7 +101,7 @@ protected:
 	explicit InternalTransaction(InternalConnection& conn) :
 	  Transaction(conn),
 	  m_IntConnection(conn),
-	  m_transaction(0)
+	  m_transaction(nullptr)
 	{}
 
 	virtual ~InternalTransaction() {}
