@@ -995,6 +995,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 		{
 			// First check - may be currentName is present among already configured plugins
 			ConfiguredPlugin* tmp = NULL;
+
 			if (plugins->get(MapKey(interfaceType, currentName), tmp))
 			{
 				currentPlugin = tmp;
@@ -1006,10 +1007,12 @@ void PluginSet::next(CheckStatusWrapper* status)
 
 			// Check if module is loaded and load it if needed
 			RefPtr<PluginModule> m(modules->findModule(info.curModule));
+
 			if (!m.hasData() && !flShutdown)
 			{
 				m = this->loadModule(info);
 			}
+
 			if (!m.hasData())
 			{
 				continue;
@@ -1025,6 +1028,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 			currentPlugin = FB_NEW ConfiguredPlugin(m, r, info.conf, info.plugConfigFile, currentName);
 
 			plugins->put(MapKey(interfaceType, currentName), currentPlugin);
+
 			return;
 		}//while
 	}
