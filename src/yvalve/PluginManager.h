@@ -43,13 +43,22 @@ class PluginManager : public AutoIface<IPluginManagerImpl<PluginManager, CheckSt
 {
 public:
 	// IPluginManager implementation
-	IPluginSet* getPlugins(CheckStatusWrapper* status, unsigned int interfaceType,
-					const char* namesList, IFirebirdConf* firebirdConf);
-	void registerPluginFactory(unsigned int interfaceType, const char* defaultName,
-					IPluginFactory* factory);
-	IConfig* getConfig(CheckStatusWrapper* status, const char* filename);
+	IPluginSet* getPlugins(CheckStatusWrapper* status,
+                           unsigned int        interfaceType,
+					       const char*         namesList,
+                           IFirebirdConf*      firebirdConf);
+
+	void registerPluginFactory(unsigned int    interfaceType,
+                               const char*     defaultName,
+					           IPluginFactory* factory);
+
+	IConfig* getConfig(CheckStatusWrapper* status,
+                       const char*         filename);
+
 	void releasePlugin(IPluginBase* plugin);
+
 	void registerModule(IPluginModule* module);
+
 	void unregisterModule(IPluginModule* module);
 
 public:
