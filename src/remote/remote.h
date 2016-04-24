@@ -515,13 +515,28 @@ public:
 	};
 
 public:
-	Rsr() :
-		rsr_next(0), rsr_rdb(0), rsr_rtr(0), rsr_iface(NULL), rsr_cursor(NULL),
-		rsr_bind_format(0), rsr_select_format(0), rsr_user_select_format(0),
-		rsr_format(0), rsr_message(0), rsr_buffer(0), rsr_status(0),
-		rsr_id(0), rsr_fmt_length(0),
-		rsr_rows_pending(0), rsr_msgs_waiting(0), rsr_reorder_level(0), rsr_batch_count(0),
-		rsr_cursor_name(getPool()), rsr_delayed_format(false), rsr_self(NULL)
+	Rsr()
+     : rsr_next(0)
+     , rsr_rdb(0)
+     , rsr_rtr(0)
+     , rsr_iface(NULL)
+     , rsr_cursor(NULL)
+     , rsr_bind_format(0)
+     , rsr_select_format(0)
+     , rsr_user_select_format(0)
+     , rsr_format(0)
+     , rsr_message(0)
+     , rsr_buffer(0)
+     , rsr_status(0)
+     , rsr_id(0)
+     , rsr_fmt_length(0)
+     , rsr_rows_pending(0)
+     , rsr_msgs_waiting(0)
+     , rsr_reorder_level(0)
+     , rsr_batch_count(0)
+     , rsr_cursor_name(getPool())
+     , rsr_delayed_format(false)
+     , rsr_self(NULL)
 	{ }
 
 	~Rsr()
