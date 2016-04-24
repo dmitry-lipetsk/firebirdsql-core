@@ -1119,7 +1119,7 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* const status)
 		ex.stuffException(status);
 	}
 
-	return NULL;
+	return nullptr;
 }//getPlugin
 
 /////////////////////////////////////////////////////////////////////////////////
