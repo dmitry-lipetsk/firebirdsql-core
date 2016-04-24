@@ -205,10 +205,15 @@ struct Rtr : public Firebird::GlobalStorage, public TypedHandle<rem_type_rtr>
 	Rtr**			rtr_self;
 
 public:
-	Rtr() :
-		rtr_rdb(0), rtr_next(0), rtr_blobs(0),
-		rtr_iface(NULL), rtr_id(0), rtr_limbo(0),
-		rtr_cursors(getPool()), rtr_self(NULL)
+	Rtr()
+     : rtr_rdb(0)
+     , rtr_next(0)
+     , rtr_blobs(0)
+     , rtr_iface(NULL)
+     , rtr_id(0)
+     , rtr_limbo(0)
+     , rtr_cursors(getPool())
+     , rtr_self(NULL)
 	{ }
 
 	~Rtr()
