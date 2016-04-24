@@ -890,7 +890,7 @@ public:
 		{
 			ex.stuffException(status);
 		}
-	}
+	}//set
 
 	virtual IPluginBase* getPlugin(CheckStatusWrapper* status) override final;
 
