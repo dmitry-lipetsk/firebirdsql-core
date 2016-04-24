@@ -36,6 +36,8 @@
 #include "../common/config/config.h"
 
 namespace Firebird {
+////////////////////////////////////////////////////////////////////////////////
+//class PluginManager
 
 class PluginManager : public AutoIface<IPluginManagerImpl<PluginManager, CheckStatusWrapper> >
 {
@@ -50,12 +52,14 @@ public:
 	void registerModule(IPluginModule* module);
 	void unregisterModule(IPluginModule* module);
 
+public:
 	PluginManager();
 
 	static void shutdown();
 	static void waitForType(unsigned int typeThatMustGoAway);
-};
+};//class PluginManager
 
-}	// namespace Firebird
+////////////////////////////////////////////////////////////////////////////////
+}//namespace Firebird
 
 #endif	// YVALVE_PLUGIN_MANAGER_H
