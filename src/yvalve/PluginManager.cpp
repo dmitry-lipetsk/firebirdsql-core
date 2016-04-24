@@ -858,7 +858,12 @@ public:
 	// IPluginSet implementation
 	virtual const char* getName() const override final
 	{
-		return currentPlugin.hasData() ? currentName.c_str() : NULL;
+        if(this->currentPlugin.hasData())
+        {
+            return this->currentName.c_str();
+        }
+
+		return nullptr;
 	}
 
 	virtual const char* getModuleName() const override final
