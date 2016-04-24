@@ -154,7 +154,7 @@ public:
 	void destroy2(unsigned dstrFlags)
 	{
 		RefDeb(Firebird::DEB_RLS_JATT, "YValve/destroy2");
-		next = NULL;
+		next = nullptr;
 
 		if (dstrFlags & DF_RELEASE)
 		{

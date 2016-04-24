@@ -189,14 +189,14 @@ void InternalConnection::doDetach(thread_db* tdbb)
 
 	if (m_isCurrent)
 	{
-		m_attachment = NULL;
+		m_attachment = nullptr;
 	}
 	else
 	{
 		FbLocalStatus status;
 
 		RefPtr<JAttachment> att = m_attachment;
-		m_attachment = NULL;
+		m_attachment = nullptr;
 
 		{	// scope
 			EngineCallbackGuard guard(tdbb, *this, FB_FUNCTION);
@@ -313,7 +313,7 @@ void InternalTransaction::doCommit(FbStatusVector* status, thread_db* tdbb, bool
 	if (m_scope == traCommon && m_IntConnection.isCurrent())
 	{
 		if (!retain) {
-			m_transaction = NULL;
+			m_transaction = nullptr;
 		}
 	}
 	else
@@ -335,7 +335,7 @@ void InternalTransaction::doRollback(FbStatusVector* status, thread_db* tdbb, bo
 	if (m_scope == traCommon && m_IntConnection.isCurrent())
 	{
 		if (!retain) {
-			m_transaction = NULL;
+			m_transaction = nullptr;
 		}
 	}
 	else
@@ -351,7 +351,7 @@ void InternalTransaction::doRollback(FbStatusVector* status, thread_db* tdbb, bo
 
 	if (status->getErrors()[1] == isc_att_shutdown && !retain)
 	{
-		m_transaction = NULL;
+		m_transaction = nullptr;
 		status->init();
 	}
 }
@@ -537,7 +537,7 @@ void InternalStatement::doOpen(thread_db* tdbb)
 		if (m_cursor)
 		{
 			m_cursor->close(&status);
-			m_cursor = NULL;
+			m_cursor = nullptr;
 		}
 
 		fb_assert(m_inMetadata->getMessageLength() == m_in_buffer.getCount());
@@ -582,7 +582,7 @@ void InternalStatement::doClose(thread_db* tdbb, bool drop)
 		if (m_cursor)
 			m_cursor->close(&status);
 
-		m_cursor = NULL;
+		m_cursor = nullptr;
 		if (status->getState() & IStatus::STATE_ERRORS)
 		{
 			raise(&status, tdbb, "JResultSet::close");
@@ -594,7 +594,7 @@ void InternalStatement::doClose(thread_db* tdbb, bool drop)
 				m_request->free(&status);
 
 			m_allocated = false;
-			m_request = NULL;
+			m_request = nullptr;
 
 			if (status->getState() & IStatus::STATE_ERRORS)
 			{
@@ -754,7 +754,7 @@ void InternalBlob::close(thread_db* tdbb)
 	{
 		EngineCallbackGuard guard(tdbb, m_connection, FB_FUNCTION);
 		m_blob->close(&status);
-		m_blob = NULL;
+		m_blob = nullptr;
 	}
 
 	if (status->getState() & IStatus::STATE_ERRORS)
@@ -774,7 +774,7 @@ void InternalBlob::cancel(thread_db* tdbb)
 	{
 		EngineCallbackGuard guard(tdbb, m_connection, FB_FUNCTION);
 		m_blob->cancel(&status);
-		m_blob = NULL;
+		m_blob = nullptr;
 	}
 
 	if (status->getState() & IStatus::STATE_ERRORS)

@@ -944,7 +944,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 	{
 		if (currentPlugin.hasData())
 		{
-			currentPlugin = NULL;
+			currentPlugin = nullptr;
 		}
 
 		MutexLockGuard g(plugins->mutex, FB_FUNCTION);

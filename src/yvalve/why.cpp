@@ -1215,7 +1215,7 @@ namespace Why
 		void fini()
 		{
 			RefDeb(DEB_RLS_JATT, "YEntry::fini");
-			nextRef = NULL;
+			nextRef = nullptr;
 
 			if (ref)
 			{
@@ -4911,7 +4911,7 @@ YTransaction* YTransaction::enterDtc(CheckStatusWrapper* status)
 			attachment->childTransactions.remove(this);
 
 		removeHandle(&transactions, handle);
-		next = NULL;
+		next = nullptr;
 		release();
 
 		return copy;
@@ -5408,7 +5408,7 @@ void YAttachment::ping(CheckStatusWrapper* status)
 			StatusVector temp(NULL);
 			CheckStatusWrapper tempCheckStatusWrapper(&temp);
 			entry.next()->detach(&tempCheckStatusWrapper);
-			next = NULL;
+			next = nullptr;
 
 			status_exception::raise(savedStatus.value());
 		}
@@ -5526,7 +5526,7 @@ void YService::destroy(unsigned dstrFlags)
 {
 	removeHandle(&services, handle);
 
-	next = NULL;
+	next = nullptr;
 	if (dstrFlags & DF_RELEASE)
 		release();
 }

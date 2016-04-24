@@ -290,7 +290,7 @@ bool DsqlDmlRequest::fetch(thread_db* tdbb, UCHAR* msgBuffer)
 	}
 
 	map_in_out(tdbb, this, true, message, delayedFormat, msgBuffer);
-	delayedFormat = NULL;
+	delayedFormat = nullptr;
 
 	trace.fetch(false, ITracePlugin::RESULT_SUCCESS);
 	return true;

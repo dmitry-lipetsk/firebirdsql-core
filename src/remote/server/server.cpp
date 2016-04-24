@@ -739,7 +739,7 @@ public:
 			LocalStatus ls;
 			CheckStatusWrapper status_vector(&ls);
 			event->rvnt_iface->cancel(&status_vector);
-			event->rvnt_iface = NULL;
+			event->rvnt_iface = nullptr;
 		}
 
 		if (port->port_flags & PORT_disconnect)
@@ -1230,7 +1230,7 @@ static void free_request(server_req_t* request)
  **************************************/
 	MutexLockGuard queGuard(request_que_mutex, FB_FUNCTION);
 
-	request->req_port = 0;
+	request->req_port = nullptr;
 	request->req_next = free_requests;
 	free_requests = request;
 }
@@ -1439,7 +1439,7 @@ void SRVR_multi_thread( rem_port* main_port, USHORT flags)
 					const SSHORT asyncSize = port->asyncReceive(&asyncPacket, buffer, dataSize);
 					if (asyncSize == dataSize)
 					{
-						port = NULL;
+						port = nullptr;
 						continue;
 					}
 					dataSize -= asyncSize;
@@ -1474,7 +1474,7 @@ void SRVR_multi_thread( rem_port* main_port, USHORT flags)
 
 							free_request(request);
 							request = 0;
-							port = 0;
+							port = nullptr;
 							continue;
 						}
 						if (!port->haveRecvData())
@@ -1516,7 +1516,7 @@ void SRVR_multi_thread( rem_port* main_port, USHORT flags)
 					}
 					request = 0;
 				}
-				port = 0;
+				port = nullptr;
 			}
 
 			Worker::shutdown();
@@ -1575,13 +1575,13 @@ void SRVR_multi_thread( rem_port* main_port, USHORT flags)
 
 						port->disconnect(NULL, NULL);
 					}
-					port = NULL;
+					port = nullptr;
 
 				}	// try
 				catch (const Exception&)
 				{
 					port->disconnect(NULL, NULL);
-					port = NULL;
+					port = nullptr;
 				}
 			}
 
@@ -1983,7 +1983,7 @@ static ISC_STATUS allocate_statement( rem_port* port, /*P_RLSE* allocate,*/ PACK
 
 	Rsr* statement = FB_NEW Rsr;
 	statement->rsr_rdb = rdb;
-	statement->rsr_iface = NULL;
+	statement->rsr_iface = nullptr;
 
 	if (statement->rsr_id = port->get_id(statement))
 	{
@@ -2408,7 +2408,7 @@ static ISC_STATUS cancel_events( rem_port* port, P_EVENT * stuff, PACKET* send)
 	if (allowCancel && event->rvnt_iface)
 	{
 		event->rvnt_iface->cancel(&status_vector);
-		event->rvnt_iface = NULL;
+		event->rvnt_iface = nullptr;
 	}
 
 	// zero event info
@@ -2734,7 +2734,7 @@ void rem_port::disconnect(PACKET* sendL, PACKET* receiveL)
 		}
 
 		rdb->rdb_iface->detach(&status_vector);
-		rdb->rdb_iface = NULL;
+		rdb->rdb_iface = nullptr;
 
 		while (rdb->rdb_events)
 			release_event(rdb->rdb_events);
@@ -2746,7 +2746,7 @@ void rem_port::disconnect(PACKET* sendL, PACKET* receiveL)
 	if (rdb->rdb_svc.hasData() && rdb->rdb_svc->svc_iface)
 	{
 		rdb->rdb_svc->svc_iface->detach(&status_vector);
-		rdb->rdb_svc->svc_iface = NULL;
+		rdb->rdb_svc->svc_iface = nullptr;
 	}
 
 	REMOTE_free_packet(this, sendL);
@@ -2818,7 +2818,7 @@ void rem_port::drop_database(P_RLSE* /*release*/, PACKET* sendL)
 		return;
 	}
 
-	rdb->rdb_iface = NULL;
+	rdb->rdb_iface = nullptr;
 	port_flags |= PORT_detached;
 	if (port_async)
 		port_async->port_flags |= PORT_detached;
@@ -2906,7 +2906,7 @@ ISC_STATUS rem_port::end_database(P_RLSE* /*release*/, PACKET* sendL)
 			release_event(rdb->rdb_events);
 	}
 
-	rdb->rdb_iface = NULL;
+	rdb->rdb_iface = nullptr;
 
 	while (rdb->rdb_requests)
 		release_request(rdb->rdb_requests);
@@ -2978,7 +2978,7 @@ ISC_STATUS rem_port::end_statement(P_SQLFREE* free_stmt, PACKET* sendL)
 			{
 				return this->send_response(sendL, 0, 0, &status_vector, true);
 			}
-			statement->rsr_cursor = NULL;
+			statement->rsr_cursor = nullptr;
 			fb_assert(statement->rsr_rtr);
 			FB_SIZE_T pos;
 			if (!statement->rsr_rtr->rtr_cursors.find(statement, pos))
@@ -3001,7 +3001,7 @@ ISC_STATUS rem_port::end_statement(P_SQLFREE* free_stmt, PACKET* sendL)
 			{
 				return this->send_response(sendL, 0, 0, &status_vector, true);
 			}
-			statement->rsr_iface = NULL;
+			statement->rsr_iface = nullptr;
 		}
 	}
 
@@ -4981,7 +4981,7 @@ static void release_statement( Rsr** statement)
  **************************************/
 	if ((*statement)->rsr_cursor)
 	{
-		(*statement)->rsr_cursor = NULL;
+		(*statement)->rsr_cursor = nullptr;
 
 		Rtr* const transaction = (*statement)->rsr_rtr;
 		fb_assert(transaction);
@@ -5054,7 +5054,7 @@ static void release_transaction( Rtr* transaction)
 	{
 		Rsr* const statement = transaction->rtr_cursors.pop();
 		fb_assert(statement->rsr_cursor);
-		statement->rsr_cursor = NULL;
+		statement->rsr_cursor = nullptr;
 	}
 
 	for (Rtr** p = &rdb->rdb_transactions; *p; p = &(*p)->rtr_next)
@@ -5420,7 +5420,7 @@ ISC_STATUS rem_port::service_end(P_RLSE* /*release*/, PACKET* sendL)
 	if (!(status_vector.getState() & Firebird::IStatus::STATE_ERRORS))
 	{
 		port_flags |= PORT_detached;
-		rdb->rdb_svc->svc_iface = NULL;
+		rdb->rdb_svc->svc_iface = nullptr;
 	}
 
 	return this->send_response(sendL, 0, 0, &status_vector, false);

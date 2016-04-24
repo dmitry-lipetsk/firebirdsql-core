@@ -1947,7 +1947,7 @@ static bool select_multi(rem_port* main_port, UCHAR* buffer, SSHORT bufsize, SSH
 		}
 		if (!select_wait(main_port, &INET_select))
 		{
-			port = NULL;
+			port = nullptr;
 			return false;
 		}
 	}

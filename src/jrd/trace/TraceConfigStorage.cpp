@@ -145,7 +145,7 @@ void ConfigStorage::shutdown()
 		return;
 
 	m_timer->stop();
-	m_timer = NULL;
+	m_timer = nullptr;
 
 	::close(m_cfg_file);
 	m_cfg_file = -1;

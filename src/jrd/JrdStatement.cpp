@@ -576,7 +576,7 @@ void JrdStatement::release(thread_db* tdbb)
 	for (jrd_req** instance = requests.begin(); instance != requests.end(); ++instance)
 		EXE_release(tdbb, *instance);
 
-	sqlText = NULL;
+	sqlText = nullptr;
 
 	// Sub statement pool is the same of the main statement, so don't delete it.
 	if (!parentStatement)

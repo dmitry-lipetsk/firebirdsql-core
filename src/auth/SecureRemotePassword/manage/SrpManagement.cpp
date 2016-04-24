@@ -263,7 +263,7 @@ public:
 				Firebird::LocalStatus ls;
 				Firebird::CheckStatusWrapper lStatus(&ls);
 				att->detach(&lStatus);
-				att = NULL;
+				att = nullptr;
 			}
 		}
 	}
@@ -620,7 +620,7 @@ public:
 			tra->commit(status);
 			if (!(status->getState() & Firebird::IStatus::STATE_ERRORS))
 			{
-				tra = NULL;
+				tra = nullptr;
 			}
 		}
 	}
@@ -632,7 +632,7 @@ public:
 			tra->rollback(status);
 			if (!(status->getState() & Firebird::IStatus::STATE_ERRORS))
 			{
-				tra = NULL;
+				tra = nullptr;
 			}
 		}
 	}
@@ -649,7 +649,7 @@ public:
 				att->detach(&statusWrapper);
 				if (!(status.getState() & Firebird::IStatus::STATE_ERRORS))
 				{
-					att = NULL;
+					att = nullptr;
 				}
 			}
 

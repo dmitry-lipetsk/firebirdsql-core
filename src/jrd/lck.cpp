@@ -1538,7 +1538,7 @@ Lock* Lock::detach()
 {
 	Lock* next = lck_next;
 	RefDeb(DEB_RLS_JATT, "Lock::detach");
-	lck_attachment = NULL;
+	lck_attachment = nullptr;
 	lck_next = NULL;
 	lck_prior = NULL;
 
