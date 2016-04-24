@@ -852,8 +852,10 @@ IAttachment* RProvider::attachDatabase(CheckStatusWrapper*  const status,
 }//attachDatabase
 
 //------------------------------------------------------------------------
-IAttachment* Loopback::attachDatabase(CheckStatusWrapper* status, const char* filename,
-	unsigned int dpb_length, const unsigned char* dpb)
+IAttachment* Loopback::attachDatabase(CheckStatusWrapper*  status,
+                                      const char*          filename,
+                                      unsigned int         dpb_length,
+                                      const unsigned char* dpb)
 {
 /**************************************
  *
@@ -867,9 +869,9 @@ IAttachment* Loopback::attachDatabase(CheckStatusWrapper* status, const char* fi
  **************************************/
 
 	return attach(status, filename, dpb_length, dpb, true);
-}
+}//attachDatabase
 
-
+//------------------------------------------------------------------------
 void Blob::getInfo(CheckStatusWrapper* status,
 				   unsigned int itemsLength, const unsigned char* items,
 				   unsigned int bufferLength, unsigned char* buffer)
