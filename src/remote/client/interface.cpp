@@ -5429,11 +5429,11 @@ static void secureAuthentication(ClntAuthBlock& cBlock, rem_port* port)
 
 static rem_port* analyze(ClntAuthBlock&       cBlock,
                          PathName&            attach_name,
-                         unsigned             flags,
+                         unsigned   const     flags,
                          ClumpletWriter&      pb,
                          const ParametersSet& parSet,
                          PathName&            node_name,
-                         PathName*            ref_db_name)
+                         PathName*  const     ref_db_name)
 {
 /**************************************
  *
