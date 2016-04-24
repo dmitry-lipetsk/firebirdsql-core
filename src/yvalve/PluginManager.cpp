@@ -1105,9 +1105,7 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* const status)
 	{
 		while (this->currentPlugin.hasData())
 		{
-			IPluginBase* const p = this->currentPlugin->factory(firebirdConf);
-
-			if (p)
+			if(IPluginBase* const p = this->currentPlugin->factory(firebirdConf))
 				return p;
 
 			this->next(status);
