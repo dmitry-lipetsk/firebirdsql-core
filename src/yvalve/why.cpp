@@ -1261,8 +1261,11 @@ namespace Why
 	}
 
 	template <>
-	YEntry<YService>::YEntry(CheckStatusWrapper* aStatus, YService* aService, int checkService)
-		: ref(aService), nextRef(NULL)
+	YEntry<YService>::YEntry(CheckStatusWrapper* aStatus,
+                             YService*           aService,
+                             int                 checkService)
+		: ref(aService)
+        , nextRef(NULL)
 	{
 		aStatus->init();
 		init(aService->next);
