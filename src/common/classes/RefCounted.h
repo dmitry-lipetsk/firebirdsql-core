@@ -174,7 +174,7 @@ public:
 
 	self_type& operator = (T* const p)
 	{
-		return this->assign(p);
+		return this->helper__assign(p);
 	}
 
     self_type& operator = (std::nullptr_t)
@@ -191,7 +191,7 @@ public:
 
 	self_type& operator = (const self_type& r)
 	{
-		return this->assign(r.ptr);
+		return this->helper__assign(r.ptr);
 	}
 
 	self_type& operator = (self_type&& rr)
@@ -227,7 +227,7 @@ public:
 	}
 
 private:
-	self_type& assign(T* const p)
+	self_type& helper__assign(T* const p)
 	{
 		if (this->ptr != p)
 		{
@@ -247,7 +247,7 @@ private:
 		}//if
 
 		return *this;
-	}//assign
+	}//helper__assign
 
 private:
     template<typename T1>
