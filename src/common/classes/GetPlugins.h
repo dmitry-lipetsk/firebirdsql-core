@@ -49,142 +49,183 @@ private:
     self_type& operator = (const self_type&);
 
 public:
-	GetPlugins(unsigned int const interfaceType,
-               const char*        namesList = nullptr)
-		: masterInterface()
-        , pluginInterface()
-        , pluginSet(nullptr)
-        , currentPlugin(nullptr)
-        , ls(*getDefaultMemoryPool())
-        , status(&ls)
-	{
-        if(!namesList)
-        {
-            namesList=Config::getDefaultConfig()->getPlugins(interfaceType);
-        }//if
+    GetPlugins(unsigned int const interfaceType,
+               const char*        namesList = nullptr);
 
-		this->pluginSet.assignRefNoIncr
-         (this->pluginInterface->getPlugins
-           (&status,
-            interfaceType,
-			namesList,
-			nullptr));
+    GetPlugins(unsigned int const interfaceType,
+               Config*      const knownConfig,
+               const char*        namesList = nullptr);
 
-		check(&status);
+    ~GetPlugins();
 
-		this->getPlugin();
-	}//GetPlugins
+    bool hasData() const;
 
-	GetPlugins(unsigned int const interfaceType,
-			   Config*      const knownConfig,
-               const char*        namesList = nullptr)
-		: masterInterface()
-        , pluginInterface()
-        , pluginSet(nullptr)
-        , currentPlugin(nullptr)
-        , ls(*getDefaultMemoryPool())
-        , status(&ls)
-	{
-		//[2016-04-23] FirebirdConf requires the not null pointer to config object.
-		fb_assert(knownConfig);
+    const char* name() const;
 
-        const RefPtr<IFirebirdConf>
-         spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
+    P* plugin() const;
 
-        if(!namesList)
-        {
-            namesList=knownConfig->getPlugins(interfaceType);
-        }//if
+    void next();
 
-		this->pluginSet.assignRefNoIncr
-         (this->pluginInterface->getPlugins
-           (&this->status,
-            interfaceType,
-			namesList,
-  		    spCfg));
-
-		check(&this->status);
-
-		this->getPlugin();
-	}//GetPlugins
-
-	~GetPlugins()
-	{
-		if (this->hasData())
-		{
-			this->pluginInterface->releasePlugin(currentPlugin);
-
-			this->currentPlugin = nullptr;
-		}
-	}//~GetPlugins
-
-	bool hasData() const
-	{
-		return this->currentPlugin;
-	}
-
-	const char* name() const
-	{
-		return this->hasData() ? this->pluginSet->getName() : nullptr;
-	}
-
-	P* plugin() const
-	{
-		return this->currentPlugin;
-	}
-
-	void next()
-	{
-		if (this->hasData())
-		{
-			this->pluginInterface->releasePlugin(currentPlugin);
-			
-            this->currentPlugin = nullptr;
-
-			this->pluginSet->next(&this->status);
-
-			check(&this->status);
-
-			this->getPlugin();
-		}
-	}//next
-
-	void set(const char* newName)
-	{
-		if (this->hasData())
-		{
-			this->pluginInterface->releasePlugin(currentPlugin);
-
-			this->currentPlugin = nullptr;
-		}//if
-
-		this->pluginSet->set(&this->status, newName);
-
-		check(&this->status);
-
-		this->getPlugin();
-	}//set
+    void set(const char* newName);
 
 private:
-	void getPlugin()
-	{
-        fb_assert(this->pluginSet);
-
-		// [2016-04-24]
-        //  As I understand, it is plus one to IUnknown score.
-        this->currentPlugin = (P*) this->pluginSet->getPlugin(&this->status);
-
-		check(&this->status);
-	}//getPlugin
+    void getPlugin();
 
 private:
-	MasterInterfacePtr masterInterface;
-	PluginManagerInterfacePtr pluginInterface;
-	RefPtr<IPluginSet> pluginSet;
-	P* currentPlugin;
-	LocalStatus ls;
-	CheckStatusWrapper status;
+    MasterInterfacePtr masterInterface;
+    PluginManagerInterfacePtr pluginInterface;
+    RefPtr<IPluginSet> pluginSet;
+    P* currentPlugin;
+    LocalStatus ls;
+    CheckStatusWrapper status;
 };//class GetPlugins
+
+////////////////////////////////////////////////////////////////////////////////
+//class GetPlugins
+
+template<typename P>
+GetPlugins<P>::GetPlugins(unsigned int const interfaceType,
+                          const char*        namesList)
+ : masterInterface()
+ , pluginInterface()
+ , pluginSet(nullptr)
+ , currentPlugin(nullptr)
+ , ls(*getDefaultMemoryPool())
+ , status(&ls)
+{
+    if(!namesList)
+    {
+        namesList=Config::getDefaultConfig()->getPlugins(interfaceType);
+    }//if
+
+    this->pluginSet.assignRefNoIncr
+        (this->pluginInterface->getPlugins
+          (&status,
+           interfaceType,
+           namesList,
+           nullptr));
+
+    check(&status);
+
+    this->getPlugin();
+}//GetPlugins
+
+//------------------------------------------------------------------------
+template<typename P>
+GetPlugins<P>::GetPlugins(unsigned int const interfaceType,
+                          Config*      const knownConfig,
+                          const char*        namesList)
+ : masterInterface()
+ , pluginInterface()
+ , pluginSet(nullptr)
+ , currentPlugin(nullptr)
+ , ls(*getDefaultMemoryPool())
+ , status(&ls)
+{
+    //[2016-04-23] FirebirdConf requires the not null pointer to config object.
+    fb_assert(knownConfig);
+
+    const RefPtr<IFirebirdConf>
+     spCfg(FB_NEW FirebirdConf(knownConfig)); //throw
+
+    if(!namesList)
+    {
+        namesList=knownConfig->getPlugins(interfaceType);
+    }//if
+
+    this->pluginSet.assignRefNoIncr
+        (this->pluginInterface->getPlugins
+          (&this->status,
+           interfaceType,
+           namesList,
+           spCfg));
+
+    check(&this->status);
+
+    this->getPlugin();
+}//GetPlugins
+
+//------------------------------------------------------------------------
+template<typename P>
+GetPlugins<P>::~GetPlugins()
+{
+    if (this->hasData())
+    {
+        this->pluginInterface->releasePlugin(currentPlugin);
+
+        this->currentPlugin = nullptr;
+    }
+}//~GetPlugins
+
+//------------------------------------------------------------------------
+template<typename P>
+bool GetPlugins<P>::hasData() const
+{
+    return this->currentPlugin;
+}//hasData
+
+//------------------------------------------------------------------------
+template<typename P>
+const char* GetPlugins<P>::name() const
+{
+    return this->hasData() ? this->pluginSet->getName() : nullptr;
+}//name
+
+//------------------------------------------------------------------------
+template<typename P>
+P* GetPlugins<P>::plugin() const
+{
+    return this->currentPlugin;
+}//plugin
+
+//------------------------------------------------------------------------
+template<typename P>
+void GetPlugins<P>::next()
+{
+    if (this->hasData())
+    {
+        this->pluginInterface->releasePlugin(currentPlugin);
+
+        this->currentPlugin = nullptr;
+
+        this->pluginSet->next(&this->status);
+
+        check(&this->status);
+
+        this->getPlugin();
+    }//if
+}//next
+
+//------------------------------------------------------------------------
+template<typename P>
+void GetPlugins<P>::set(const char* newName)
+{
+    if (this->hasData())
+    {
+        this->pluginInterface->releasePlugin(currentPlugin);
+
+        this->currentPlugin = nullptr;
+    }//if
+
+    this->pluginSet->set(&this->status, newName);
+
+    check(&this->status);
+
+    this->getPlugin();
+}//set
+
+//------------------------------------------------------------------------
+template<typename P>
+void GetPlugins<P>::getPlugin()
+{
+    fb_assert(this->pluginSet);
+
+    // [2016-04-24]
+    //  As I understand, it is plus one to IUnknown score.
+    this->currentPlugin = (P*) this->pluginSet->getPlugin(&this->status);
+
+    check(&this->status);
+}//getPlugin
 
 ////////////////////////////////////////////////////////////////////////////////
 }//namespace Firebird
