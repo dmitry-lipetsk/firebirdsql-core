@@ -88,7 +88,9 @@ namespace Jrd
 	public:
 		typedef Firebird::Array<InternalModule*> LoadedModules;
 
-		Module() : interMod(0) { }
+		Module()
+            : interMod(0)
+        { }
 
 		explicit Module(MemoryPool&)
 			: interMod(NULL)
