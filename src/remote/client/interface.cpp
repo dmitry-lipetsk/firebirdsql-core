@@ -766,11 +766,11 @@ inline static void defer_packet(rem_port* port, PACKET* packet, bool sent = fals
 	port->port_deferred_packets->add(p);
 }
 
-IAttachment* RProvider::attach(CheckStatusWrapper*  status,
-                               const char*          filename,
-                               unsigned int         dpb_length,
-                               const unsigned char* dpb,
-                               bool                 loopback)
+IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
+                               const char*          const filename,
+                               unsigned int         const dpb_length,
+                               const unsigned char* const dpb,
+                               bool                 const loopback)
 {
 /**************************************
  *
@@ -831,10 +831,10 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  status,
 }
 
 
-IAttachment* RProvider::attachDatabase(CheckStatusWrapper*  status,
-                                       const char*          filename,
-                                       unsigned int         dpb_length,
-                                       const unsigned char* dpb)
+IAttachment* RProvider::attachDatabase(CheckStatusWrapper*  const status,
+                                       const char*          const filename,
+                                       unsigned int         const dpb_length,
+                                       const unsigned char* const dpb)
 {
 /**************************************
  *
