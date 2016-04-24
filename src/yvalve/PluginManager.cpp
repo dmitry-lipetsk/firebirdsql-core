@@ -1018,7 +1018,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 				continue;
 			}
 
-			int r = m->findPlugin(interfaceType, info.regName);
+			const int r = m->findPlugin(interfaceType, info.regName);
 
 			if (r < 0)
 			{
