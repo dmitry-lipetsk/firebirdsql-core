@@ -1086,7 +1086,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 	{
 		current = rc;
 
-		startModule(masterInterface);
+		startModule(this->masterInterface);
 
 		current = NULL;
 
