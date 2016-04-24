@@ -856,41 +856,11 @@ class PluginSet FB_FINAL : public RefCntIface<IPluginSetImpl<PluginSet, CheckSta
 {
 public:
 	// IPluginSet implementation
-	virtual const char* getName() const override final
-	{
-        if(this->currentPlugin.hasData())
-        {
-            return this->currentName.c_str();
-        }
+	virtual const char* getName() const override final;
 
-		return nullptr;
-	}//getName
+	virtual const char* getModuleName() const override final;
 
-	virtual const char* getModuleName() const override final
-	{
-		if(this->currentPlugin.hasData())
-        {
-            return this->currentPlugin->getPluggedModule()->getName();
-        }
-
-        return nullptr;
-	}//getModuleName
-
-	virtual void set(CheckStatusWrapper* status, const char* newName) override final
-	{
-		try
-		{
-			namesList = newName;
-
-			namesList.alltrim(" \t");
-
-			next(status);
-		}
-		catch (const Firebird::Exception& ex)
-		{
-			ex.stuffException(status);
-		}
-	}//set
+	virtual void set(CheckStatusWrapper* status, const char* newName) override final;
 
 	virtual IPluginBase* getPlugin(CheckStatusWrapper* status) override final;
 
@@ -954,9 +924,48 @@ private:
 	RefPtr<PluginModule> loadModule(const PluginLoadInfo& info);
 };//class PluginSet
 
-// ************************************* //
-// ** next() - core of plugin manager ** //
-// ************************************* //
+////////////////////////////////////////////////////////////////////////////////
+//class PluginSet
+
+const char* PluginSet::getName() const
+{
+    if(this->currentPlugin.hasData())
+    {
+        return this->currentName.c_str();
+    }
+
+	return nullptr;
+}//getName
+
+//------------------------------------------------------------------------
+const char* PluginSet::getModuleName() const
+{
+	if(this->currentPlugin.hasData())
+    {
+        return this->currentPlugin->getPluggedModule()->getName();
+    }
+
+    return nullptr;
+}//getModuleName
+
+//------------------------------------------------------------------------
+void PluginSet::set(CheckStatusWrapper* status, const char* newName)
+{
+	try
+	{
+		namesList = newName;
+
+		namesList.alltrim(" \t");
+
+		next(status);
+	}
+	catch (const Firebird::Exception& ex)
+	{
+		ex.stuffException(status);
+	}
+}//set
+
+//------------------------------------------------------------------------
 void PluginSet::next(CheckStatusWrapper* status)
 {
 	try
