@@ -881,7 +881,9 @@ public:
 		try
 		{
 			namesList = newName;
+
 			namesList.alltrim(" \t");
+
 			next(status);
 		}
 		catch (const Firebird::Exception& ex)
