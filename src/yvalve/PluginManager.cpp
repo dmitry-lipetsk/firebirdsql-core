@@ -984,26 +984,26 @@ void PluginSet::next(CheckStatusWrapper* status)
 {
 	try
 	{
-		if (currentPlugin.hasData())
+		if (this->currentPlugin.hasData())
 		{
-			currentPlugin = nullptr;
+			this->currentPlugin = nullptr;
 		}
 
 		MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
-		while (currentName.getWord(namesList, " \t,;"))
+		while (this->currentName.getWord(namesList, " \t,;"))
 		{
 			// First check - may be currentName is present among already configured plugins
 			ConfiguredPlugin* tmp = NULL;
 
-			if (plugins->get(MapKey(interfaceType, currentName), tmp))
+			if (plugins->get(MapKey(this->interfaceType, this->currentName), tmp))
 			{
-				currentPlugin = tmp;
+				this->currentPlugin = tmp;
 				break;
 			}
 
 			// setup loadinfo
-			PluginLoadInfo info(currentName.c_str());
+			PluginLoadInfo info(this->currentName.c_str());
 
 			// Check if module is loaded and load it if needed
 			RefPtr<PluginModule> m(modules->findModule(info.curModule));
@@ -1018,19 +1018,19 @@ void PluginSet::next(CheckStatusWrapper* status)
 				continue;
 			}
 
-			const int r = m->findPlugin(interfaceType, info.regName);
+			const int r = m->findPlugin(this->interfaceType, info.regName);
 
 			if (r < 0)
 			{
 				loadError(Arg::Gds(isc_pman_plugin_notfound)
                            << info.curModule
                            << info.regName
-                           << Arg::Num(interfaceType));
+                           << Arg::Num(this->interfaceType));
 			}//if
 
-			currentPlugin = FB_NEW ConfiguredPlugin(m, r, info.conf, info.plugConfigFile, currentName);
+			this->currentPlugin = FB_NEW ConfiguredPlugin(m, r, info.conf, info.plugConfigFile, this->currentName);
 
-			plugins->put(MapKey(interfaceType, currentName), currentPlugin);
+			plugins->put(MapKey(this->interfaceType, this->currentName), this->currentPlugin);
 
 			return;
 		}//while
