@@ -632,16 +632,27 @@ public:
 	}//release
 
 protected:
-	IAttachment* attach(CheckStatusWrapper* status, const char* filename, unsigned int dpb_length,
-		const unsigned char* dpb, bool loopback);
-	IAttachment* create(CheckStatusWrapper* status, const char* filename, unsigned int dpb_length,
-		const unsigned char* dpb, bool loopback);
-	IService* attachSvc(CheckStatusWrapper* status, const char* service, unsigned int spbLength,
-		const unsigned char* spb, bool loopback);
+	IAttachment* attach(CheckStatusWrapper*  status,
+                        const char*          filename,
+                        unsigned int         dpb_length,
+		                const unsigned char* dpb,
+                        bool                 loopback);
+
+	IAttachment* create(CheckStatusWrapper*  status,
+                        const char*          filename,
+                        unsigned int         dpb_length,
+		                const unsigned char* dpb,
+                        bool                 loopback);
+
+	IService* attachSvc(CheckStatusWrapper*  status,
+                        const char*          service,
+                        unsigned int         spbLength,
+		                const unsigned char* spb,
+                        bool                 loopback);
 
 private:
 	Firebird::ICryptKeyCallback* cryptCallback;
-};
+};//class RProvider
 
 void RProvider::shutdown(CheckStatusWrapper* status, unsigned int /*timeout*/, const int /*reason*/)
 {
