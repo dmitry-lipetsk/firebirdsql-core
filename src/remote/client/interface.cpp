@@ -665,6 +665,7 @@ void RProvider::shutdown(CheckStatusWrapper* status, unsigned int /*timeout*/, c
 void RProvider::setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallback* callback)
 {
 	status->init();
+
 	cryptCallback = callback;
 }
 
