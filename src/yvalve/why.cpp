@@ -6042,8 +6042,9 @@ void Dispatcher::setDbCryptCallback(CheckStatusWrapper* status,
                                     ICryptKeyCallback*  callback)
 {
 	status->init();
+
 	cryptCallback = callback;
-}
+}//setDbCryptCallback
 
 ////////////////////////////////////////////////////////////////////////////////
 }//namespace Why
