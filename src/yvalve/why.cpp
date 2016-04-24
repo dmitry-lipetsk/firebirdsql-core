@@ -5628,7 +5628,7 @@ YAttachment* Dispatcher::createDatabase(CheckStatusWrapper*  const status,
 YAttachment*
  Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* const status,
                                     bool                          const createFlag,
-	                                const char*                   const filename,
+                                    const char*                   const filename,
                                     unsigned int                  const dpbLength,
                                     const unsigned char*          const dpb)
 {
