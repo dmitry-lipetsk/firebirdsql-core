@@ -294,7 +294,7 @@ IConfig* findDefConfig(ConfigFile*     defaultConfig,
 	if (defaultConfig)
 	{
 		const ConfigFile::Parameter* p = defaultConfig->findParameter("Config");
-		IConfig* rc = FB_NEW ConfigAccess(p ? findConfig("Config", p->value.c_str()) : RefPtr<ConfigFile>(NULL));
+		IConfig* rc = FB_NEW ConfigAccess(p ? findConfig("Config", p->value.c_str()) : RefPtr<ConfigFile>(nullptr));
 		rc->addRef();
 		return rc;
 	}
