@@ -915,9 +915,9 @@ PluginSet::PluginSet(unsigned int   const pinterfaceType,
  , currentPlugin(nullptr)
  , firebirdConf(fbConf)
 {
-	namesList.assign(pnamesList);
+	this->namesList.assign(pnamesList);
 
-	namesList.alltrim(" \t");
+	this->namesList.alltrim(" \t");
 
 	Firebird::LocalStatus s;
 
@@ -967,9 +967,9 @@ void PluginSet::set(CheckStatusWrapper* status, const char* newName)
 {
 	try
 	{
-		namesList = newName;
+		this->namesList = newName;
 
-		namesList.alltrim(" \t");
+		this->namesList.alltrim(" \t");
 
 		this->next(status);
 	}
@@ -991,7 +991,7 @@ void PluginSet::next(CheckStatusWrapper* const status)
 
 		MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
-		while (this->currentName.getWord(namesList, " \t,;"))
+		while (this->currentName.getWord(this->namesList, " \t,;"))
 		{
 			// First check - may be currentName is present among already configured plugins
 			ConfiguredPlugin* tmp = NULL;
@@ -1103,9 +1103,9 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 {
 	try
 	{
-		while (currentPlugin.hasData())
+		while (this->currentPlugin.hasData())
 		{
-			IPluginBase* p = currentPlugin->factory(firebirdConf);
+			IPluginBase* p = this->currentPlugin->factory(firebirdConf);
 
 			if (p)
 				return p;
