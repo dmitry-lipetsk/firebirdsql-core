@@ -1059,7 +1059,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 		ModuleLoader::doctorModuleExtension(fixedModuleName);
 
 		module = ModuleLoader::loadModule(fixedModuleName);
-	}
+	}//if
 
 	if (!module)
 	{
@@ -1074,7 +1074,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 		}
 
 		return RefPtr<PluginModule>(nullptr);
-	}
+	}//if
 
 	RefPtr<PluginModule> rc(FB_NEW PluginModule(module, info.curModule));
 
