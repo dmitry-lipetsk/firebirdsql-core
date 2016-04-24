@@ -152,7 +152,7 @@ struct Svc : public Firebird::GlobalStorage
 {
 	ServService					svc_iface;		// service interface
 	Svc() :
-		svc_iface(NULL)
+		svc_iface(nullptr)
 	{ }
 };
 
