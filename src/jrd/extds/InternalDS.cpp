@@ -648,7 +648,7 @@ void InternalStatement::getExtBlob(thread_db* tdbb, const dsc& src, dsc& dst)
 InternalBlob::InternalBlob(InternalConnection& conn) :
 	Blob(conn),
 	m_connection(conn),
-	m_blob(NULL)
+	m_blob(nullptr)
 {
 	memset(&m_blob_id, 0, sizeof(m_blob_id));
 }
