@@ -5698,15 +5698,21 @@ YAttachment*
 			if (cryptCallback)
 			{
 				provider->setDbCryptCallback(currentStatus, cryptCallback);
+
 				if (currentStatus->getState() & Firebird::IStatus::STATE_ERRORS)
 					continue;
-			}
+			}//if
 
-			IAttachment* const attachment = createFlag ?
-				provider->createDatabase(currentStatus,	expandedFilename.c_str(),
-					newDpb.getBufferLength(), newDpb.getBuffer()) :
-				provider->attachDatabase(currentStatus,	expandedFilename.c_str(),
-					newDpb.getBufferLength(), newDpb.getBuffer());
+            IAttachment* const attachment
+             = createFlag
+               ?provider->createDatabase(currentStatus,
+                                         expandedFilename.c_str(),
+                                         newDpb.getBufferLength(),
+                                         newDpb.getBuffer())
+               :provider->attachDatabase(currentStatus,
+                                         expandedFilename.c_str(),
+                                         newDpb.getBufferLength(),
+                                         newDpb.getBuffer());
 
 			if (!(currentStatus->getState() & Firebird::IStatus::STATE_ERRORS))
 			{
