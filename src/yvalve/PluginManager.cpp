@@ -1026,7 +1026,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 
 			plugins->put(MapKey(interfaceType, currentName), currentPlugin);
 			return;
-		}
+		}//while
 	}
 	catch (const Firebird::Exception& ex)
 	{
@@ -1034,6 +1034,7 @@ void PluginSet::next(CheckStatusWrapper* status)
 	}
 }//next
 
+//------------------------------------------------------------------------
 RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 {
 	PathName fixedModuleName(info.curModule);
@@ -1075,6 +1076,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 	return RefPtr<PluginModule>(nullptr);	// compiler warning silencer
 }//loadModule
 
+//------------------------------------------------------------------------
 IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 {
 	try
