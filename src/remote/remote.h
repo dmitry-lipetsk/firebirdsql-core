@@ -385,10 +385,17 @@ struct Rrq : public Firebird::GlobalStorage, public TypedHandle<rem_type_rrq>
 	Rrq**	rrq_self;
 
 public:
-	explicit Rrq(FB_SIZE_T rpt) :
-		rrq_rdb(0), rrq_rtr(0), rrq_next(0), rrq_levels(0),
-		rrq_iface(NULL), rrq_id(0), rrq_max_msg(0), rrq_level(0),
-		rrq_rpt(getPool(), rpt), rrq_self(NULL)
+	explicit Rrq(FB_SIZE_T rpt)
+     : rrq_rdb(0)
+     , rrq_rtr(0)
+     , rrq_next(0)
+     , rrq_levels(0)
+     , rrq_iface(NULL)
+     , rrq_id(0)
+     , rrq_max_msg(0)
+     , rrq_level(0)
+     , rrq_rpt(getPool(), rpt)
+     , rrq_self(NULL)
 	{
 		//memset(rrq_status_vector, 0, sizeof rrq_status_vector);
 		rrq_rpt.grow(rpt);
