@@ -1166,7 +1166,7 @@ namespace Why
 	public:
 		YEntry(CheckStatusWrapper* aStatus, Y* object, int checkAttachment = 1)
 			: ref(object->attachment)
-            , nextRef(NULL)
+            , nextRef(nullptr)
 		{
 			aStatus->init();
 			init(object->next);
@@ -1243,7 +1243,7 @@ namespace Why
 
 	template <>
 	YEntry<YAttachment>::YEntry(CheckStatusWrapper* aStatus, YAttachment* aAttachment, int checkAttachment)
-		: ref(aAttachment), nextRef(NULL)
+		: ref(aAttachment), nextRef(nullptr)
 	{
 		aStatus->init();
 		init(aAttachment->next);
@@ -1266,7 +1266,7 @@ namespace Why
                              YService*           aService,
                              int                 checkService)
 		: ref(aService)
-        , nextRef(NULL)
+        , nextRef(nullptr)
 	{
 		aStatus->init();
 		init(aService->next);
