@@ -6432,8 +6432,14 @@ static void authReceiveResponse(bool havePacket, ClntAuthBlock& cBlock, rem_port
 	(Arg::Gds(isc_login) << Arg::StatusVector(&s)).raise();
 }
 
-static void init(CheckStatusWrapper* status, ClntAuthBlock& cBlock, rem_port* port, P_OP op, PathName& file_name,
-	ClumpletWriter& dpb, IntlParametersBlock& intlParametersBlock, ICryptKeyCallback* cryptCallback)
+static void init(CheckStatusWrapper*  status,
+                 ClntAuthBlock&       cBlock,
+                 rem_port*            port,
+                 P_OP                 op,
+                 PathName&            file_name,
+                 ClumpletWriter&      dpb,
+                 IntlParametersBlock& intlParametersBlock,
+                 ICryptKeyCallback*   cryptCallback)
 {
 /**************************************
  *
