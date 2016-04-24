@@ -5497,9 +5497,8 @@ void YAttachment::getNextTransaction(CheckStatusWrapper* status, ITransaction* t
 		Arg::Gds(isc_bad_trans_handle).raise();
 }
 
-
-//-------------------------------------
-
+////////////////////////////////////////////////////////////////////////////////
+//class YService
 
 YService::YService(IProvider* aProvider, IService* aNext, bool utf8)
 	: YHelper(aNext),
@@ -5510,18 +5509,21 @@ YService::YService(IProvider* aProvider, IService* aNext, bool utf8)
 	makeHandle(&services, this, handle);
 }
 
+//------------------------------------------------------------------------
 FB_API_HANDLE& YService::getHandle()
 {
 	fb_assert(handle);
 	return handle;
 }
 
+//------------------------------------------------------------------------
 YService::~YService()
 {
 	if (provider)
 		PluginManagerInterfacePtr()->releasePlugin(provider);
 }
 
+//------------------------------------------------------------------------
 void YService::destroy(unsigned dstrFlags)
 {
 	removeHandle(&services, handle);
@@ -5531,6 +5533,7 @@ void YService::destroy(unsigned dstrFlags)
 		release();
 }
 
+//------------------------------------------------------------------------
 void YService::shutdown()
 {
 	if (provider)
@@ -5541,6 +5544,7 @@ void YService::shutdown()
 	}
 }
 
+//------------------------------------------------------------------------
 void YService::detach(CheckStatusWrapper* status)
 {
 	try
@@ -5558,6 +5562,7 @@ void YService::detach(CheckStatusWrapper* status)
 	}
 }
 
+//------------------------------------------------------------------------
 void YService::query(CheckStatusWrapper* status, unsigned int sendLength, const unsigned char* sendItems,
 	unsigned int receiveLength, const unsigned char* receiveItems,
 	unsigned int bufferLength, unsigned char* buffer)
@@ -5574,6 +5579,7 @@ void YService::query(CheckStatusWrapper* status, unsigned int sendLength, const 
 	}
 }
 
+//------------------------------------------------------------------------
 void YService::start(CheckStatusWrapper* status, unsigned int spbLength, const unsigned char* spbItems)
 {
 	try
@@ -5593,24 +5599,28 @@ void YService::start(CheckStatusWrapper* status, unsigned int spbLength, const u
 	}
 }
 
-
-//-------------------------------------
-
+////////////////////////////////////////////////////////////////////////////////
+//class Dispatcher
 
 // Attach a database through the first subsystem that recognizes it.
+
 YAttachment* Dispatcher::attachDatabase(CheckStatusWrapper* status, const char* filename,
 	unsigned int dpbLength, const unsigned char* dpb)
 {
 	return attachOrCreateDatabase(status, false, filename, dpbLength, dpb);
 }
 
+//------------------------------------------------------------------------
+
 // Create new database using the first subsystem that can do it.
+
 YAttachment* Dispatcher::createDatabase(CheckStatusWrapper* status, const char* filename,
 	unsigned int dpbLength, const unsigned char* dpb)
 {
 	return attachOrCreateDatabase(status, true, filename, dpbLength, dpb);
 }
 
+//------------------------------------------------------------------------
 YAttachment*
  Dispatcher::attachOrCreateDatabase(Firebird::CheckStatusWrapper* const status,
                                     bool                          const createFlag,
@@ -5749,7 +5759,10 @@ YAttachment*
 	return NULL;
 }
 
+//------------------------------------------------------------------------
+
 // Attach a service through the first subsystem that recognizes it.
+
 YService* Dispatcher::attachServiceManager(CheckStatusWrapper* status, const char* serviceName,
 	unsigned int spbLength, const unsigned char* spb)
 {
@@ -5854,6 +5867,7 @@ YService* Dispatcher::attachServiceManager(CheckStatusWrapper* status, const cha
 	return NULL;
 }
 
+//------------------------------------------------------------------------
 void Dispatcher::shutdown(CheckStatusWrapper* userStatus, unsigned int timeout, const int reason)
 {
 	// can't syncronize with already killed threads, just exit
@@ -6015,10 +6029,12 @@ void Dispatcher::shutdown(CheckStatusWrapper* userStatus, unsigned int timeout, 
 	}
 }
 
+//------------------------------------------------------------------------
 void Dispatcher::setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallback* callback)
 {
 	status->init();
 	cryptCallback = callback;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 } // namespace Why
