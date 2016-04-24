@@ -5695,6 +5695,8 @@ YAttachment*
 		{
 			IProvider* const provider = providerIterator.plugin();
 
+            fb_assert(provider);
+
 			if (cryptCallback)
 			{
 				provider->setDbCryptCallback(currentStatus, cryptCallback);
@@ -5713,6 +5715,8 @@ YAttachment*
                                          expandedFilename.c_str(),
                                          newDpb.getBufferLength(),
                                          newDpb.getBuffer());
+
+            fb_assert(attachment);
 
 			if (!(currentStatus->getState() & Firebird::IStatus::STATE_ERRORS))
 			{
