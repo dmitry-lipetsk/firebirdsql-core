@@ -1099,13 +1099,13 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 }//loadModule
 
 //------------------------------------------------------------------------
-IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
+IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* const status)
 {
 	try
 	{
 		while (this->currentPlugin.hasData())
 		{
-			IPluginBase* p = this->currentPlugin->factory(firebirdConf);
+			IPluginBase* const p = this->currentPlugin->factory(firebirdConf);
 
 			if (p)
 				return p;
