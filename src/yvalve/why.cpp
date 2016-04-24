@@ -1165,7 +1165,8 @@ namespace Why
 	{
 	public:
 		YEntry(CheckStatusWrapper* aStatus, Y* object, int checkAttachment = 1)
-			: ref(object->attachment), nextRef(NULL)
+			: ref(object->attachment)
+            , nextRef(NULL)
 		{
 			aStatus->init();
 			init(object->next);
