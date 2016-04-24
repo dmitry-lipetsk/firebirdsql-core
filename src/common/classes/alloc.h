@@ -338,6 +338,11 @@ inline void operator delete[](void* mem, Firebird::MemoryPool& pool ALLOC_PARAMS
 #pragma clang diagnostic ignored "-Winline-new-delete"
 #endif
 
+#if defined(_MSC_VER)
+# pragma warning (push)
+# pragma warning (disable:4595)
+#endif
+
 inline void operator delete(void* mem) throw()
 {
 	MemoryPool::globalFree(mem);
@@ -346,6 +351,10 @@ inline void operator delete[](void* mem) throw()
 {
 	MemoryPool::globalFree(mem);
 }
+
+#if defined(_MSC_VER)
+# pragma warning (pop)
+#endif
 
 #ifdef __clang__
 #pragma clang diagnostic pop
