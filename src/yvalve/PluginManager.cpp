@@ -885,9 +885,9 @@ public:
 	virtual void next(CheckStatusWrapper* status) override final;
 
 public:
-	PluginSet(unsigned int   pinterfaceType,
-              const char*    pnamesList,
-			  IFirebirdConf* fbConf)
+	PluginSet(unsigned int   const pinterfaceType,
+              const char*    const pnamesList,
+			  IFirebirdConf* const fbConf)
 		: interfaceType(pinterfaceType)
         , namesList(getPool())
         , currentName(getPool())
