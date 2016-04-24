@@ -28,6 +28,8 @@
 #include "../common/classes/fb_atomic.h"
 #include "../common/gdsassert.h"
 
+#include <cstddef>
+
 namespace Firebird{
 ////////////////////////////////////////////////////////////////////////////////
 //class RefCounted
@@ -108,6 +110,10 @@ public:
 	RefPtr()
      : ptr(nullptr)
 	{ }
+
+    RefPtr(std::nullptr_t)
+     : ptr(nullptr)
+    { }
 
 	explicit RefPtr(T* const p)
      : ptr(p)
