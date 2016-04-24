@@ -49,7 +49,8 @@ public:
 	}
 
 	// IClient implementation
-	virtual int authenticate(CheckStatusWrapper* status, IClientBlock* cb) override final;
+	virtual int authenticate(CheckStatusWrapper* status,
+                             IClientBlock*       cb) override final;
 
     virtual int release() override final;
 
