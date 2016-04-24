@@ -868,7 +868,12 @@ public:
 
 	virtual const char* getModuleName() const override final
 	{
-		return currentPlugin.hasData() ? currentPlugin->getPluggedModule()->getName() : NULL;
+		if(this->currentPlugin.hasData())
+        {
+            return this->currentPlugin->getPluggedModule()->getName();
+        }
+
+        return nullptr;
 	}
 
 	virtual void set(CheckStatusWrapper* status, const char* newName) override final
