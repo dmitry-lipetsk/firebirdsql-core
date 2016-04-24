@@ -1030,7 +1030,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 	}
 
 	loadError(Arg::Gds(isc_pman_entrypoint_notfound) << fixedModuleName);
-	return RefPtr<PluginModule>(NULL);	// compiler warning silencer
+	return RefPtr<PluginModule>(nullptr);	// compiler warning silencer
 }//loadModule
 
 IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
