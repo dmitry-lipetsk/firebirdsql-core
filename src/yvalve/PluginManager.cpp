@@ -1018,7 +1018,8 @@ void PluginSet::next(CheckStatusWrapper* status)
 				continue;
 			}
 
-			const int r = m->findPlugin(this->interfaceType, info.regName);
+			const int r = m->findPlugin(this->interfaceType,
+                                        info.regName);
 
 			if (r < 0)
 			{
@@ -1028,9 +1029,14 @@ void PluginSet::next(CheckStatusWrapper* status)
                            << Arg::Num(this->interfaceType));
 			}//if
 
-			this->currentPlugin = FB_NEW ConfiguredPlugin(m, r, info.conf, info.plugConfigFile, this->currentName);
+			this->currentPlugin = FB_NEW ConfiguredPlugin(m,
+                                                          r,
+                                                          info.conf,
+                                                          info.plugConfigFile,
+                                                          this->currentName);
 
-			plugins->put(MapKey(this->interfaceType, this->currentName), this->currentPlugin);
+			plugins->put(MapKey(this->interfaceType, this->currentName),
+                         this->currentPlugin);
 
 			return;
 		}//while
