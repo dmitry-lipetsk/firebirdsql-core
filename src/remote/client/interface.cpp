@@ -599,11 +599,15 @@ public:
 	// IProvider implementation
 	IAttachment* attachDatabase(CheckStatusWrapper* status, const char* fileName,
 		unsigned int dpbLength, const unsigned char* dpb);
+
 	IAttachment* createDatabase(CheckStatusWrapper* status, const char* fileName,
 		unsigned int dpbLength, const unsigned char* dpb);
+
 	IService* attachServiceManager(CheckStatusWrapper* status, const char* service,
 		unsigned int spbLength, const unsigned char* spb);
+
 	void shutdown(CheckStatusWrapper* status, unsigned int timeout, const int reason);
+
 	void setDbCryptCallback(CheckStatusWrapper* status, ICryptKeyCallback* cryptCallback);
 
 	int release()
