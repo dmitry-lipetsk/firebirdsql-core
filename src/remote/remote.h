@@ -176,10 +176,15 @@ public:
 	Firebird::Mutex	rdb_async_lock;			// Sync to avoid 2 async calls at once
 
 public:
-	Rdb() :
-		rdb_iface(NULL), rdb_port(0),
-		rdb_transactions(0), rdb_requests(0), rdb_events(0), rdb_sql_requests(0),
-		rdb_id(0), rdb_async_thread_id(0)
+	Rdb()
+     : rdb_iface(NULL)
+     , rdb_port(0)
+     , rdb_transactions(0)
+     , rdb_requests(0)
+     , rdb_events(0)
+     , rdb_sql_requests(0)
+     , rdb_id(0)
+     , rdb_async_thread_id(0)
 	{
 	}
 
