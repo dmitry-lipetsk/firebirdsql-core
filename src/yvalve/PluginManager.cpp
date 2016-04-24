@@ -919,6 +919,17 @@ public:
 	}//release
 
 private:
+	void loadError(const Arg::StatusVector& error)
+	{
+		(Arg::Gds(isc_pman_cannot_load_plugin) << currentName << error).raise();
+	}
+
+	static void CLOOP_CARG upFunction(void* /*interface*/, IStatus* status)
+	{
+		status->setErrors(Arg::Gds(isc_wish_list).value());
+	}
+
+private:
 	unsigned int interfaceType;
 	PathName namesList;
 
@@ -929,16 +940,6 @@ private:
 	MasterInterfacePtr masterInterface;
 
 	RefPtr<PluginModule> loadModule(const PluginLoadInfo& info);
-
-	void loadError(const Arg::StatusVector& error)
-	{
-		(Arg::Gds(isc_pman_cannot_load_plugin) << currentName << error).raise();
-	}
-
-	static void CLOOP_CARG upFunction(void* /*interface*/, IStatus* status)
-	{
-		status->setErrors(Arg::Gds(isc_wish_list).value());
-	}
 };//class PluginSet
 
 // ************************************* //
