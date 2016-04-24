@@ -788,6 +788,7 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
 		reset(status);
 
 		ClumpletWriter newDpb(ClumpletReader::dpbList, MAX_DPB_SIZE, dpb, dpb_length);
+
 		unsigned flags = ANALYZE_MOUNTS;
 
 		if (get_new_dpb(newDpb, dpbParam))
@@ -800,8 +801,14 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
 		PathName node_name;
 
 		ClntAuthBlock cBlock(&expanded_name, &newDpb, &dpbParam);
-		rem_port* port = analyze(cBlock, expanded_name, flags, newDpb, dpbParam, node_name, NULL);
 
+		rem_port* port = analyze(cBlock,
+                                 expanded_name,
+                                 flags,
+                                 newDpb,
+                                 dpbParam,
+                                 node_name,
+                                 NULL);
 		if (!port)
 		{
 			Arg::Gds(isc_unavailable).copyTo(status);
@@ -814,14 +821,19 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
 		// the DPB so the server can pay attention to it.
 
 		add_other_params(port, newDpb, dpbParam);
+
 		add_working_directory(newDpb, node_name);
 
 		IntlDpb intl;
+
 		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: call init for DB='%s'\n", expanded_name.c_str()));
+
 		init(status, cBlock, port, op_attach, expanded_name, newDpb, intl, cryptCallback);
 
 		Attachment* a = FB_NEW Attachment(port->port_context, filename);
+
 		a->addRef();
+
 		return a;
 	}
 	catch (const Exception& ex)
