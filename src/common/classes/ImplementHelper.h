@@ -137,7 +137,7 @@ template <class P>
 class SimpleFactoryBase : public AutoIface<IPluginFactoryImpl<SimpleFactoryBase<P>, CheckStatusWrapper> >
 {
 public:
-	IPluginBase* createPlugin(CheckStatusWrapper* status, IPluginConfig* factoryParameter)
+	virtual IPluginBase* createPlugin(CheckStatusWrapper* status, IPluginConfig* factoryParameter) override final
 	{
 		try
 		{
