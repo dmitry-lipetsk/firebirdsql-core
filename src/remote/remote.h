@@ -255,12 +255,23 @@ public:
 	};
 
 public:
-	Rbl() :
-		rbl_data(getPool()), rbl_rdb(0), rbl_rtr(0), rbl_next(0),
-		rbl_buffer(rbl_data.getBuffer(BLOB_LENGTH)), rbl_ptr(rbl_buffer), rbl_iface(NULL),
-		rbl_offset(0), rbl_id(0), rbl_flags(0),
-		rbl_buffer_length(BLOB_LENGTH), rbl_length(0), rbl_fragment_length(0),
-		rbl_source_interp(0), rbl_target_interp(0), rbl_self(NULL)
+	Rbl()
+     : rbl_data(getPool())
+     , rbl_rdb(0)
+     , rbl_rtr(0)
+     , rbl_next(0)
+     , rbl_buffer(rbl_data.getBuffer(BLOB_LENGTH))
+     , rbl_ptr(rbl_buffer)
+     , rbl_iface(NULL)
+     , rbl_offset(0)
+     , rbl_id(0)
+     , rbl_flags(0)
+     , rbl_buffer_length(BLOB_LENGTH)
+     , rbl_length(0)
+     , rbl_fragment_length(0)
+     , rbl_source_interp(0)
+     , rbl_target_interp(0)
+     , rbl_self(NULL)
 	{ }
 
 	~Rbl()
