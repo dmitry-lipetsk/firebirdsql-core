@@ -861,6 +861,13 @@ private:
     self_type& operator = (const self_type&);
 
 public:
+	PluginSet(unsigned int   const pinterfaceType,
+              const char*    const pnamesList,
+			  IFirebirdConf* const fbConf);
+
+	virtual int release() override final;
+
+public:
 	// IPluginSet implementation
 	virtual const char* getName() const override final;
 
@@ -871,13 +878,6 @@ public:
 	virtual IPluginBase* getPlugin(CheckStatusWrapper* status) override final;
 
 	virtual void next(CheckStatusWrapper* status) override final;
-
-public:
-	PluginSet(unsigned int   const pinterfaceType,
-              const char*    const pnamesList,
-			  IFirebirdConf* const fbConf);
-
-	virtual int release() override final;
 
 private:
 	void loadError(const Arg::StatusVector& error)
