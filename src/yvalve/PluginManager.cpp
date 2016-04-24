@@ -923,7 +923,7 @@ PluginSet::PluginSet(unsigned int   const pinterfaceType,
 
 	Firebird::CheckStatusWrapper statusWrapper(&s);
 
-	next(&statusWrapper);
+	this->next(&statusWrapper);
 
 	check(&statusWrapper);
 }//PluginSet
@@ -971,7 +971,7 @@ void PluginSet::set(CheckStatusWrapper* status, const char* newName)
 
 		namesList.alltrim(" \t");
 
-		next(status);
+		this->next(status);
 	}
 	catch (const Firebird::Exception& ex)
 	{
@@ -1085,7 +1085,7 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 			if (p)
 				return p;
 
-			next(status);
+			this->next(status);
 			if (status->getState() & Firebird::IStatus::STATE_ERRORS)
 				break;
 		}
