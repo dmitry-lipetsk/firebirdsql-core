@@ -33,9 +33,12 @@
 #include "../common/config/config.h"
 #include "../common/StatusHolder.h"
 
-namespace Firebird {
+namespace Firebird{
+////////////////////////////////////////////////////////////////////////////////
+//class GetPlugins
 
 // Template to help with loop in the set of plugins
+
 template <typename P>
 class GetPlugins
 {
@@ -183,7 +186,6 @@ private:
 	CheckStatusWrapper status;
 };//class GetPlugins
 
-} // namespace Firebird
-
-
+////////////////////////////////////////////////////////////////////////////////
+}//namespace Firebird
 #endif // FB_COMMON_CLASSES_GET_PLUGINS
