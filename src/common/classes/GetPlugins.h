@@ -153,7 +153,7 @@ public:
 			this->pluginInterface->releasePlugin(currentPlugin);
 
 			this->currentPlugin = nullptr;
-		}
+		}//if
 
 		this->pluginSet->set(&this->status, newName);
 
