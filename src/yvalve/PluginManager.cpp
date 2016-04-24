@@ -875,36 +875,9 @@ public:
 public:
 	PluginSet(unsigned int   const pinterfaceType,
               const char*    const pnamesList,
-			  IFirebirdConf* const fbConf)
-		: interfaceType(pinterfaceType)
-        , namesList(getPool())
-        , currentName(getPool())
-        , currentPlugin(nullptr)
-        , firebirdConf(fbConf)
-	{
-		namesList.assign(pnamesList);
+			  IFirebirdConf* const fbConf);
 
-		namesList.alltrim(" \t");
-
-		Firebird::LocalStatus s;
-
-		Firebird::CheckStatusWrapper statusWrapper(&s);
-
-		next(&statusWrapper);
-
-		check(&statusWrapper);
-	}//PluginSet
-
-	virtual int release() override final
-	{
-		if (--refCounter == 0)
-		{
-			delete this;
-			return 0;
-		}
-
-		return 1;
-	}//release
+	virtual int release() override final;
 
 private:
 	void loadError(const Arg::StatusVector& error)
@@ -933,6 +906,41 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 //class PluginSet
 
+PluginSet::PluginSet(unsigned int   const pinterfaceType,
+                     const char*    const pnamesList,
+                     IFirebirdConf* const fbConf)
+ : interfaceType(pinterfaceType)
+ , namesList(getPool())
+ , currentName(getPool())
+ , currentPlugin(nullptr)
+ , firebirdConf(fbConf)
+{
+	namesList.assign(pnamesList);
+
+	namesList.alltrim(" \t");
+
+	Firebird::LocalStatus s;
+
+	Firebird::CheckStatusWrapper statusWrapper(&s);
+
+	next(&statusWrapper);
+
+	check(&statusWrapper);
+}//PluginSet
+
+//------------------------------------------------------------------------
+int PluginSet::release()
+{
+	if (--refCounter == 0)
+	{
+		delete this;
+		return 0;
+	}
+
+	return 1;
+}//release
+
+//------------------------------------------------------------------------
 const char* PluginSet::getName() const
 {
     if(this->currentPlugin.hasData())
