@@ -885,7 +885,7 @@ public:
 	void next(CheckStatusWrapper* status);
 
 	PluginSet(unsigned int   pinterfaceType,
-                 const char*    pnamesList,
+              const char*    pnamesList,
 			  IFirebirdConf* fbConf)
 		: interfaceType(pinterfaceType)
            , namesList(getPool())
