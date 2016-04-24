@@ -1044,6 +1044,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 	if (!module && !ModuleLoader::isLoadableModule(fixedModuleName))
 	{
 		ModuleLoader::doctorModuleExtension(fixedModuleName);
+
 		module = ModuleLoader::loadModule(fixedModuleName);
 	}
 
@@ -1053,6 +1054,7 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 		{
 			loadError(Arg::Gds(isc_pman_module_bad) << fixedModuleName);
 		}
+
 		if (info.required)
 		{
 			loadError(Arg::Gds(isc_pman_module_notfound) << fixedModuleName);
@@ -1062,17 +1064,24 @@ RefPtr<PluginModule> PluginSet::loadModule(const PluginLoadInfo& info)
 	}
 
 	RefPtr<PluginModule> rc(FB_NEW PluginModule(module, info.curModule));
+
 	typedef void PluginEntrypoint(IMaster* masterInterface);
+
 	PluginEntrypoint* startModule;
+
 	if (module->findSymbol(STRINGIZE(FB_PLUGIN_ENTRY_POINT), startModule))
 	{
 		current = rc;
+
 		startModule(masterInterface);
+
 		current = NULL;
+
 		return rc;
-	}
+	}//if
 
 	loadError(Arg::Gds(isc_pman_entrypoint_notfound) << fixedModuleName);
+
 	return RefPtr<PluginModule>(nullptr);	// compiler warning silencer
 }//loadModule
 
@@ -1084,10 +1093,12 @@ IPluginBase* PluginSet::getPlugin(CheckStatusWrapper* status)
 		while (currentPlugin.hasData())
 		{
 			IPluginBase* p = currentPlugin->factory(firebirdConf);
+
 			if (p)
 				return p;
 
 			this->next(status);
+
 			if (status->getState() & Firebird::IStatus::STATE_ERRORS)
 				break;
 		}
