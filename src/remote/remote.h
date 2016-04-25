@@ -761,7 +761,7 @@ public:
                   Firebird::ClumpletReader* dpb,
 		          const ParametersSet*      tags);
 
-	~ClntAuthBlock()
+   ~ClntAuthBlock()
 	{
 		this->releaseKeys(0);
 	}
