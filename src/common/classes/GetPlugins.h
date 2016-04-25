@@ -202,7 +202,7 @@ void GetPlugins<P>::set(const char* const newName)
 {
     if (this->hasData())
     {
-        this->pluginInterface->releasePlugin(currentPlugin);
+        this->pluginInterface->releasePlugin(this->currentPlugin);
 
         this->currentPlugin = nullptr;
     }//if
