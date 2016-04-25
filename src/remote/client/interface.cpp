@@ -7515,9 +7515,9 @@ static void cleanDpb(Firebird::ClumpletWriter& dpb, const ParametersSet* tags)
 ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* const fileName,
                              Firebird::ClumpletReader* const dpb,
 							 const ParametersSet*      const tags)
-	: pluginList(getPool())
+    : pluginList(getPool())
     , serverPluginList(getPool())
-	, cliUserName(getPool())
+    , cliUserName(getPool())
     , cliPassword(getPool())
     , cliOrigUserName(getPool())
     , dataForPlugin(getPool())
