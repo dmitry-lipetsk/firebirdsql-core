@@ -5501,7 +5501,11 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 #ifdef WIN_NT
 	if (ISC_analyze_protocol(PROTOCOL_XNET, attach_name, node_name, NULL))
     {
-		port = XNET_analyze(&cBlock, attach_name, flags & ANALYZE_UV, cBlock.getConfig(), ref_db_name);
+		port = XNET_analyze(&cBlock,
+                            attach_name,
+                            flags & ANALYZE_UV,
+                            cBlock.getConfig(),
+                            ref_db_name);
     }
 	else
     if (ISC_analyze_protocol(PROTOCOL_WNET, attach_name, node_name, WNET_SEPARATOR) ||
@@ -5517,8 +5521,12 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 			ISC_utf8ToSystem(node_name);
 		}
 
-		port = WNET_analyze(&cBlock, attach_name, node_name.c_str(), flags & ANALYZE_UV,
-			cBlock.getConfig(), ref_db_name);
+		port = WNET_analyze(&cBlock,
+                            attach_name,
+                            node_name.c_str(),
+                            flags & ANALYZE_UV,
+			                cBlock.getConfig(),
+                            ref_db_name);
 	}
 	else
 #endif
@@ -5536,8 +5544,13 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 			ISC_utf8ToSystem(node_name);
 		}
 
-		port = INET_analyze(&cBlock, attach_name, node_name.c_str(), flags & ANALYZE_UV, pb,
-			cBlock.getConfig(), ref_db_name);
+		port = INET_analyze(&cBlock,
+                            attach_name,
+                            node_name.c_str(),
+                            flags & ANALYZE_UV,
+                            pb,
+			                cBlock.getConfig(),
+                            ref_db_name);
 	}
 
 	// We have a local connection string. If it's a file on a network share,
@@ -5555,8 +5568,12 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 				ISC_unescape(node_name);
 				ISC_utf8ToSystem(node_name);
 
-				port = WNET_analyze(&cBlock, expanded_name, node_name.c_str(), flags & ANALYZE_UV,
-					cBlock.getConfig(), ref_db_name);
+				port = WNET_analyze(&cBlock,
+                                    expanded_name,
+                                    node_name.c_str(),
+                                    flags & ANALYZE_UV,
+					                cBlock.getConfig(),
+                                    ref_db_name);
 			}
 		}
 #endif
@@ -5570,8 +5587,13 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 				ISC_unescape(node_name);
 				ISC_utf8ToSystem(node_name);
 
-				port = INET_analyze(&cBlock, expanded_name, node_name.c_str(), flags & ANALYZE_UV, pb,
-					cBlock.getConfig(), ref_db_name);
+				port = INET_analyze(&cBlock,
+                                    expanded_name,
+                                    node_name.c_str(),
+                                    flags & ANALYZE_UV,
+                                    pb,
+					                cBlock.getConfig(),
+                                    ref_db_name);
 			}
 		}
 #endif
@@ -5587,20 +5609,32 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 #ifdef WIN_NT
 			if (!port)
 			{
-				port = XNET_analyze(&cBlock, attach_name, flags & ANALYZE_UV,
-					cBlock.getConfig(), ref_db_name);
+				port = XNET_analyze(&cBlock,
+                                    attach_name,
+                                    flags & ANALYZE_UV,
+					                cBlock.getConfig(),
+                                    ref_db_name);
 			}
 
 			if (!port)
 			{
-				port = WNET_analyze(&cBlock, attach_name, WNET_LOCALHOST, flags & ANALYZE_UV,
-					cBlock.getConfig(), ref_db_name);
+				port = WNET_analyze(&cBlock,
+                                    attach_name,
+                                    WNET_LOCALHOST,
+                                    flags & ANALYZE_UV,
+					                cBlock.getConfig(),
+                                    ref_db_name);
 			}
 #endif
 			if (!port)
 			{
-				port = INET_analyze(&cBlock, attach_name, INET_LOCALHOST, flags & ANALYZE_UV, pb,
-					cBlock.getConfig(), ref_db_name);
+				port = INET_analyze(&cBlock,
+                                    attach_name,
+                                    INET_LOCALHOST,
+                                    flags & ANALYZE_UV,
+                                    pb,
+					                cBlock.getConfig(),
+                                    ref_db_name);
 			}
 		}
 	}
