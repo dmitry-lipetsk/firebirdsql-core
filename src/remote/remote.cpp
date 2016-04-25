@@ -957,7 +957,9 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 	user_id.insertInt(CNCT_client_crypt, clntConfig->getWireCrypt(WC_CLIENT));
 }
 
-void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName, const CSTRING* listStr)
+//------------------------------------------------------------------------
+void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName,
+                              const CSTRING*            listStr)
 {
 	if (listStr)
 	{
@@ -968,25 +970,31 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName, const CSTRING*
 		}
 
 		Firebird::ClumpletReader srvList(Firebird::ClumpletReader::UnTagged,
-										 listStr->cstr_address, listStr->cstr_length);
+										 listStr->cstr_address,
+                                         listStr->cstr_length);
 
 		if (srvList.find(TAG_KNOWN_PLUGINS))
 		{
 			srvList.getPath(serverPluginList);
 		}
-	}
+	}//if
 
 	dataForPlugin.clear();
+
 	dataFromPlugin.clear();
+
 	firstTime = true;
 
 	clntConfig = REMOTE_get_config(fileName, &dpbConfig);
+
 	pluginList = clntConfig->getPlugins(Firebird::IPluginManager::TYPE_AUTH_CLIENT);
 
 	Firebird::PathName final;
+
 	if (serverPluginList.hasData())
 	{
 		Auth::mergeLists(final, serverPluginList, pluginList);
+
 		if (final.length() == 0)
 		{
 			HANDSHAKE_DEBUG(fprintf(stderr, "Cli: No matching plugins on client\n"));
@@ -1003,8 +1011,9 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName, const CSTRING*
 	}
 
 	plugins.set(final.c_str());
-}
+}//resetClnt
 
+//------------------------------------------------------------------------
 Firebird::RefPtr<Config>* ClntAuthBlock::getConfig()
 {
 	return clntConfig.hasData() ? &clntConfig : NULL;
