@@ -164,7 +164,7 @@ IPluginBase* SimpleFactoryBase<P>::createPlugin(CheckStatusWrapper* const status
 		ex.stuffException(status);
 	}
 
-	return NULL;
+	return nullptr;
 }//createPlugin
 
 ////////////////////////////////////////////////////////////////////////////////
