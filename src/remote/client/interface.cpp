@@ -5465,6 +5465,7 @@ static void secureAuthentication(ClntAuthBlock& cBlock, rem_port* port)
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////
 
 static rem_port* analyze(ClntAuthBlock&       cBlock,
                          PathName&            attach_name,
@@ -5499,12 +5500,17 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 
 #ifdef WIN_NT
 	if (ISC_analyze_protocol(PROTOCOL_XNET, attach_name, node_name, NULL))
+    {
 		port = XNET_analyze(&cBlock, attach_name, flags & ANALYZE_UV, cBlock.getConfig(), ref_db_name);
-	else if (ISC_analyze_protocol(PROTOCOL_WNET, attach_name, node_name, WNET_SEPARATOR) ||
+    }
+	else
+    if (ISC_analyze_protocol(PROTOCOL_WNET, attach_name, node_name, WNET_SEPARATOR) ||
 		ISC_analyze_pclan(attach_name, node_name))
 	{
 		if (node_name.isEmpty())
+        {
 			node_name = WNET_LOCALHOST;
+        }
 		else
 		{
 			ISC_unescape(node_name);
@@ -5521,7 +5527,9 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 		ISC_analyze_tcp(attach_name, node_name))
 	{
 		if (node_name.isEmpty())
+        {
 			node_name = INET_LOCALHOST;
+        }
 		else
 		{
 			ISC_unescape(node_name);
@@ -5611,8 +5619,9 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 	}
 
 	return port;
-}
+}//analyze
 
+////////////////////////////////////////////////////////////////////////////////
 
 static void clear_stmt_que(rem_port* port, Rsr* statement)
 {
