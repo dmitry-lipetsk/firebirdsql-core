@@ -765,8 +765,9 @@ public:
 	bool firstTime;							// Invoked first time after reset
 
 public:
-	ClntAuthBlock(const Firebird::PathName* fileName, Firebird::ClumpletReader* dpb,
-		const ParametersSet* tags);
+	ClntAuthBlock(const Firebird::PathName* fileName,
+                  Firebird::ClumpletReader* dpb,
+		          const ParametersSet*      tags);
 
 	~ClntAuthBlock()
 	{
