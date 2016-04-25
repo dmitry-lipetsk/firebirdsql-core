@@ -108,8 +108,11 @@ protected:
 	AtomicCounter refCounter;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+//class StdPlugin
 
 // Helps to implement plugins
+
 template <class C>
 class StdPlugin : public RefCntIface<C>
 {
