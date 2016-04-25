@@ -33,6 +33,8 @@
 using namespace Firebird;
 
 namespace Auth {
+////////////////////////////////////////////////////////////////////////////////
+//class SrpClient
 
 class SrpClient FB_FINAL : public StdPlugin<IClientImpl<SrpClient, CheckStatusWrapper> >
 {
@@ -59,6 +61,9 @@ private:
 	string data;
 	UCharBuffer sessionKey;
 };//class SrpClient
+
+////////////////////////////////////////////////////////////////////////////////
+//class SrpClient
 
 int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 {
@@ -159,8 +164,9 @@ int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 	}
 
 	return AUTH_SUCCESS;
-}
+}//authenticate
 
+//------------------------------------------------------------------------
 int SrpClient::release()
 {
 	if (--refCounter == 0)
@@ -169,7 +175,9 @@ int SrpClient::release()
 		return 0;
 	}
 	return 1;
-}
+}//release
+
+////////////////////////////////////////////////////////////////////////////////
 
 namespace
 {
