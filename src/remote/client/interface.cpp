@@ -7531,7 +7531,7 @@ ClntAuthBlock::ClntAuthBlock(const Firebird::PathName* const fileName,
 {
 	if (dpb && tags && dpb->find(tags->config_text))
 	{
-		dpb->getString(dpbConfig);
+		dpb->getString(this->dpbConfig);
 	}
 
 	this->resetClnt(fileName);
