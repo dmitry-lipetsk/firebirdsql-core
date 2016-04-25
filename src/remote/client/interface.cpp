@@ -7680,12 +7680,12 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter&  dpb,
 
 			makeUtfString(uft8Convert, this->cliUserName);
 
-			this->cliOrigUserName = cliUserName;
+			this->cliOrigUserName = this->cliUserName;
 
-			fb_utils::dpbItemUpper(cliUserName);
+			fb_utils::dpbItemUpper(this->cliUserName);
 
 			HANDSHAKE_DEBUG(fprintf(stderr, "Cli: loadClnt: Loaded from PB user = %s(was %s)\n",
-				cliUserName.c_str(), cliOrigUserName.c_str()));
+				this->cliUserName.c_str(), this->cliOrigUserName.c_str()));
 		}
 		else
         if (t == tags->password)
@@ -7695,7 +7695,7 @@ void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter&  dpb,
 			makeUtfString(uft8Convert, this->cliPassword);
 
 			HANDSHAKE_DEBUG(fprintf(stderr,
-				"Cli: loadClnt: Loaded from PB cliPassword = %s\n", cliPassword.c_str()));
+				"Cli: loadClnt: Loaded from PB cliPassword = %s\n", this->cliPassword.c_str()));
 		}
 		else
         if (t == tags->encrypt_key)
