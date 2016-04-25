@@ -838,7 +838,7 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
                                        expanded_name,
                                        flags,
                                        newDpb,
-                                       dpbParam,
+                                       /*parSet*/dpbParam,
                                        node_name,
                                        /*ref_db_name*/nullptr);
 		if (!port)
