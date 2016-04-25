@@ -195,7 +195,11 @@ protected:
 	static IMaster* getMasterInterface();
 };
 
+/////////////////////////////////////////////////////////////////////////////////
+//class AccessAutoInterface
+
 // Base for interface type independent accessors
+
 template <typename C>
 class AccessAutoInterface : public CachedMasterInterface
 {
@@ -216,19 +220,26 @@ public:
 
 private:
 	C* ptr;
-};
+};//class AccessAutoInterface
+
+////////////////////////////////////////////////////////////////////////////////
+//class MasterInterfacePtr
 
 // Master interface access
+
 class MasterInterfacePtr : public AccessAutoInterface<IMaster>
 {
 public:
 	MasterInterfacePtr()
 		: AccessAutoInterface<IMaster>(getMasterInterface())
 	{ }
-};
+};//class MasterInterfacePtr
 
+////////////////////////////////////////////////////////////////////////////////
+//class PluginManagerInterfacePtr
 
 // Generic plugins interface access
+
 class PluginManagerInterfacePtr : public AccessAutoInterface<IPluginManager>
 {
 public:
