@@ -126,7 +126,7 @@ public:
 		return this->owner;
 	}
 
-	void setOwner(IReferenceCounted* const iface)
+	void setOwner(IReferenceCounted* iface)
 	{
 		this->owner = iface;
 	}
