@@ -40,7 +40,7 @@ class SrpClient FB_FINAL : public StdPlugin<IClientImpl<SrpClient, CheckStatusWr
 {
 public:
 	explicit SrpClient(IPluginConfig*)
-		: client(NULL)
+		: client(nullptr)
         , data(getPool())
         , sessionKey(getPool())
 	{ }
