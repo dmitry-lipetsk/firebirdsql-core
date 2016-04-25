@@ -958,8 +958,8 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 }
 
 //------------------------------------------------------------------------
-void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName,
-                              const CSTRING*            listStr)
+void ClntAuthBlock::resetClnt(const Firebird::PathName* const fileName,
+                              const CSTRING*            const listStr)
 {
 	if (listStr)
 	{
