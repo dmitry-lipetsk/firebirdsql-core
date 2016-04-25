@@ -154,13 +154,16 @@ IPluginBase* SimpleFactoryBase<P>::createPlugin(CheckStatusWrapper* const status
 	try
 	{
 		P* const p = FB_NEW P(factoryParameter);
+
 		p->addRef();
+
 		return p;
 	}
 	catch (const Firebird::Exception& ex)
 	{
 		ex.stuffException(status);
 	}
+
 	return NULL;
 }//createPlugin
 
