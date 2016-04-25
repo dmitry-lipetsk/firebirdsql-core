@@ -989,7 +989,7 @@ void PluginSet::next(CheckStatusWrapper* const status)
 			this->currentPlugin = nullptr;
 		}
 
-		MutexLockGuard g(plugins->mutex, FB_FUNCTION);
+		const MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
 		while (this->currentName.getWord(this->namesList, " \t,;"))
 		{
