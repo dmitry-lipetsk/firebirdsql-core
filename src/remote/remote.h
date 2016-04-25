@@ -745,20 +745,6 @@ typedef Firebird::GetPlugins<Firebird::IClient> AuthClientPlugins;
 class ClntAuthBlock FB_FINAL :
 	public Firebird::RefCntIface<Firebird::IClientBlockImpl<ClntAuthBlock, Firebird::CheckStatusWrapper> >
 {
-private:
-	Firebird::PathName pluginList;				// To be passed to server
-	Firebird::PathName serverPluginList;		// Received from server
-	Firebird::string cliUserName, cliPassword;	// Used by plugin, taken from DPB
-	Firebird::string cliOrigUserName;			// Original user name, passed to server
-	// These two are legacy encrypted password, trusted auth data and so on - what plugin needs
-	Firebird::UCharBuffer dataForPlugin, dataFromPlugin;
-	Firebird::HalfStaticArray<InternalCryptKey*, 1> cryptKeys;		// Wire crypt keys that came from plugin(s) last time
-	Firebird::string dpbConfig;				// Used to recreate config with new filename
-	Firebird::RefPtr<Config> clntConfig;	// Used to get plugins list and pass to port
-	unsigned nextKey;						// First key to be analyzed
-
-	bool hasCryptKey;						// DPB contains disk crypt key, may be passed only over encrypted wire
-
 public:
 	AuthClientPlugins plugins;
 	bool authComplete;						// Set as response from client that authentication accepted
@@ -815,6 +801,20 @@ public:
 	virtual void putData(Firebird::CheckStatusWrapper* status, unsigned int length, const void* data) override final;
 
 	virtual Firebird::ICryptKey* newKey(Firebird::CheckStatusWrapper* status) override final;
+
+private:
+	Firebird::PathName pluginList;				// To be passed to server
+	Firebird::PathName serverPluginList;		// Received from server
+	Firebird::string cliUserName, cliPassword;	// Used by plugin, taken from DPB
+	Firebird::string cliOrigUserName;			// Original user name, passed to server
+	// These two are legacy encrypted password, trusted auth data and so on - what plugin needs
+	Firebird::UCharBuffer dataForPlugin, dataFromPlugin;
+	Firebird::HalfStaticArray<InternalCryptKey*, 1> cryptKeys;		// Wire crypt keys that came from plugin(s) last time
+	Firebird::string dpbConfig;				// Used to recreate config with new filename
+	Firebird::RefPtr<Config> clntConfig;	// Used to get plugins list and pass to port
+	unsigned nextKey;						// First key to be analyzed
+
+	bool hasCryptKey;						// DPB contains disk crypt key, may be passed only over encrypted wire
 };//class ClntAuthBlock
 
 ////////////////////////////////////////////////////////////////////////////////
