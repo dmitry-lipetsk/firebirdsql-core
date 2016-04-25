@@ -1262,11 +1262,11 @@ IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* const status,
 }//getPlugins
 
 //------------------------------------------------------------------------------
-void PluginManager::releasePlugin(IPluginBase* plugin)
+void PluginManager::releasePlugin(IPluginBase* const plugin)
 {
-	MutexLockGuard g(plugins->mutex, FB_FUNCTION);
+	const MutexLockGuard g(plugins->mutex, FB_FUNCTION);
 
-	IReferenceCounted* parent = plugin->getOwner();
+	IReferenceCounted* const parent = plugin->getOwner();
 
 	if (plugin->release() == 0)
 	{
