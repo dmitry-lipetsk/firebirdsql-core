@@ -118,7 +118,7 @@ private:
 
 public:
 	StdPlugin()
-     : owner(NULL)
+     : owner(nullptr)
 	{ }
 
 	IReferenceCounted* getOwner()
