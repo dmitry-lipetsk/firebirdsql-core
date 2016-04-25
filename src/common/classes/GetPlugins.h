@@ -100,12 +100,12 @@ GetPlugins<P>::GetPlugins(unsigned int const interfaceType,
 
     this->pluginSet.assignRefNoIncr
         (this->pluginInterface->getPlugins
-          (&status,
+          (&this->status,
            interfaceType,
            namesList,
            nullptr));
 
-    check(&status);
+    check(&this->status);
 
     this->getPlugin();
 }//GetPlugins
