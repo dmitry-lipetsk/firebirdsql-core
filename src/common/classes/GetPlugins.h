@@ -202,6 +202,9 @@ void GetPlugins<P>::set(const char* const newName)
 {
     if (this->hasData())
     {
+        fb_assert(this->pluginInterface);
+        fb_assert(this->currentPlugin);
+
         this->pluginInterface->releasePlugin(this->currentPlugin);
 
         this->currentPlugin = nullptr;
