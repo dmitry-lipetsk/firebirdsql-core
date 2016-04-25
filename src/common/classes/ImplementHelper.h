@@ -114,6 +114,12 @@ template <class C>
 class StdPlugin : public RefCntIface<C>
 {
 private:
+    typedef StdPlugin<C>                    self_type;
+
+    StdPlugin(const self_type&);
+    self_type& operator = (const self_type&);
+
+private:
 	IReferenceCounted* owner;
 
 public:
