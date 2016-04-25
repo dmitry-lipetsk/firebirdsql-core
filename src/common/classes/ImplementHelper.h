@@ -122,12 +122,12 @@ public:
 
 	IReferenceCounted* getOwner()
 	{
-		return owner;
+		return this->owner;
 	}
 
-	void setOwner(IReferenceCounted* iface)
+	void setOwner(IReferenceCounted* const iface)
 	{
-		owner = iface;
+		this->owner = iface;
 	}
 };
 
