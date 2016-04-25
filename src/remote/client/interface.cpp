@@ -5496,6 +5496,7 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 	rem_port* port = NULL;
 
 	cBlock.loadClnt(pb, &parSet);
+
 	authenticateStep0(cBlock);
 
 #ifdef WIN_NT
@@ -5561,6 +5562,7 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 		if (!port)
 		{
 			PathName expanded_name = attach_name;
+
 			ISC_expand_share(expanded_name);
 
 			if (ISC_analyze_pclan(expanded_name, node_name))
@@ -5582,6 +5584,7 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 		if (!port)
 		{
 			PathName expanded_name = attach_name;
+
 			if (ISC_analyze_nfs(expanded_name, node_name))
 			{
 				ISC_unescape(node_name);
