@@ -195,8 +195,10 @@ int SrpClient::release()
 	if (--refCounter == 0)
 	{
 		delete this;
+
 		return 0;
-	}
+	}//if
+
 	return 1;
 }//release
 
