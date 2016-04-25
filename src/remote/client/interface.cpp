@@ -7668,6 +7668,8 @@ static inline void makeUtfString(bool const        uft8Convert,
 void ClntAuthBlock::loadClnt(Firebird::ClumpletWriter&  dpb,
                              const ParametersSet* const tags)
 {
+    fb_assert(tags);
+
 	const bool uft8Convert = !dpb.find(tags->utf8_filename);
 
 	for (dpb.rewind(); !dpb.isEof(); dpb.moveNext())
