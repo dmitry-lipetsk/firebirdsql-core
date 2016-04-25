@@ -203,6 +203,12 @@ protected:
 template <typename C>
 class AccessAutoInterface : public CachedMasterInterface
 {
+private:
+    typedef AccessAutoInterface<C>          self_type;
+
+    AccessAutoInterface(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	explicit AccessAutoInterface(C* aPtr)
 		: ptr(aPtr)
