@@ -47,7 +47,7 @@ public:
 
 	~SrpClient()
 	{
-		delete client;
+		delete this->client;
 	}
 
 	// IClient implementation
