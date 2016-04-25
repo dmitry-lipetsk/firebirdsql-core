@@ -210,12 +210,12 @@ public:
 
 	operator C* ()
 	{
-		return ptr;
+		return this->ptr;
 	}
 
 	C* operator -> ()
 	{
-		return ptr;
+		return this->ptr;
 	}
 
 private:
