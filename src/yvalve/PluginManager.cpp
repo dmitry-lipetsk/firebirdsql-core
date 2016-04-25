@@ -675,7 +675,7 @@ IPluginBase* ConfiguredPlugin::factory(IFirebirdConf* const firebirdConf)
 
 	check(&s);
 
-	return NULL;
+	return nullptr;
 }//factory
 
 ////////////////////////////////////////////////////////////////////////////////
