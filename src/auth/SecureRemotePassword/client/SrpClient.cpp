@@ -79,29 +79,40 @@ int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 		{
 			HANDSHAKE_DEBUG(fprintf(stderr, "Cli: SRP phase1: login=%s password=%s\n",
 				cb->getLogin(), cb->getPassword()));
+
 			if (!(cb->getLogin() && cb->getPassword()))
 			{
 				return AUTH_CONTINUE;
 			}
 
 			client = FB_NEW RemotePassword;
+
 			client->genClientKey(data);
+
 			dumpIt("Clnt: clientPubKey", data);
+
 			cb->putData(status, data.length(), data.begin());
+
 			if (status->getState() & IStatus::STATE_ERRORS)
 				return AUTH_FAILED;
+
 			return AUTH_MORE_DATA;
 		}
 
 		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: SRP phase2\n"));
+
 		unsigned length;
+
 		const unsigned char* saltAndKey = cb->getData(&length);
+
 		if (!saltAndKey || length == 0)
 		{
 			Arg::Gds(isc_auth_data).raise();
 		}
+
 		const unsigned expectedLength =
 			(RemotePassword::SRP_SALT_SIZE + RemotePassword::SRP_KEY_SIZE + 2) * 2;
+
 		if (length > expectedLength)
 		{
 			(Arg::Gds(isc_auth_datalength) << Arg::Num(length) <<
@@ -109,13 +120,17 @@ int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 		}
 
 		string salt, key;
+
 		unsigned charSize = *saltAndKey++;
+
 		charSize += ((unsigned) *saltAndKey++) << 8;
+
 		if (charSize > RemotePassword::SRP_SALT_SIZE * 2)
 		{
 			(Arg::Gds(isc_auth_datalength) << Arg::Num(charSize) <<
 				Arg::Num(RemotePassword::SRP_SALT_SIZE * 2) << "salt").raise();
 		}
+
 		salt.assign(saltAndKey, charSize);
 		dumpIt("Clnt: salt", salt);
 		saltAndKey += charSize;
@@ -123,12 +138,15 @@ int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 
 		charSize = *saltAndKey++;
 		charSize += ((unsigned) *saltAndKey++) << 8;
+
 		if (charSize != length - 2)
 		{
 			(Arg::Gds(isc_auth_datalength) << Arg::Num(charSize) <<
 				Arg::Num(length - 2) << "key").raise();
 		}
+
 		key.assign(saltAndKey, charSize);
+
 		dumpIt("Clnt: key(srvPub)", key);
 
 		dumpIt("Clnt: login", string(cb->getLogin()));
@@ -137,9 +155,11 @@ int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 		dumpIt("Clnt: sessionKey", sessionKey);
 
 		BigInteger cProof = client->clientProof(cb->getLogin(), salt.c_str(), sessionKey);
+
 		cProof.getText(data);
 
 		cb->putData(status, data.length(), data.c_str());
+
 		if (status->getState() & IStatus::STATE_ERRORS)
 		{
 			return AUTH_FAILED;
@@ -147,11 +167,14 @@ int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
 
 		// output the key
 		ICryptKey* cKey = cb->newKey(status);
+
 		if (status->getState() & IStatus::STATE_ERRORS)
 		{
 			return AUTH_FAILED;
 		}
+
 		cKey->setSymmetric(status, "Symmetric", sessionKey.getCount(), sessionKey.begin());
+
 		if (status->getState() & IStatus::STATE_ERRORS)
 		{
 			return AUTH_FAILED;
