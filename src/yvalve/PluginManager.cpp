@@ -1274,13 +1274,14 @@ void PluginManager::releasePlugin(IPluginBase* const plugin)
 		if (parent)
 		{
 			parent->release();
+
 			if (plugins->wakeIt)
 			{
 				plugins->wakeIt->release();
 				plugins->wakeIt = NULL;
-			}
-		}
-	}
+			}//if
+		}//if
+	}//if
 }//releasePlugin
 
 //------------------------------------------------------------------------------
