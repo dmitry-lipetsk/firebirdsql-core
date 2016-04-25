@@ -153,7 +153,7 @@ IPluginBase* SimpleFactoryBase<P>::createPlugin(CheckStatusWrapper* const status
 {
 	try
 	{
-		P* p = FB_NEW P(factoryParameter);
+		P* const p = FB_NEW P(factoryParameter);
 		p->addRef();
 		return p;
 	}
