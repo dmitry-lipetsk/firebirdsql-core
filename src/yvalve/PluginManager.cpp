@@ -994,7 +994,7 @@ void PluginSet::next(CheckStatusWrapper* const status)
 		while (this->currentName.getWord(this->namesList, " \t,;"))
 		{
 			// First check - may be currentName is present among already configured plugins
-			ConfiguredPlugin* tmp = NULL;
+			ConfiguredPlugin* tmp = nullptr;
 
 			if (plugins->get(MapKey(this->interfaceType, this->currentName), tmp))
 			{
