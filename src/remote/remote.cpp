@@ -975,7 +975,7 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* const fileName,
 
 		if (srvList.find(TAG_KNOWN_PLUGINS))
 		{
-			srvList.getPath(serverPluginList);
+			srvList.getPath(this->serverPluginList);
 		}
 	}//if
 
@@ -985,7 +985,7 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* const fileName,
 
 	this->firstTime = true;
 
-	this->clntConfig = REMOTE_get_config(fileName, &dpbConfig);
+	this->clntConfig = REMOTE_get_config(fileName, &this->dpbConfig);
 
     fb_assert(this->clntConfig);
 
