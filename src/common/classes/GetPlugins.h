@@ -198,7 +198,7 @@ void GetPlugins<P>::next()
 
 //------------------------------------------------------------------------
 template<typename P>
-void GetPlugins<P>::set(const char* newName)
+void GetPlugins<P>::set(const char* const newName)
 {
     if (this->hasData())
     {
