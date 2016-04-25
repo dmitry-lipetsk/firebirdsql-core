@@ -754,6 +754,8 @@ private:
 public:
 	AuthClientPlugins plugins;
 	bool authComplete;						// Set as response from client that authentication accepted
+
+private:
 	bool firstTime;							// Invoked first time after reset
 
 public:
