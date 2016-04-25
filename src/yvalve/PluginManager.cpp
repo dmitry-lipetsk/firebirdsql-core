@@ -1257,7 +1257,7 @@ IPluginSet* PluginManager::getPlugins(CheckStatusWrapper* const status,
 	catch (const Exception& ex)
 	{
 		ex.stuffException(status);
-		return NULL;
+		return nullptr;
 	}
 }//getPlugins
 
