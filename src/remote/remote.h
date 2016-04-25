@@ -136,14 +136,27 @@ typedef Firebird::RefPtr<Firebird::IService> ServService;
 // for both services and databases attachments
 struct ParametersSet
 {
-	UCHAR dummy_packet_interval, user_name, auth_block,
-		  password, password_enc, trusted_auth,
-		  plugin_name, plugin_list, specific_data,
-		  address_path, process_id, process_name,
-		  encrypt_key, client_version, remote_protocol,
-		  host_name, os_user, config_text,
-		  utf8_filename, map_attach;
-};
+    UCHAR dummy_packet_interval;
+    UCHAR user_name;
+    UCHAR auth_block;
+    UCHAR password;
+    UCHAR password_enc;
+    UCHAR trusted_auth;
+    UCHAR plugin_name;
+    UCHAR plugin_list;
+    UCHAR specific_data;
+    UCHAR address_path;
+    UCHAR process_id;
+    UCHAR process_name;
+    UCHAR encrypt_key;
+    UCHAR client_version;
+    UCHAR remote_protocol;
+    UCHAR host_name;
+    UCHAR os_user;
+    UCHAR config_text;
+    UCHAR utf8_filename;
+    UCHAR map_attach;
+};//struct ParametersSet
 
 extern const ParametersSet dpbParam, spbParam, connectParam;
 
