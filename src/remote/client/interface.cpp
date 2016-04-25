@@ -840,7 +840,7 @@ IAttachment* RProvider::attach(CheckStatusWrapper*  const status,
                                        newDpb,
                                        dpbParam,
                                        node_name,
-                                       NULL);
+                                       /*ref_db_name*/NULL);
 		if (!port)
 		{
 			Arg::Gds(isc_unavailable).copyTo(status);
