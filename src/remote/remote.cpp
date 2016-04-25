@@ -963,7 +963,7 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName,
 {
 	if (listStr)
 	{
-		if (dataForPlugin.hasData())
+		if (this->dataForPlugin.hasData())
 		{
 			// We should not change plugins iterator now
 			return;
@@ -979,21 +979,21 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName,
 		}
 	}//if
 
-	dataForPlugin.clear();
+	this->dataForPlugin.clear();
 
-	dataFromPlugin.clear();
+	this->dataFromPlugin.clear();
 
-	firstTime = true;
+	this->firstTime = true;
 
-	clntConfig = REMOTE_get_config(fileName, &dpbConfig);
+	this->clntConfig = REMOTE_get_config(fileName, &dpbConfig);
 
-	pluginList = clntConfig->getPlugins(Firebird::IPluginManager::TYPE_AUTH_CLIENT);
+	this->pluginList = clntConfig->getPlugins(Firebird::IPluginManager::TYPE_AUTH_CLIENT);
 
 	Firebird::PathName final;
 
-	if (serverPluginList.hasData())
+	if (this->serverPluginList.hasData())
 	{
-		Auth::mergeLists(final, serverPluginList, pluginList);
+		Auth::mergeLists(final, this->serverPluginList, this->pluginList);
 
 		if (final.length() == 0)
 		{
@@ -1007,10 +1007,10 @@ void ClntAuthBlock::resetClnt(const Firebird::PathName* fileName,
 	}
 	else
 	{
-		final = pluginList;
+		final = this->pluginList;
 	}
 
-	plugins.set(final.c_str());
+	this->plugins.set(final.c_str());
 }//resetClnt
 
 //------------------------------------------------------------------------
