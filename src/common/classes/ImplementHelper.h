@@ -204,12 +204,12 @@ public:
 		: ptr(aPtr)
 	{ }
 
-	operator C*()
+	operator C* ()
 	{
 		return ptr;
 	}
 
-	C* operator->()
+	C* operator -> ()
 	{
 		return ptr;
 	}
