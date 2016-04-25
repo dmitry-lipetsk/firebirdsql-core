@@ -222,15 +222,15 @@ namespace Firebird
 	public:
 		const_pointer c_str() const
 		{
-			return stringBuffer;
+			return this->stringBuffer;
 		}
 		size_type length() const
 		{
-			return stringLength;
+			return this->stringLength;
 		}
 		size_type getCount() const throw()
 		{
-			return stringLength;
+			return this->stringLength;
 		}
 		// Almost same as c_str(), but return 0, not "",
 		// when string has no data. Useful when interacting
