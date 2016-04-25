@@ -745,6 +745,12 @@ typedef Firebird::GetPlugins<Firebird::IClient> AuthClientPlugins;
 class ClntAuthBlock FB_FINAL :
 	public Firebird::RefCntIface<Firebird::IClientBlockImpl<ClntAuthBlock, Firebird::CheckStatusWrapper> >
 {
+private:
+    typedef ClntAuthBlock                   self_type;
+
+    ClntAuthBlock(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
 	AuthClientPlugins plugins;
 	bool authComplete;						// Set as response from client that authentication accepted
