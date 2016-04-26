@@ -177,10 +177,15 @@ void RemotePassword::genServerKey(string&                      pubkey,
 void RemotePassword::computeScramble()
 {
 	hash.reset();
+
 	dumpIt("computeScramble: clientPublicKey", this->clientPublicKey);
+
 	hash.processStrippedInt(this->clientPublicKey);
+
 	dumpIt("computeScramble: serverPublicKey", this->serverPublicKey);
+
 	hash.processStrippedInt(this->serverPublicKey);
+
 	hash.getInt(scramble);
 }//computeScramble
 
