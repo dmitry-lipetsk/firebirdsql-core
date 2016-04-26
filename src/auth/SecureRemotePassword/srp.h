@@ -143,10 +143,10 @@ public:
 									 const Firebird::UCharBuffer& sessionKey);
 
 private:
-	const RemoteGroup*		group;
-	Auth::Sha1				hash;
-	Firebird::BigInteger	privateKey;
-	Firebird::BigInteger	scramble;
+	const RemoteGroup*    group;
+	Auth::Sha1            hash;
+	Firebird::BigInteger  privateKey;
+	Firebird::BigInteger  scramble;
 };//class RemotePassword
 
 ////////////////////////////////////////////////////////////////////////////////
