@@ -108,7 +108,9 @@ RemotePassword::RemotePassword()
 }//RemotePassword
 
 //------------------------------------------------------------------------
-BigInteger RemotePassword::getUserHash(const char* account, const char* salt, const char* password)
+BigInteger RemotePassword::getUserHash(const char* account,
+                                       const char* salt,
+                                       const char* password)
 {
 	hash.reset();
 	hash.process(account);
@@ -127,7 +129,9 @@ BigInteger RemotePassword::getUserHash(const char* account, const char* salt, co
 }//getUserHash
 
 //------------------------------------------------------------------------
-BigInteger RemotePassword::computeVerifier(const string& account, const string& salt, const string& password)
+BigInteger RemotePassword::computeVerifier(const string& account,
+                                           const string& salt,
+                                           const string& password)
 {
 	BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
 	return group->generator.modPow(x, group->prime);
@@ -143,7 +147,8 @@ void RemotePassword::genClientKey(string& pubkey)
 }//genClientKey
 
 //------------------------------------------------------------------------
-void RemotePassword::genServerKey(string& pubkey, const Firebird::UCharBuffer& verifier)
+void RemotePassword::genServerKey(string&                      pubkey,
+                                  const Firebird::UCharBuffer& verifier)
 {
 	dumpIt("privateKey(S)", privateKey);
 	BigInteger gb(group->generator.modPow(privateKey, group->prime));	// g^b
@@ -168,9 +173,11 @@ void RemotePassword::computeScramble()
 }//computeScramble
 
 //------------------------------------------------------------------------
-void RemotePassword::clientSessionKey(UCharBuffer& sessionKey, const char* account,
-									  const char* salt, const char* password,
-									  const char* serverPubKey)
+void RemotePassword::clientSessionKey(UCharBuffer& sessionKey,
+                                      const char*  account,
+									  const char*  salt,
+                                      const char*  password,
+									  const char*  serverPubKey)
 {
 	serverPublicKey = BigInteger(serverPubKey);
 	computeScramble();
@@ -195,7 +202,8 @@ void RemotePassword::clientSessionKey(UCharBuffer& sessionKey, const char* accou
 }//clientSessionKey
 
 //------------------------------------------------------------------------
-void RemotePassword::serverSessionKey(UCharBuffer& sessionKey, const char* clientPubKey,
+void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
+                                      const char*        clientPubKey,
 									  const UCharBuffer& verifier)
 {
 	clientPublicKey = BigInteger(clientPubKey);
@@ -218,7 +226,9 @@ void RemotePassword::serverSessionKey(UCharBuffer& sessionKey, const char* clien
 
 // H(H(prime) ^ H(g), H(I), s, A, B, K)
 
-BigInteger RemotePassword::clientProof(const char* account, const char* salt, const UCharBuffer& sessionKey)
+BigInteger RemotePassword::clientProof(const char*        account,
+                                       const char*        salt,
+                                       const UCharBuffer& sessionKey)
 {
 	hash.reset();
 	hash.processInt(group->prime);
