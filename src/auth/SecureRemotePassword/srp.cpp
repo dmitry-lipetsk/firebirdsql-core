@@ -108,9 +108,9 @@ RemotePassword::RemotePassword()
 }//RemotePassword
 
 //------------------------------------------------------------------------
-BigInteger RemotePassword::getUserHash(const char* account,
-                                       const char* salt,
-                                       const char* password)
+BigInteger RemotePassword::getUserHash(const char* const account,
+                                       const char* const salt,
+                                       const char* const password)
 {
 	hash.reset();
 	hash.process(account);
@@ -173,11 +173,11 @@ void RemotePassword::computeScramble()
 }//computeScramble
 
 //------------------------------------------------------------------------
-void RemotePassword::clientSessionKey(UCharBuffer& sessionKey,
-                                      const char*  account,
-									  const char*  salt,
-                                      const char*  password,
-									  const char*  serverPubKey)
+void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
+                                      const char*  const account,
+									  const char*  const salt,
+                                      const char*  const password,
+									  const char*  const serverPubKey)
 {
 	serverPublicKey = BigInteger(serverPubKey);
 	computeScramble();
@@ -203,7 +203,7 @@ void RemotePassword::clientSessionKey(UCharBuffer& sessionKey,
 
 //------------------------------------------------------------------------
 void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
-                                      const char*        clientPubKey,
+                                      const char*  const clientPubKey,
 									  const UCharBuffer& verifier)
 {
 	clientPublicKey = BigInteger(clientPubKey);
@@ -226,8 +226,8 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 // H(H(prime) ^ H(g), H(I), s, A, B, K)
 
-BigInteger RemotePassword::clientProof(const char*        account,
-                                       const char*        salt,
+BigInteger RemotePassword::clientProof(const char*  const account,
+                                       const char*  const salt,
                                        const UCharBuffer& sessionKey)
 {
 	hash.reset();
