@@ -895,9 +895,11 @@ Firebird::PathName ClntAuthBlock::getPluginName()const
 	return plugins.hasData() ? plugins.name() : "";
 }
 
+//------------------------------------------------------------------------
 template <typename T>
-static void addMultiPartConnectParameter(const T& dataToAdd,
-	Firebird::ClumpletWriter& user_id, UCHAR param)
+static void addMultiPartConnectParameter(const T&                  dataToAdd,
+                                         Firebird::ClumpletWriter& user_id,
+                                         UCHAR                     param)
 {
 	FB_SIZE_T remaining = dataToAdd.getCount();
 	fb_assert(remaining <= 254u * 256u); // paranoid check => 65024
@@ -920,8 +922,8 @@ static void addMultiPartConnectParameter(const T& dataToAdd,
 		user_id.insertBytes(param, buffer, step + 1);
 		if (!part) // we completed 256 loops, almost impossible but check anyway.
 			break;
-	}
-}
+	}//while
+}//addMultiPartConnectParameter
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)const
