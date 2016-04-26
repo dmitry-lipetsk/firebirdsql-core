@@ -525,12 +525,12 @@ static GlobalPtr<Mutex> port_mutex;
 static GlobalPtr<PortsCleanup>	inet_ports;
 static GlobalPtr<SocketsArray> ports_to_close;
 
-
-rem_port* INET_analyze(ClntAuthBlock* cBlock,
+//------------------------------------------------------------------------
+rem_port* INET_analyze(ClntAuthBlock*  cBlock,
 					   const PathName& file_name,
-					   const TEXT* node_name,
-					   bool uv_flag,
-					   ClumpletReader &dpb,
+					   const TEXT*     node_name,
+					   bool            uv_flag,
+					   ClumpletReader& dpb,
 					   RefPtr<Config>* config,
 					   const PathName* ref_db_name)
 {
