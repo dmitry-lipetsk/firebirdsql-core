@@ -554,10 +554,12 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	// blocks and get ready to go.
 
 	Rdb* rdb = FB_NEW Rdb;
+
 	PACKET* packet = &rdb->rdb_packet;
 
 	// Pick up some user identification information
 	ClumpletWriter user_id(ClumpletReader::UnTagged, 64000);
+
 	if (cBlock)
 	{
 		cBlock->extractDataFromPluginTo(user_id);
@@ -612,7 +614,9 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		REMOTE_PROTOCOL(PROTOCOL_VERSION12, ptype_lazy_send, 3),
 		REMOTE_PROTOCOL(PROTOCOL_VERSION13, ptype_lazy_send, 4)
 	};
+
 	fb_assert(FB_NELEM(protocols_to_try) <= FB_NELEM(cnct->p_cnct_versions));
+
 	cnct->p_cnct_count = FB_NELEM(protocols_to_try);
 
 	for (size_t i = 0; i < cnct->p_cnct_count; i++) {
@@ -627,6 +631,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	rem_port* port = inet_try_connect(packet, rdb, file_name, node_name, dpb, config, ref_db_name);
 
 	P_ACPT* accept = NULL;
+
 	switch (packet->p_operation)
 	{
 	case op_accept_data:
