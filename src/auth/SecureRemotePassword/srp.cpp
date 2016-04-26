@@ -133,7 +133,7 @@ BigInteger RemotePassword::computeVerifier(const string& account,
                                            const string& salt,
                                            const string& password)
 {
-	BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
+	const BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
 
 	return group->generator.modPow(x, group->prime);
 }//computeVerifier
