@@ -22,32 +22,7 @@ public:
     BigInteger       k;
 
 public:
-	explicit RemoteGroup(Firebird::MemoryPool&)
-		: prime(sm_primeStr)
-        , generator(sm_genStr)
-        , k()
-	{
-		Auth::Sha1 hash;
-
-		hash.processInt(prime);
-
-		if (prime.length() > generator.length())
-		{
-			unsigned int const pad = prime.length() - generator.length();
-
-			char pb[1024];
-
-            fb_assert(pad<=sizeof(pb));
-
-			memset(pb, 0, pad);
-
-			hash.process(pad, pb);
-		}//if
-
-		hash.processInt(generator);
-
-		hash.getInt(k);
-	}//RemoteGroup
+	explicit RemoteGroup(Firebird::MemoryPool&);
 
 public:
 	static RemoteGroup* getGroup()
@@ -80,6 +55,34 @@ const char* const RemoteGroup::sm_primeStr
 //------------------------------------------------------------------------
 const char* const RemoteGroup::sm_genStr
  ="02";
+
+//------------------------------------------------------------------------
+RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
+ : prime(sm_primeStr)
+ , generator(sm_genStr)
+ , k()
+{
+	Auth::Sha1 hash;
+
+	hash.processInt(prime);
+
+	if (prime.length() > generator.length())
+	{
+		unsigned int const pad = prime.length() - generator.length();
+
+		char pb[1024];
+
+        fb_assert(pad<=sizeof(pb));
+
+		memset(pb, 0, pad);
+
+		hash.process(pad, pb);
+	}//if
+
+	hash.processInt(generator);
+
+	hash.getInt(k);
+}//RemoteGroup
 
 ////////////////////////////////////////////////////////////////////////////////
 //class RemotePassword
