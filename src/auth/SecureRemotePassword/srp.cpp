@@ -231,14 +231,23 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 									  const UCharBuffer& verifier)
 {
 	clientPublicKey = BigInteger(clientPubKey);
+
 	computeScramble();
+
 	dumpIt("scramble", scramble);
+
 	BigInteger v = BigInteger(verifier);
+
 	BigInteger vu = v.modPow(scramble, group->prime);					// v^u
+
 	BigInteger Avu = (clientPublicKey * vu) % group->prime;				// Av^u
+
 	dumpIt("Avu", Avu);
+
 	BigInteger sessionSecret = Avu.modPow(privateKey, group->prime);	// (Av^u) ^ b
+
 	dumpIt("serverPrivateKey", privateKey);
+
 	dumpIt("sessionSecret", sessionSecret);
 
 	hash.reset();
