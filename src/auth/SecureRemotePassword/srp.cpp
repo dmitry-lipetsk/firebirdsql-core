@@ -61,19 +61,19 @@ public:
 		hash.getInt(k);
 	}//RemoteGroup
 
-private:
-	static InitInstance<RemoteGroup> group;
-
 public:
 	static RemoteGroup* getGroup()
 	{
-		return &group();
+		return &sm_instance();
 	}
+
+private:
+	static InitInstance<RemoteGroup> sm_instance;
 };//class RemotePassword
 
 ////////////////////////////////////////////////////////////////////////////////
 
-InitInstance<RemoteGroup> RemoteGroup::group;
+InitInstance<RemoteGroup> RemoteGroup::sm_instance;
 
 ////////////////////////////////////////////////////////////////////////////////
 //class RemotePassword
