@@ -98,7 +98,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				return AUTH_FAILED;
 
 			return AUTH_MORE_DATA;
-		}
+		}//if !this->client
 
 		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: SRP phase2\n"));
 
@@ -133,8 +133,11 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 		}
 
 		salt.assign(saltAndKey, charSize);
+
 		dumpIt("Clnt: salt", salt);
+
 		saltAndKey += charSize;
+
 		length -= (charSize + 2);
 
 		charSize = *saltAndKey++;
