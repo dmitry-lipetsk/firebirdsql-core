@@ -899,7 +899,7 @@ Firebird::PathName ClntAuthBlock::getPluginName()const
 template <typename T>
 static void addMultiPartConnectParameter(const T&                  dataToAdd,
                                          Firebird::ClumpletWriter& user_id,
-                                         UCHAR                     param)
+                                         UCHAR               const param)
 {
 	FB_SIZE_T remaining = dataToAdd.getCount();
 
