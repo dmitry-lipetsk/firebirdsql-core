@@ -116,18 +116,25 @@ public:
 	Firebird::BigInteger getUserHash(const char* account,
 									 const char* salt,
 									 const char* password);
+
 	Firebird::BigInteger computeVerifier(const Firebird::string& account,
 										 const Firebird::string& salt,
 										 const Firebird::string& password);
+
 	void genClientKey(Firebird::string& clientPubKey);
+
 	void genServerKey(Firebird::string& serverPubKey, const Firebird::UCharBuffer& verifier);
+
 	void computeScramble();
+
 	void clientSessionKey(Firebird::UCharBuffer& sessionKey, const char* account,
 						  const char* salt, const char* password,
 						  const char* serverPubKey);
+
 	void serverSessionKey(Firebird::UCharBuffer& sessionKey,
 						  const char* clientPubKey,
 						  const Firebird::UCharBuffer& verifier);
+
 	Firebird::BigInteger clientProof(const char* account,
 									 const char* salt,
 									 const Firebird::UCharBuffer& sessionKey);
