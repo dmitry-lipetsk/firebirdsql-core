@@ -33,9 +33,9 @@ namespace Auth{
 class RemoteGroup
 {
 public:
-	BigInteger	prime;
-    BigInteger  generator;
-    BigInteger  k;
+    BigInteger const prime;
+    BigInteger const generator;
+    BigInteger       k;
 
 public:
 	explicit RemoteGroup(Firebird::MemoryPool&)
