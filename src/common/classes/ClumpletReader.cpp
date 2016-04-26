@@ -627,19 +627,19 @@ void ClumpletReader::rewind()
 }
 
 //------------------------------------------------------------------------
-bool ClumpletReader::find(UCHAR tag)
+bool ClumpletReader::find(UCHAR const tag)
 {
-	const FB_SIZE_T co = getCurOffset();
+	const FB_SIZE_T co = this->getCurOffset();
 
-	for (rewind(); !isEof(); moveNext())
+	for (this->rewind(); !this->isEof(); this->moveNext())
 	{
-		if (tag == getClumpTag())
+		if (tag == this->getClumpTag())
 		{
 			return true;
 		}
 	}//for
 
-	setCurOffset(co);
+	this->setCurOffset(co);
 
 	return false;
 }//find
