@@ -630,7 +630,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		{
 			cnct->p_cnct_versions[i].p_cnct_max_type |= pflag_compress;
 		}
-	}
+	}//for
 
 	rem_port* port = inet_try_connect(packet, rdb, file_name, node_name, dpb, config, ref_db_name);
 
