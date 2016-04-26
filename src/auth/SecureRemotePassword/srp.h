@@ -100,12 +100,6 @@ private:
     RemotePassword(const self_type&);
     self_type& operator = (const self_type&);
 
-private:
-	const RemoteGroup*		group;
-	Auth::Sha1				hash;
-	Firebird::BigInteger	privateKey;
-	Firebird::BigInteger	scramble;
-
 public:
 	Firebird::BigInteger	clientPublicKey;
 	Firebird::BigInteger	serverPublicKey;
@@ -136,6 +130,12 @@ public:
 	Firebird::BigInteger clientProof(const char* account,
 									 const char* salt,
 									 const Firebird::UCharBuffer& sessionKey);
+
+private:
+	const RemoteGroup*		group;
+	Auth::Sha1				hash;
+	Firebird::BigInteger	privateKey;
+	Firebird::BigInteger	scramble;
 };//class RemotePassword
 
 ////////////////////////////////////////////////////////////////////////////////
