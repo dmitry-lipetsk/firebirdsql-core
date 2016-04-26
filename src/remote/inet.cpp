@@ -2686,19 +2686,26 @@ static rem_port* inet_try_connect(PACKET*         packet,
  *
  **************************************/
 	P_CNCT* cnct = &packet->p_cnct;
+
 	packet->p_operation = op_connect;
+
 	cnct->p_cnct_operation = op_attach;
+
 	cnct->p_cnct_cversion = CONNECT_VERSION3;
+
 	cnct->p_cnct_client = ARCHITECTURE;
 
 	const PathName& cnct_file(ref_db_name ? (*ref_db_name) : file_name);
+
 	cnct->p_cnct_file.cstr_length = (ULONG) cnct_file.length();
+
 	cnct->p_cnct_file.cstr_address = reinterpret_cast<const UCHAR*>(cnct_file.c_str());
 
 	// If we can't talk to a server, punt.  Let somebody else generate
 	// an error.  status_vector will have the network error info.
 
 	rem_port* port = NULL;
+
 	try
 	{
 		port = INET_connect(node_name, packet, false, &dpb, config);
@@ -2712,7 +2719,9 @@ static rem_port* inet_try_connect(PACKET*         packet,
 	// Get response packet from server.
 
 	rdb->rdb_port = port;
+
 	port->port_context = rdb;
+
 	if (!port->receive(packet))
 	{
 		rdb->rdb_port = NULL;
