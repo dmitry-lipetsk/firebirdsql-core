@@ -598,7 +598,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 
 	// Should compression be tried?
 
-	bool compression = config && (*config)->getWireCompression();
+	const bool compression = config && (*config)->getWireCompression();
 
 	// Establish connection to server
 	// If we want user verification, we can't speak anything less than version 7
