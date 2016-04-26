@@ -583,7 +583,8 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	ISC_systemToUtf8(buffer);
 	user_id.insertString(CNCT_host, buffer);
 
-	if ((eff_uid == -1) || uv_flag) {
+	if ((eff_uid == -1) || uv_flag)
+    {
 		user_id.insertTag(CNCT_user_verification);
 	}
 	else
@@ -619,9 +620,12 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 
 	cnct->p_cnct_count = FB_NELEM(protocols_to_try);
 
-	for (size_t i = 0; i < cnct->p_cnct_count; i++) {
+	for (size_t i = 0; i < cnct->p_cnct_count; i++)
+    {
 		cnct->p_cnct_versions[i] = protocols_to_try[i];
-		if (compression && cnct->p_cnct_versions[i].p_cnct_version >= PROTOCOL_VERSION13 &&
+
+		if (compression &&
+            cnct->p_cnct_versions[i].p_cnct_version >= PROTOCOL_VERSION13 &&
 			rem_port::checkCompression())
 		{
 			cnct->p_cnct_versions[i].p_cnct_max_type |= pflag_compress;
@@ -698,7 +702,8 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 
 	port->port_version = REMOTE_make_string(temp.c_str());
 
-	if (accept->p_acpt_architecture == ARCHITECTURE) {
+	if (accept->p_acpt_architecture == ARCHITECTURE)
+    {
 		port->port_flags |= PORT_symmetric;
 	}
 
@@ -706,16 +711,20 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 
 	accept->p_acpt_type &= ptype_MASK;
 
-	if (accept->p_acpt_type != ptype_out_of_band) {
+	if (accept->p_acpt_type != ptype_out_of_band)
+    {
 		port->port_flags |= PORT_no_oob;
 	}
 
-	if (accept->p_acpt_type == ptype_lazy_send) {
+	if (accept->p_acpt_type == ptype_lazy_send)
+    {
 		port->port_flags |= PORT_lazy;
 	}
 
 	if (compress)
+    {
 		port->initCompression();
+    }
 
 	return port;
 }//INET_analyze
