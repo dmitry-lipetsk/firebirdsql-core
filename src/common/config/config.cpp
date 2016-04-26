@@ -846,7 +846,7 @@ int Config::getWireCrypt(WireCryptMode const wcMode) const
 
 	if (!wc)
 	{
-		return wcMode == WC_CLIENT ? WIRE_CRYPT_ENABLED : WIRE_CRYPT_REQUIRED;
+		return (wcMode == WC_CLIENT) ? WIRE_CRYPT_ENABLED : WIRE_CRYPT_REQUIRED;
 	}
 
 	Firebird::NoCaseString wireCrypt(wc);
