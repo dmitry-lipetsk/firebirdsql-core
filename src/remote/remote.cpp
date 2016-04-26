@@ -923,29 +923,36 @@ static void addMultiPartConnectParameter(const T& dataToAdd,
 	}
 }
 
+//------------------------------------------------------------------------
 void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 {
 	// Add user login name
 	if (this->cliOrigUserName.hasData())
 	{
-		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: extractDataFromPluginTo: cliOrigUserName=%s\n",
-			this->cliOrigUserName.c_str()));
+		HANDSHAKE_DEBUG(fprintf(stderr,
+                                "Cli: extractDataFromPluginTo: cliOrigUserName=%s\n",
+			                    this->cliOrigUserName.c_str()));
+
 		user_id.insertString(CNCT_login, this->cliOrigUserName);
-	}
+	}//if
 
 	// Add plugin name
 	Firebird::PathName pluginName = this->getPluginName();
+
 	if (pluginName.hasData())
 	{
-		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: extractDataFromPluginTo: pluginName=%s\n", pluginName.c_str()));
+		HANDSHAKE_DEBUG(fprintf(stderr,
+                                "Cli: extractDataFromPluginTo: pluginName=%s\n",
+                                pluginName.c_str()));
+
 		user_id.insertPath(CNCT_plugin_name, pluginName);
-	}
+	}//if
 
 	// Add plugin list
 	if (this->pluginList.hasData())
 	{
 		user_id.insertPath(CNCT_plugin_list, this->pluginList);
-	}
+	}//if
 
 	// This is specially tricky field - user_id is limited to 255 bytes per entry,
 	// and we have no ways to override this limit cause it can be sent to any version server.
@@ -954,8 +961,9 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 	addMultiPartConnectParameter(dataFromPlugin, user_id, CNCT_specific_data);
 
 	// Client's wirecrypt requested level
-	user_id.insertInt(CNCT_client_crypt, this->clntConfig->getWireCrypt(WC_CLIENT));
-}
+	user_id.insertInt(CNCT_client_crypt,
+                      this->clntConfig->getWireCrypt(WC_CLIENT));
+}//extractDataFromPluginTo
 
 //------------------------------------------------------------------------
 void ClntAuthBlock::resetClnt(const Firebird::PathName* const fileName,
