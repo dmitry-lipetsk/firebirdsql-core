@@ -626,20 +626,25 @@ void ClumpletReader::rewind()
 	spbState = 0;
 }
 
+//------------------------------------------------------------------------
 bool ClumpletReader::find(UCHAR tag)
 {
 	const FB_SIZE_T co = getCurOffset();
+
 	for (rewind(); !isEof(); moveNext())
 	{
 		if (tag == getClumpTag())
 		{
 			return true;
 		}
-	}
-	setCurOffset(co);
-	return false;
-}
+	}//for
 
+	setCurOffset(co);
+
+	return false;
+}//find
+
+//------------------------------------------------------------------------
 bool ClumpletReader::next(UCHAR tag)
 {
 	if (!isEof())
