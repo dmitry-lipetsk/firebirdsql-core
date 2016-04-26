@@ -707,7 +707,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		port->port_flags |= PORT_symmetric;
 	}
 
-	bool compress = accept->p_acpt_type & pflag_compress;
+	const bool compress = accept->p_acpt_type & pflag_compress;
 
 	accept->p_acpt_type &= ptype_MASK;
 
