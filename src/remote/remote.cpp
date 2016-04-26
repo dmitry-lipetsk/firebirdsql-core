@@ -946,7 +946,8 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)co
                                 "Cli: extractDataFromPluginTo: pluginName=%s\n",
                                 pluginName.c_str()));
 
-		user_id.insertPath(CNCT_plugin_name, pluginName);
+		user_id.insertPath(CNCT_plugin_name,
+                           pluginName);
 	}//if
 
 	// Add plugin list
