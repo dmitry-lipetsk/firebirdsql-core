@@ -70,13 +70,13 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 {
 	try
 	{
-		if (sessionKey.hasData())
+		if (this->sessionKey.hasData())
 		{
 			// Why are we called when auth is completed?
 			(Arg::Gds(isc_random) << "Auth sync failure - SRP's authenticate called more times than supported").raise();
 		}
 
-		if (!client)
+		if (!this->client)
 		{
 			HANDSHAKE_DEBUG(fprintf(stderr, "Cli: SRP phase1: login=%s password=%s\n",
 				cb->getLogin(), cb->getPassword()));
@@ -86,13 +86,13 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				return AUTH_CONTINUE;
 			}
 
-			client = FB_NEW RemotePassword;
+			this->client = FB_NEW RemotePassword;
 
-			client->genClientKey(data);
+			this->client->genClientKey(this->data);
 
-			dumpIt("Clnt: clientPubKey", data);
+			dumpIt("Clnt: clientPubKey", this->data);
 
-			cb->putData(status, data.length(), data.begin());
+			cb->putData(status, this->data.length(), this->data.begin());
 
 			if (status->getState() & IStatus::STATE_ERRORS)
 				return AUTH_FAILED;
@@ -152,14 +152,14 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 
 		dumpIt("Clnt: login", string(cb->getLogin()));
 		dumpIt("Clnt: pass", string(cb->getPassword()));
-		client->clientSessionKey(sessionKey, cb->getLogin(), salt.c_str(), cb->getPassword(), key.c_str());
+		this->client->clientSessionKey(sessionKey, cb->getLogin(), salt.c_str(), cb->getPassword(), key.c_str());
 		dumpIt("Clnt: sessionKey", sessionKey);
 
-		BigInteger cProof = client->clientProof(cb->getLogin(), salt.c_str(), sessionKey);
+		BigInteger cProof = this->client->clientProof(cb->getLogin(), salt.c_str(), sessionKey);
 
-		cProof.getText(data);
+		cProof.getText(this->data);
 
-		cb->putData(status, data.length(), data.c_str());
+		cb->putData(status, this->data.length(), this->data.c_str());
 
 		if (status->getState() & IStatus::STATE_ERRORS)
 		{
