@@ -961,7 +961,9 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)co
 	// and we have no ways to override this limit cause it can be sent to any version server.
 	// Therefore divide data into 254-byte parts, leaving first byte for the number of that part.
 	// This appears more reliable than put them in strict order.
-	addMultiPartConnectParameter(dataFromPlugin, user_id, CNCT_specific_data);
+	addMultiPartConnectParameter(dataFromPlugin,
+                                 user_id,
+                                 CNCT_specific_data);
 
 	// Client's wirecrypt requested level
 	user_id.insertInt(CNCT_client_crypt,
