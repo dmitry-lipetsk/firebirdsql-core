@@ -135,7 +135,7 @@ BigInteger RemotePassword::computeVerifier(const string& account,
 {
 	const BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
 
-	return group->generator.modPow(x, group->prime);
+	return this->group->generator.modPow(x, this->group->prime);
 }//computeVerifier
 
 //------------------------------------------------------------------------
@@ -143,7 +143,7 @@ void RemotePassword::genClientKey(string& pubkey)
 {
 	dumpIt("privateKey(C)", this->privateKey);
 
-	this->clientPublicKey = group->generator.modPow(this->privateKey, group->prime);
+	this->clientPublicKey = this->group->generator.modPow(this->privateKey, this->group->prime);
 
 	this->clientPublicKey.getText(pubkey);
 
@@ -156,17 +156,17 @@ void RemotePassword::genServerKey(string&                      pubkey,
 {
 	dumpIt("privateKey(S)", this->privateKey);
 
-	const BigInteger gb(group->generator.modPow(this->privateKey, group->prime));	// g^b
+	const BigInteger gb(this->group->generator.modPow(this->privateKey, this->group->prime));	// g^b
 
 	dumpIt("gb", gb);
 
 	const BigInteger v(verifier);											// v
 
-	const BigInteger kv = (group->k * v) % group->prime;
+	const BigInteger kv = (this->group->k * v) % this->group->prime;
 
 	dumpIt("kv", kv);
 
-	this->serverPublicKey = (kv + gb) % group->prime;
+	this->serverPublicKey = (kv + gb) % this->group->prime;
 
 	this->serverPublicKey.getText(pubkey);
 
@@ -208,23 +208,23 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("x", x);
 
-	const BigInteger gx = group->generator.modPow(x, group->prime);	// g^x
+	const BigInteger gx = this->group->generator.modPow(x, this->group->prime);	// g^x
 
-	const BigInteger kgx = (group->k * gx) % group->prime;			// kg^x
+	const BigInteger kgx = (this->group->k * gx) % this->group->prime;			// kg^x
 
 	dumpIt("kgx", kgx);
 
-	const BigInteger diff = (this->serverPublicKey - kgx) % group->prime;	// B - kg^x
+	const BigInteger diff = (this->serverPublicKey - kgx) % this->group->prime;	// B - kg^x
 
-	const BigInteger ux = (scramble * x) % group->prime;			// ux
+	const BigInteger ux = (scramble * x) % this->group->prime;			// ux
 
-	const BigInteger aux = (this->privateKey + ux) % group->prime;	// A + ux
+	const BigInteger aux = (this->privateKey + ux) % this->group->prime;	// A + ux
 
 	dumpIt("clientPrivateKey", this->privateKey);
 
 	dumpIt("aux", aux);
 
-	const BigInteger sessionSecret = diff.modPow(aux, group->prime);// (B - kg^x) ^ (a + ux)
+	const BigInteger sessionSecret = diff.modPow(aux, this->group->prime);// (B - kg^x) ^ (a + ux)
 
 	dumpIt("sessionSecret", sessionSecret);
 
@@ -246,13 +246,13 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	const BigInteger v = BigInteger(verifier);
 
-	const BigInteger vu = v.modPow(scramble, group->prime);					// v^u
+	const BigInteger vu = v.modPow(scramble, this->group->prime);					// v^u
 
-	const BigInteger Avu = (this->clientPublicKey * vu) % group->prime;		// Av^u
+	const BigInteger Avu = (this->clientPublicKey * vu) % this->group->prime;		// Av^u
 
 	dumpIt("Avu", Avu);
 
-	const BigInteger sessionSecret = Avu.modPow(this->privateKey, group->prime);	// (Av^u) ^ b
+	const BigInteger sessionSecret = Avu.modPow(this->privateKey, this->group->prime);	// (Av^u) ^ b
 
 	dumpIt("serverPrivateKey", this->privateKey);
 
@@ -272,15 +272,15 @@ BigInteger RemotePassword::clientProof(const char*  const account,
                                        const UCharBuffer& sessionKey)
 {
 	this->hash.reset();
-	this->hash.processInt(group->prime);
+	this->hash.processInt(this->group->prime);
 	BigInteger n1;
 	this->hash.getInt(n1);
 
 	this->hash.reset();
-	this->hash.processInt(group->generator);
+	this->hash.processInt(this->group->generator);
 	BigInteger n2;
 	this->hash.getInt(n2);
-	n1 = n1.modPow(n2, group->prime);
+	n1 = n1.modPow(n2, this->group->prime);
 
 	this->hash.reset();
 	this->hash.process(account);
