@@ -799,7 +799,7 @@ public:
 
 	bool checkPluginName(const Firebird::PathName& nameToCheck)const;
 
-	Firebird::PathName getPluginName();
+	Firebird::PathName getPluginName()const;
 
 	void tryNewKeys(rem_port*);
 
