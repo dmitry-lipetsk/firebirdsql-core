@@ -2662,10 +2662,11 @@ static bool packet_receive2(rem_port* port, UCHAR* p, SSHORT bufSize, SSHORT* le
 	return true;
 }
 
-static rem_port* inet_try_connect(PACKET* packet,
-								  Rdb* rdb,
+//------------------------------------------------------------------------
+static rem_port* inet_try_connect(PACKET*         packet,
+								  Rdb*            rdb,
 								  const PathName& file_name,
-								  const TEXT* node_name,
+								  const TEXT*     node_name,
 								  ClumpletReader& dpb,
 								  RefPtr<Config>* config,
 								  const PathName* ref_db_name)
@@ -2720,8 +2721,9 @@ static rem_port* inet_try_connect(PACKET* packet,
 	}
 
 	return port;
-}
+}//inet_try_connect
 
+//------------------------------------------------------------------------
 static bool inet_write(XDR* xdrs)
 {
 /**************************************
