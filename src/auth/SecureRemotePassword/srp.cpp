@@ -78,7 +78,7 @@ InitInstance<RemoteGroup> RemoteGroup::sm_instance;
 ////////////////////////////////////////////////////////////////////////////////
 //class RemotePassword
 
-const char* RemotePassword::plugName = "Srp";
+const char* const RemotePassword::plugName = "Srp";
 
 //------------------------------------------------------------------------
 RemotePassword::RemotePassword()
