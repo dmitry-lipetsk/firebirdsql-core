@@ -112,18 +112,18 @@ BigInteger RemotePassword::getUserHash(const char* const account,
                                        const char* const salt,
                                        const char* const password)
 {
-	hash.reset();
-	hash.process(account);
-	hash.process(":");
-	hash.process(password);
+	this->hash.reset();
+	this->hash.process(account);
+	this->hash.process(":");
+	this->hash.process(password);
 	UCharBuffer hash1;
-	hash.getHash(hash1);
+	this->hash.getHash(hash1);
 
-	hash.reset();
-	hash.process(salt);
-	hash.process(hash1);
+	this->hash.reset();
+	this->hash.process(salt);
+	this->hash.process(hash1);
 	BigInteger rc;
-	hash.getInt(rc);
+	this->hash.getInt(rc);
 
 	return rc;
 }//getUserHash
@@ -176,17 +176,17 @@ void RemotePassword::genServerKey(string&                      pubkey,
 //------------------------------------------------------------------------
 void RemotePassword::computeScramble()
 {
-	hash.reset();
+	this->hash.reset();
 
 	dumpIt("computeScramble: clientPublicKey", this->clientPublicKey);
 
-	hash.processStrippedInt(this->clientPublicKey);
+	this->hash.processStrippedInt(this->clientPublicKey);
 
 	dumpIt("computeScramble: serverPublicKey", this->serverPublicKey);
 
-	hash.processStrippedInt(this->serverPublicKey);
+	this->hash.processStrippedInt(this->serverPublicKey);
 
-	hash.getInt(scramble);
+	this->hash.getInt(scramble);
 }//computeScramble
 
 //------------------------------------------------------------------------
@@ -228,9 +228,9 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("sessionSecret", sessionSecret);
 
-	hash.reset();
-	hash.processStrippedInt(sessionSecret);
-	hash.getHash(sessionKey);
+	this->hash.reset();
+	this->hash.processStrippedInt(sessionSecret);
+	this->hash.getHash(sessionKey);
 }//clientSessionKey
 
 //------------------------------------------------------------------------
@@ -258,9 +258,9 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("sessionSecret", sessionSecret);
 
-	hash.reset();
-	hash.processStrippedInt(sessionSecret);
-	hash.getHash(sessionKey);
+	this->hash.reset();
+	this->hash.processStrippedInt(sessionSecret);
+	this->hash.getHash(sessionKey);
 }//serverSessionKey
 
 //------------------------------------------------------------------------
@@ -271,31 +271,31 @@ BigInteger RemotePassword::clientProof(const char*  const account,
                                        const char*  const salt,
                                        const UCharBuffer& sessionKey)
 {
-	hash.reset();
-	hash.processInt(group->prime);
+	this->hash.reset();
+	this->hash.processInt(group->prime);
 	BigInteger n1;
-	hash.getInt(n1);
+	this->hash.getInt(n1);
 
-	hash.reset();
-	hash.processInt(group->generator);
+	this->hash.reset();
+	this->hash.processInt(group->generator);
 	BigInteger n2;
-	hash.getInt(n2);
+	this->hash.getInt(n2);
 	n1 = n1.modPow(n2, group->prime);
 
-	hash.reset();
-	hash.process(account);
-	hash.getInt(n2);
+	this->hash.reset();
+	this->hash.process(account);
+	this->hash.getInt(n2);
 
-	hash.reset();
-	hash.processInt(n1);				// H(prime) ^ H(g)
-	hash.processInt(n2);				// H(I)
-	hash.process(salt);					// s
-	hash.processInt(this->clientPublicKey);	// A
-	hash.processInt(this->serverPublicKey);	// B
-	hash.process(sessionKey);			// K
+	this->hash.reset();
+	this->hash.processInt(n1);				// H(prime) ^ H(g)
+	this->hash.processInt(n2);				// H(I)
+	this->hash.process(salt);					// s
+	this->hash.processInt(this->clientPublicKey);	// A
+	this->hash.processInt(this->serverPublicKey);	// B
+	this->hash.process(sessionKey);			// K
 
 	BigInteger rc;
-	hash.getInt(rc);
+	this->hash.getInt(rc);
 	return rc;
 }//clientProof
 
