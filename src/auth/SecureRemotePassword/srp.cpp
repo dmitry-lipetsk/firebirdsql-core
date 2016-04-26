@@ -141,19 +141,19 @@ BigInteger RemotePassword::computeVerifier(const string& account,
 //------------------------------------------------------------------------
 void RemotePassword::genClientKey(string& pubkey)
 {
-	dumpIt("privateKey(C)", privateKey);
-	clientPublicKey = group->generator.modPow(privateKey, group->prime);
-	clientPublicKey.getText(pubkey);
-	dumpIt("clientPublicKey", clientPublicKey);
+	dumpIt("privateKey(C)", this->privateKey);
+	this->clientPublicKey = group->generator.modPow(this->privateKey, group->prime);
+	this->clientPublicKey.getText(pubkey);
+	dumpIt("clientPublicKey", this->clientPublicKey);
 }//genClientKey
 
 //------------------------------------------------------------------------
 void RemotePassword::genServerKey(string&                      pubkey,
                                   const Firebird::UCharBuffer& verifier)
 {
-	dumpIt("privateKey(S)", privateKey);
+	dumpIt("privateKey(S)", this->privateKey);
 
-	const BigInteger gb(group->generator.modPow(privateKey, group->prime));	// g^b
+	const BigInteger gb(group->generator.modPow(this->privateKey, group->prime));	// g^b
 
 	dumpIt("gb", gb);
 
@@ -163,21 +163,21 @@ void RemotePassword::genServerKey(string&                      pubkey,
 
 	dumpIt("kv", kv);
 
-	serverPublicKey = (kv + gb) % group->prime;
+	this->serverPublicKey = (kv + gb) % group->prime;
 
-	serverPublicKey.getText(pubkey);
+	this->serverPublicKey.getText(pubkey);
 
-	dumpIt("serverPublicKey", serverPublicKey);
+	dumpIt("serverPublicKey", this->serverPublicKey);
 }//genServerKey
 
 //------------------------------------------------------------------------
 void RemotePassword::computeScramble()
 {
 	hash.reset();
-	dumpIt("computeScramble: clientPublicKey", clientPublicKey);
-	hash.processStrippedInt(clientPublicKey);
-	dumpIt("computeScramble: serverPublicKey", serverPublicKey);
-	hash.processStrippedInt(serverPublicKey);
+	dumpIt("computeScramble: clientPublicKey", this->clientPublicKey);
+	hash.processStrippedInt(this->clientPublicKey);
+	dumpIt("computeScramble: serverPublicKey", this->serverPublicKey);
+	hash.processStrippedInt(this->serverPublicKey);
 	hash.getInt(scramble);
 }//computeScramble
 
@@ -188,7 +188,7 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
                                       const char*  const password,
 									  const char*  const serverPubKey)
 {
-	serverPublicKey = BigInteger(serverPubKey);
+	this->serverPublicKey = BigInteger(serverPubKey);
 
 	this->computeScramble();
 
@@ -206,13 +206,13 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("kgx", kgx);
 
-	const BigInteger diff = (serverPublicKey - kgx) % group->prime;	// B - kg^x
+	const BigInteger diff = (this->serverPublicKey - kgx) % group->prime;	// B - kg^x
 
 	const BigInteger ux = (scramble * x) % group->prime;			// ux
 
-	const BigInteger aux = (privateKey + ux) % group->prime;		// A + ux
+	const BigInteger aux = (this->privateKey + ux) % group->prime;	// A + ux
 
-	dumpIt("clientPrivateKey", privateKey);
+	dumpIt("clientPrivateKey", this->privateKey);
 
 	dumpIt("aux", aux);
 
@@ -230,7 +230,7 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
                                       const char*  const clientPubKey,
 									  const UCharBuffer& verifier)
 {
-	clientPublicKey = BigInteger(clientPubKey);
+	this->clientPublicKey = BigInteger(clientPubKey);
 
 	this->computeScramble();
 
@@ -240,13 +240,13 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	const BigInteger vu = v.modPow(scramble, group->prime);					// v^u
 
-	const BigInteger Avu = (clientPublicKey * vu) % group->prime;			// Av^u
+	const BigInteger Avu = (this->clientPublicKey * vu) % group->prime;		// Av^u
 
 	dumpIt("Avu", Avu);
 
-	const BigInteger sessionSecret = Avu.modPow(privateKey, group->prime);	// (Av^u) ^ b
+	const BigInteger sessionSecret = Avu.modPow(this->privateKey, group->prime);	// (Av^u) ^ b
 
-	dumpIt("serverPrivateKey", privateKey);
+	dumpIt("serverPrivateKey", this->privateKey);
 
 	dumpIt("sessionSecret", sessionSecret);
 
@@ -282,8 +282,8 @@ BigInteger RemotePassword::clientProof(const char*  const account,
 	hash.processInt(n1);				// H(prime) ^ H(g)
 	hash.processInt(n2);				// H(I)
 	hash.process(salt);					// s
-	hash.processInt(clientPublicKey);	// A
-	hash.processInt(serverPublicKey);	// B
+	hash.processInt(this->clientPublicKey);	// A
+	hash.processInt(this->serverPublicKey);	// B
 	hash.process(sessionKey);			// K
 
 	BigInteger rc;
