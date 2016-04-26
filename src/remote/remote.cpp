@@ -902,24 +902,34 @@ static void addMultiPartConnectParameter(const T&                  dataToAdd,
                                          UCHAR                     param)
 {
 	FB_SIZE_T remaining = dataToAdd.getCount();
+
 	fb_assert(remaining <= 254u * 256u); // paranoid check => 65024
+
 	UCHAR part = 0;
+
 	UCHAR buffer[255];
+
 	typename T::const_pointer ptr = dataToAdd.begin();
 
 	while (remaining > 0)
 	{
 		FB_SIZE_T step = remaining;
+
 		if (step > 254)
 			step = 254;
 
 		remaining -= step;
+
 		buffer[0] = part++;
+
 		fb_assert(part || remaining == 0);
+
 		memcpy(&buffer[1], ptr, step);
+
 		ptr += step;
 
 		user_id.insertBytes(param, buffer, step + 1);
+
 		if (!part) // we completed 256 loops, almost impossible but check anyway.
 			break;
 	}//while
