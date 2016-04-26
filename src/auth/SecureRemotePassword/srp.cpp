@@ -53,6 +53,8 @@ public:
 
 			char pb[1024];
 
+            fb_assert(pad<=sizeof(pb));
+
 			memset(pb, 0, pad);
 
 			hash.process(pad, pb);
