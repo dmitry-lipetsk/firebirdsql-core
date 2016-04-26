@@ -446,15 +446,15 @@ void ClumpletWriter::deleteClumplet()
 }
 
 //------------------------------------------------------------------------
-bool ClumpletWriter::deleteWithTag(UCHAR tag)
+bool ClumpletWriter::deleteWithTag(UCHAR const tag)
 {
    bool rc = false;
 
-   while (find(tag))
+   while (this->find(tag))
    {
        rc = true;
 
-       deleteClumplet();
+       this->deleteClumplet();
    }//while
 
    return rc;
