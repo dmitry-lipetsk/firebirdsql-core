@@ -445,18 +445,22 @@ void ClumpletWriter::deleteClumplet()
 	}
 }
 
+//------------------------------------------------------------------------
 bool ClumpletWriter::deleteWithTag(UCHAR tag)
 {
    bool rc = false;
+
    while (find(tag))
    {
        rc = true;
+
        deleteClumplet();
-   }
+   }//while
 
    return rc;
-}
+}//deleteWithTag
 
+//------------------------------------------------------------------------
 bool ClumpletWriter::upgradeVersion()
 {
 	// Sanity check
