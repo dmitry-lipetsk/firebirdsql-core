@@ -603,7 +603,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	// Establish connection to server
 	// If we want user verification, we can't speak anything less than version 7
 
-	P_CNCT*	cnct = &packet->p_cnct;
+	P_CNCT* const cnct = &packet->p_cnct;
 
 	cnct->p_cnct_user_id.cstr_length = (ULONG) user_id.getBufferLength();
 	cnct->p_cnct_user_id.cstr_address = user_id.getBuffer();
