@@ -52,7 +52,17 @@ class RemoteGroup;
 
 class Sha1 : public Firebird::Sha1
 {
+private:
+    typedef Sha1                            self_type;
+
+    Sha1(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
+    Sha1()
+    {
+    }
+
 	void getInt(Firebird::BigInteger& hash)
 	{
 		Firebird::UCharBuffer tmp;
