@@ -16,6 +16,12 @@ namespace Auth{
 
 class RemoteGroup
 {
+private:
+    typedef RemoteGroup                     self_type;
+
+    RemoteGroup(const self_type&);
+    self_type& operator = (const self_type&);
+
 public:
     BigInteger const prime;
     BigInteger const generator;
