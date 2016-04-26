@@ -124,14 +124,14 @@ BigInteger RemotePassword::getUserHash(const char* account, const char* salt, co
 	hash.getInt(rc);
 
 	return rc;
-}
+}//getUserHash
 
 //------------------------------------------------------------------------
 BigInteger RemotePassword::computeVerifier(const string& account, const string& salt, const string& password)
 {
 	BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
 	return group->generator.modPow(x, group->prime);
-}
+}//computeVerifier
 
 //------------------------------------------------------------------------
 void RemotePassword::genClientKey(string& pubkey)
@@ -140,7 +140,7 @@ void RemotePassword::genClientKey(string& pubkey)
 	clientPublicKey = group->generator.modPow(privateKey, group->prime);
 	clientPublicKey.getText(pubkey);
 	dumpIt("clientPublicKey", clientPublicKey);
-}
+}//genClientKey
 
 //------------------------------------------------------------------------
 void RemotePassword::genServerKey(string& pubkey, const Firebird::UCharBuffer& verifier)
@@ -154,7 +154,7 @@ void RemotePassword::genServerKey(string& pubkey, const Firebird::UCharBuffer& v
 	serverPublicKey = (kv + gb) % group->prime;
 	serverPublicKey.getText(pubkey);
 	dumpIt("serverPublicKey", serverPublicKey);
-}
+}//genServerKey
 
 //------------------------------------------------------------------------
 void RemotePassword::computeScramble()
@@ -165,7 +165,7 @@ void RemotePassword::computeScramble()
 	dumpIt("computeScramble: serverPublicKey", serverPublicKey);
 	hash.processStrippedInt(serverPublicKey);
 	hash.getInt(scramble);
-}
+}//computeScramble
 
 //------------------------------------------------------------------------
 void RemotePassword::clientSessionKey(UCharBuffer& sessionKey, const char* account,
@@ -192,7 +192,7 @@ void RemotePassword::clientSessionKey(UCharBuffer& sessionKey, const char* accou
 	hash.reset();
 	hash.processStrippedInt(sessionSecret);
 	hash.getHash(sessionKey);
-}
+}//clientSessionKey
 
 //------------------------------------------------------------------------
 void RemotePassword::serverSessionKey(UCharBuffer& sessionKey, const char* clientPubKey,
@@ -212,7 +212,7 @@ void RemotePassword::serverSessionKey(UCharBuffer& sessionKey, const char* clien
 	hash.reset();
 	hash.processStrippedInt(sessionSecret);
 	hash.getHash(sessionKey);
-}
+}//serverSessionKey
 
 //------------------------------------------------------------------------
 
@@ -246,7 +246,7 @@ BigInteger RemotePassword::clientProof(const char* account, const char* salt, co
 	BigInteger rc;
 	hash.getInt(rc);
 	return rc;
-}
+}//clientProof
 
 ////////////////////////////////////////////////////////////////////////////////
 
