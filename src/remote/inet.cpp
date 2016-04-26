@@ -730,9 +730,9 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 }//INET_analyze
 
 //------------------------------------------------------------------------
-rem_port* INET_connect(const TEXT* name,
-					   PACKET* packet,
-					   USHORT flag,
+rem_port* INET_connect(const TEXT*     name,
+					   PACKET*         packet,
+					   USHORT          flag,
 					   ClumpletReader* dpb,
 					   RefPtr<Config>* config)
 {
@@ -765,10 +765,12 @@ rem_port* INET_connect(const TEXT* name,
 #endif
 
 	rem_port* port = alloc_port(NULL);
+
 	if (config)
 	{
 		port->port_config = *config;
 	}
+
 	REMOTE_get_timeout_params(port, dpb);
 
 	string host;
@@ -867,7 +869,8 @@ rem_port* INET_connect(const TEXT* name,
 			protocol.printf("%hu", FB_SERVICE_PORT);
 			retry_gai = (protocol != FB_SERVICE_NAME);
 		}
-	} while (retry_gai);
+	}
+    while (retry_gai);
 
 	if (n)
 	{
@@ -933,8 +936,9 @@ err_close:
 exit_free:
 	freeaddrinfo(gai_result);
 	return port;
-}
+}//INET_connect
 
+//------------------------------------------------------------------------
 static rem_port* listener_socket(rem_port* port, USHORT flag, const addrinfo* pai)
 {
 /**************************************
