@@ -840,7 +840,7 @@ const char* Config::getSecurityDatabase() const
 }
 
 //------------------------------------------------------------------------
-int Config::getWireCrypt(WireCryptMode wcMode) const
+int Config::getWireCrypt(WireCryptMode const wcMode) const
 {
 	const char* const wc = get<const char*>(KEY_WIRE_CRYPT);
 
