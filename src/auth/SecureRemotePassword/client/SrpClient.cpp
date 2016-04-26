@@ -68,6 +68,9 @@ private:
 int SrpClient::authenticate(CheckStatusWrapper* const status,
                             IClientBlock*       const cb)
 {
+    fb_assert(status);
+    fb_assert(cb);
+
 	try
 	{
 		if (this->sessionKey.hasData())
