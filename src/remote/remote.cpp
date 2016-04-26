@@ -926,15 +926,15 @@ static void addMultiPartConnectParameter(const T& dataToAdd,
 void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 {
 	// Add user login name
-	if (cliOrigUserName.hasData())
+	if (this->cliOrigUserName.hasData())
 	{
 		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: extractDataFromPluginTo: cliOrigUserName=%s\n",
-			cliOrigUserName.c_str()));
-		user_id.insertString(CNCT_login, cliOrigUserName);
+			this->cliOrigUserName.c_str()));
+		user_id.insertString(CNCT_login, this->cliOrigUserName);
 	}
 
 	// Add plugin name
-	Firebird::PathName pluginName = getPluginName();
+	Firebird::PathName pluginName = this->getPluginName();
 	if (pluginName.hasData())
 	{
 		HANDSHAKE_DEBUG(fprintf(stderr, "Cli: extractDataFromPluginTo: pluginName=%s\n", pluginName.c_str()));
@@ -942,9 +942,9 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 	}
 
 	// Add plugin list
-	if (pluginList.hasData())
+	if (this->pluginList.hasData())
 	{
-		user_id.insertPath(CNCT_plugin_list, pluginList);
+		user_id.insertPath(CNCT_plugin_list, this->pluginList);
 	}
 
 	// This is specially tricky field - user_id is limited to 255 bytes per entry,
@@ -954,7 +954,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
 	addMultiPartConnectParameter(dataFromPlugin, user_id, CNCT_specific_data);
 
 	// Client's wirecrypt requested level
-	user_id.insertInt(CNCT_client_crypt, clntConfig->getWireCrypt(WC_CLIENT));
+	user_id.insertInt(CNCT_client_crypt, this->clntConfig->getWireCrypt(WC_CLIENT));
 }
 
 //------------------------------------------------------------------------
