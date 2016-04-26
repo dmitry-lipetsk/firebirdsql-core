@@ -526,13 +526,13 @@ static GlobalPtr<PortsCleanup>	inet_ports;
 static GlobalPtr<SocketsArray> ports_to_close;
 
 //------------------------------------------------------------------------
-rem_port* INET_analyze(ClntAuthBlock*  cBlock,
-					   const PathName& file_name,
-					   const TEXT*     node_name,
-					   bool            uv_flag,
-					   ClumpletReader& dpb,
-					   RefPtr<Config>* config,
-					   const PathName* ref_db_name)
+rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
+					   const PathName&       file_name,
+					   const TEXT*     const node_name,
+					   bool            const uv_flag,
+					   ClumpletReader&       dpb,
+					   RefPtr<Config>* const config,
+					   const PathName* const ref_db_name)
 {
 /**************************************
  *
