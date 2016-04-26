@@ -7793,7 +7793,7 @@ void ClntAuthBlock::putData(CheckStatusWrapper* const status,
 {
 	try
 	{
-		void* to = this->dataFromPlugin.getBuffer(length);
+		void* const to = this->dataFromPlugin.getBuffer(length);
 
 		memcpy(to, data, length);
 	}
