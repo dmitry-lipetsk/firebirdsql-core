@@ -10,16 +10,23 @@
 
 using namespace Firebird;
 
-namespace {
+namespace{
+////////////////////////////////////////////////////////////////////////////////
+
 const char* primeStr =	"E67D2E994B2F900C3F41F08F5BB2627ED0D49EE1FE767A52EFCD565C"
 						"D6E768812C3E1E9CE8F0A8BEA6CB13CD29DDEBF7A96D4A93B55D488D"
 						"F099A15C89DCB0640738EB2CBDD9A8F7BAB561AB1B0DC1C6CDABF303"
 						"264A08D1BCA932D1F1EE428B619D970F342ABA9A65793B8B2F041AE5"
 						"364350C16F735F56ECBCA87BD57B29E7";
-const char* genStr = "02";
-} // anonumous namespace
 
-namespace Auth {
+const char* genStr = "02";
+
+////////////////////////////////////////////////////////////////////////////////
+}// anonumous namespace
+
+namespace Auth{
+////////////////////////////////////////////////////////////////////////////////
+//class RemoteGroup
 
 class RemoteGroup
 {
@@ -53,12 +60,18 @@ public:
 	{
 		return &group();
 	}
-};
+};//class RemotePassword
+
+////////////////////////////////////////////////////////////////////////////////
 
 InitInstance<RemoteGroup> RemoteGroup::group;
 
+////////////////////////////////////////////////////////////////////////////////
+//class RemotePassword
+
 const char* RemotePassword::plugName = "Srp";
 
+//------------------------------------------------------------------------
 RemotePassword::RemotePassword()
 	: group(RemoteGroup::getGroup())
 {
@@ -68,8 +81,9 @@ RemotePassword::RemotePassword()
 	this->privateKey.random(RemotePassword::SRP_KEY_SIZE);
 #endif
 	this->privateKey %= this->group->prime;
-}
+}//RemotePassword
 
+//------------------------------------------------------------------------
 BigInteger RemotePassword::getUserHash(const char* account, const char* salt, const char* password)
 {
 	hash.reset();
@@ -88,12 +102,14 @@ BigInteger RemotePassword::getUserHash(const char* account, const char* salt, co
 	return rc;
 }
 
+//------------------------------------------------------------------------
 BigInteger RemotePassword::computeVerifier(const string& account, const string& salt, const string& password)
 {
 	BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
 	return group->generator.modPow(x, group->prime);
 }
 
+//------------------------------------------------------------------------
 void RemotePassword::genClientKey(string& pubkey)
 {
 	dumpIt("privateKey(C)", privateKey);
@@ -102,6 +118,7 @@ void RemotePassword::genClientKey(string& pubkey)
 	dumpIt("clientPublicKey", clientPublicKey);
 }
 
+//------------------------------------------------------------------------
 void RemotePassword::genServerKey(string& pubkey, const Firebird::UCharBuffer& verifier)
 {
 	dumpIt("privateKey(S)", privateKey);
@@ -115,6 +132,7 @@ void RemotePassword::genServerKey(string& pubkey, const Firebird::UCharBuffer& v
 	dumpIt("serverPublicKey", serverPublicKey);
 }
 
+//------------------------------------------------------------------------
 void RemotePassword::computeScramble()
 {
 	hash.reset();
@@ -125,6 +143,7 @@ void RemotePassword::computeScramble()
 	hash.getInt(scramble);
 }
 
+//------------------------------------------------------------------------
 void RemotePassword::clientSessionKey(UCharBuffer& sessionKey, const char* account,
 									  const char* salt, const char* password,
 									  const char* serverPubKey)
@@ -151,6 +170,7 @@ void RemotePassword::clientSessionKey(UCharBuffer& sessionKey, const char* accou
 	hash.getHash(sessionKey);
 }
 
+//------------------------------------------------------------------------
 void RemotePassword::serverSessionKey(UCharBuffer& sessionKey, const char* clientPubKey,
 									  const UCharBuffer& verifier)
 {
@@ -170,7 +190,10 @@ void RemotePassword::serverSessionKey(UCharBuffer& sessionKey, const char* clien
 	hash.getHash(sessionKey);
 }
 
+//------------------------------------------------------------------------
+
 // H(H(prime) ^ H(g), H(I), s, A, B, K)
+
 BigInteger RemotePassword::clientProof(const char* account, const char* salt, const UCharBuffer& sessionKey)
 {
 	hash.reset();
@@ -201,6 +224,8 @@ BigInteger RemotePassword::clientProof(const char* account, const char* salt, co
 	return rc;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 #if SRP_DEBUG > 0
 void dumpIt(const char* name, const Firebird::UCharBuffer& data)
 {
@@ -210,11 +235,13 @@ void dumpIt(const char* name, const Firebird::UCharBuffer& data)
 	fprintf(stderr, "\n");
 }
 
+//------------------------------------------------------------------------
 void dumpIt(const char* name, const Firebird::string& str)
 {
 	fprintf(stderr, "%s: '%s'\n", name, str.c_str());
 }
 
+//------------------------------------------------------------------------
 void dumpBin(const char* name, const Firebird::string& str)
 {
 	fprintf(stderr, "%s (%ld)\n", name, str.length());
@@ -223,14 +250,17 @@ void dumpBin(const char* name, const Firebird::string& str)
 	fprintf(stderr, "\n");
 }
 
+//------------------------------------------------------------------------
 void dumpIt(const char* name, const BigInteger& bi)
 {
 	string x;
 	bi.getText(x);
 	dumpIt(name, x);
 }
+
 #endif
 
+//------------------------------------------------------------------------
 void checkStatusVectorForMissingTable(const ISC_STATUS* v)
 {
 	while (v[0] == isc_arg_gds)
@@ -247,4 +277,5 @@ void checkStatusVectorForMissingTable(const ISC_STATUS* v)
 	}
 }
 
-} // namespace Auth
+////////////////////////////////////////////////////////////////////////////////
+}//namespace Auth
