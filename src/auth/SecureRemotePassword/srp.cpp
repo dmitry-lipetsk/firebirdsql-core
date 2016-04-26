@@ -74,7 +74,7 @@ RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
 
 	if (prime.length() > generator.length())
 	{
-		unsigned int const pad = prime.length() - generator.length();
+		size_t const pad = (prime.length() - generator.length());
 
 		char pb[1024];
 
