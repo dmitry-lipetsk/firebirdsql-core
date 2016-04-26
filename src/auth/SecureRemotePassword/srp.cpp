@@ -190,7 +190,7 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 {
 	serverPublicKey = BigInteger(serverPubKey);
 
-	computeScramble();
+	this->computeScramble();
 
 	dumpIt("scramble", scramble);
 
@@ -232,7 +232,7 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 {
 	clientPublicKey = BigInteger(clientPubKey);
 
-	computeScramble();
+	this->computeScramble();
 
 	dumpIt("scramble", scramble);
 
