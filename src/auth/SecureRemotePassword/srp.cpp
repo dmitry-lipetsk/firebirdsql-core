@@ -70,11 +70,11 @@ RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
 {
 	Auth::Sha1 hash;
 
-	hash.processInt(prime);
+	hash.processInt(this->prime);
 
-	if (prime.length() > generator.length())
+	if (this->prime.length() > this->generator.length())
 	{
-		size_t const pad = (prime.length() - generator.length());
+		size_t const pad = (this->prime.length() - this->generator.length());
 
 		char pb[1024];
 
@@ -85,7 +85,7 @@ RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
 		hash.process(pad, pb);
 	}//if
 
-	hash.processInt(generator);
+	hash.processInt(this->generator);
 
 	hash.getInt(k);
 }//RemoteGroup
