@@ -9,7 +9,8 @@
 // for HANDSHAKE_DEBUG
 #include "../remote/remot_proto.h"
 
-namespace Auth {
+namespace Auth{
+////////////////////////////////////////////////////////////////////////////////
 
 /*
  * Order of battle for SRP handshake:
@@ -46,6 +47,9 @@ namespace Auth {
 
 class RemoteGroup;
 
+////////////////////////////////////////////////////////////////////////////////
+//class Sha1
+
 class Sha1 : public Firebird::Sha1
 {
 public:
@@ -73,7 +77,10 @@ public:
 			process(bytes.getCount() - n, bytes.begin() + n);
 		}
 	}
-};
+};//class Sha1
+
+////////////////////////////////////////////////////////////////////////////////
+//class RemotePassword
 
 class RemotePassword : public Firebird::GlobalStorage
 {
@@ -119,8 +126,9 @@ public:
 	Firebird::BigInteger clientProof(const char* account,
 									 const char* salt,
 									 const Firebird::UCharBuffer& sessionKey);
-};
+};//class RemotePassword
 
+////////////////////////////////////////////////////////////////////////////////
 
 #if SRP_DEBUG > 0
 void dumpIt(const char* name, const Firebird::BigInteger& bi);
@@ -134,7 +142,9 @@ void static inline dumpIt(const char* /*name*/, const Firebird::string& /*str*/)
 void static inline dumpBin(const char* /*name*/, const Firebird::string& /*str*/) { }
 #endif
 
+////////////////////////////////////////////////////////////////////////////////
 
 void checkStatusVectorForMissingTable(const ISC_STATUS* v);
 
+////////////////////////////////////////////////////////////////////////////////
 } // namespace Auth
