@@ -73,7 +73,7 @@ public:
 
 private:
 	static InitInstance<RemoteGroup> sm_instance;
-};//class RemotePassword
+};//class RemoteGroup
 
 ////////////////////////////////////////////////////////////////////////////////
 
