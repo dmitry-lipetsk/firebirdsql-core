@@ -158,7 +158,9 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 
 		dumpIt("Clnt: login", string(cb->getLogin()));
 		dumpIt("Clnt: pass", string(cb->getPassword()));
+
 		this->client->clientSessionKey(sessionKey, cb->getLogin(), salt.c_str(), cb->getPassword(), key.c_str());
+
 		dumpIt("Clnt: sessionKey", sessionKey);
 
 		BigInteger cProof = this->client->clientProof(cb->getLogin(), salt.c_str(), sessionKey);
