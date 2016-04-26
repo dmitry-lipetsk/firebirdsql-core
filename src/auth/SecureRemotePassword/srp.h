@@ -78,6 +78,12 @@ public:
 class RemotePassword : public Firebird::GlobalStorage
 {
 private:
+    typedef RemotePassword                  self_type;
+
+    RemotePassword(const self_type&);
+    self_type& operator = (const self_type&);
+
+private:
 	const RemoteGroup*		group;
 	Auth::Sha1				hash;
 	Firebird::BigInteger	privateKey;
