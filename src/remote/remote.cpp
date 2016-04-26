@@ -827,6 +827,7 @@ ISC_STATUS* Rdb::get_status_vector() throw()
 }
 */
 
+//------------------------------------------------------------------------
 void Rrq::saveStatus(const Firebird::Exception& ex) throw()
 {
 	if (rrqStatus.isSuccess())
@@ -836,19 +837,22 @@ void Rrq::saveStatus(const Firebird::Exception& ex) throw()
 		ex.stuffException(&tmp);
 		rrqStatus.save(&tmp);
 	}
-}
+}//saveStatus
 
+//------------------------------------------------------------------------
 void Rrq::saveStatus(Firebird::IStatus* v) throw()
 {
 	if (rrqStatus.isSuccess())
 	{
 		rrqStatus.save(v);
 	}
-}
+}//saveStatus
 
+//------------------------------------------------------------------------
 void Rsr::saveException(const Firebird::Exception& ex, bool overwrite)
 {
-	if (!rsr_status) {
+	if (!rsr_status)
+    {
 		rsr_status = FB_NEW Firebird::StatusHolder();
 	}
 
@@ -859,8 +863,9 @@ void Rsr::saveException(const Firebird::Exception& ex, bool overwrite)
 		ex.stuffException(&temp);
 		rsr_status->save(&temp);
 	}
-}
+}//saveException
 
+//------------------------------------------------------------------------
 Firebird::string rem_port::getRemoteId() const
 {
 	fb_assert(port_protocol_id.hasData());
@@ -870,8 +875,9 @@ Firebird::string rem_port::getRemoteId() const
 		id += Firebird::string("/") + port_address;
 
 	return id;
-}
+}//getRemoteId
 
+//------------------------------------------------------------------------
 LegacyPlugin REMOTE_legacy_auth(const char* nm, int p)
 {
 	const char* legacyTrusted = "WIN_SSPI";
@@ -888,12 +894,13 @@ LegacyPlugin REMOTE_legacy_auth(const char* nm, int p)
 	}
 
 	return PLUGIN_NEW;
-}
+}//REMOTE_legacy_auth
 
+//------------------------------------------------------------------------
 Firebird::PathName ClntAuthBlock::getPluginName()const
 {
 	return plugins.hasData() ? plugins.name() : "";
-}
+}//getPluginName
 
 //------------------------------------------------------------------------
 template <typename T>
