@@ -299,7 +299,7 @@ void checkStatusVectorForMissingTable(const ISC_STATUS* v)
 			v += 2;
 		}
         while (v[0] != isc_arg_warning && v[0] != isc_arg_gds && v[0] != isc_arg_end);
-	}
+	}//while
 }//checkStatusVectorForMissingTable
 
 ////////////////////////////////////////////////////////////////////////////////
