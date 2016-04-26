@@ -65,7 +65,8 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 //class SrpClient
 
-int SrpClient::authenticate(CheckStatusWrapper* status, IClientBlock* cb)
+int SrpClient::authenticate(CheckStatusWrapper* const status,
+                            IClientBlock*       const cb)
 {
 	try
 	{
