@@ -555,7 +555,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 
 	Rdb* rdb = FB_NEW Rdb;
 
-	PACKET* packet = &rdb->rdb_packet;
+	PACKET* const packet = &rdb->rdb_packet;
 
 	// Pick up some user identification information
 	ClumpletWriter user_id(ClumpletReader::UnTagged, 64000);
