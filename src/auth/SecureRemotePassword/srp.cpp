@@ -152,13 +152,21 @@ void RemotePassword::genServerKey(string&                      pubkey,
                                   const Firebird::UCharBuffer& verifier)
 {
 	dumpIt("privateKey(S)", privateKey);
+
 	BigInteger gb(group->generator.modPow(privateKey, group->prime));	// g^b
+
 	dumpIt("gb", gb);
+
 	BigInteger v(verifier);												// v
+
 	BigInteger kv = (group->k * v) % group->prime;
+
 	dumpIt("kv", kv);
+
 	serverPublicKey = (kv + gb) % group->prime;
+
 	serverPublicKey.getText(pubkey);
+
 	dumpIt("serverPublicKey", serverPublicKey);
 }//genServerKey
 
