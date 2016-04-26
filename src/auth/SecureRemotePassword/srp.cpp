@@ -236,15 +236,15 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("scramble", scramble);
 
-	BigInteger v = BigInteger(verifier);
+	const BigInteger v = BigInteger(verifier);
 
-	BigInteger vu = v.modPow(scramble, group->prime);					// v^u
+	const BigInteger vu = v.modPow(scramble, group->prime);					// v^u
 
-	BigInteger Avu = (clientPublicKey * vu) % group->prime;				// Av^u
+	const BigInteger Avu = (clientPublicKey * vu) % group->prime;			// Av^u
 
 	dumpIt("Avu", Avu);
 
-	BigInteger sessionSecret = Avu.modPow(privateKey, group->prime);	// (Av^u) ^ b
+	const BigInteger sessionSecret = Avu.modPow(privateKey, group->prime);	// (Av^u) ^ b
 
 	dumpIt("serverPrivateKey", privateKey);
 
