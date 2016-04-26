@@ -2663,13 +2663,13 @@ static bool packet_receive2(rem_port* port, UCHAR* p, SSHORT bufSize, SSHORT* le
 }
 
 //------------------------------------------------------------------------
-static rem_port* inet_try_connect(PACKET*         packet,
-								  Rdb*            rdb,
-								  const PathName& file_name,
-								  const TEXT*     node_name,
-								  ClumpletReader& dpb,
-								  RefPtr<Config>* config,
-								  const PathName* ref_db_name)
+static rem_port* inet_try_connect(PACKET*         const packet,
+								  Rdb*            const rdb,
+								  const PathName&       file_name,
+								  const TEXT*     const node_name,
+								  ClumpletReader&       dpb,
+								  RefPtr<Config>* const config,
+								  const PathName* const ref_db_name)
 {
 /**************************************
  *
@@ -2685,7 +2685,7 @@ static rem_port* inet_try_connect(PACKET*         packet,
  *	return NULL.
  *
  **************************************/
-	P_CNCT* cnct = &packet->p_cnct;
+	P_CNCT* const cnct = &packet->p_cnct;
 
 	packet->p_operation = op_connect;
 
