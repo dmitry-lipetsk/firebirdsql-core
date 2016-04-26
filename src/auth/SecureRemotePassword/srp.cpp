@@ -50,11 +50,13 @@ public:
 		if (prime.length() > generator.length())
 		{
 			unsigned int pad = prime.length() - generator.length();
+
 			char pb[1024];
+
 			memset(pb, 0, pad);
 
 			hash.process(pad, pb);
-		}
+		}//if
 
 		hash.processInt(generator);
 
