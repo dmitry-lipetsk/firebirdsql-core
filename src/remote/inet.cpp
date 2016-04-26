@@ -730,11 +730,11 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 }//INET_analyze
 
 //------------------------------------------------------------------------
-rem_port* INET_connect(const TEXT*     name,
-					   PACKET*         packet,
-					   USHORT          flag,
-					   ClumpletReader* dpb,
-					   RefPtr<Config>* config)
+rem_port* INET_connect(const TEXT*           name,
+					   PACKET*         const packet,
+					   USHORT          const flag,
+					   ClumpletReader* const dpb,
+					   RefPtr<Config>* const config)
 {
 /**************************************
  *
