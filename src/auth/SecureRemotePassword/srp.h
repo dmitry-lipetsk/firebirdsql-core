@@ -101,16 +101,17 @@ private:
     self_type& operator = (const self_type&);
 
 public:
+	static const char* const plugName;
+	static const unsigned SRP_KEY_SIZE = 128;
+	static const unsigned SRP_VERIFIER_SIZE = SRP_KEY_SIZE;
+	static const unsigned SRP_SALT_SIZE = 32;
+
+public:
 	Firebird::BigInteger	clientPublicKey;
 	Firebird::BigInteger	serverPublicKey;
 
 public:
 	RemotePassword();
-
-	static const char* const plugName;
-	static const unsigned SRP_KEY_SIZE = 128;
-	static const unsigned SRP_VERIFIER_SIZE = SRP_KEY_SIZE;
-	static const unsigned SRP_SALT_SIZE = 32;
 
 	Firebird::BigInteger getUserHash(const char* account,
 									 const char* salt,
