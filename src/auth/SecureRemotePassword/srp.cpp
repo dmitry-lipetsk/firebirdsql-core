@@ -63,11 +63,11 @@ RemotePassword::RemotePassword()
 	: group(RemoteGroup::getGroup())
 {
 #if SRP_DEBUG > 1
-	privateKey = BigInteger("60975527035CF2AD1989806F0407210BC81EDC04E2762A56AFD529DDDA2D4393");
+	this->privateKey = BigInteger("60975527035CF2AD1989806F0407210BC81EDC04E2762A56AFD529DDDA2D4393");
 #else
-	privateKey.random(RemotePassword::SRP_KEY_SIZE);
+	this->privateKey.random(RemotePassword::SRP_KEY_SIZE);
 #endif
-	privateKey %= group->prime;
+	this->privateKey %= this->group->prime;
 }
 
 BigInteger RemotePassword::getUserHash(const char* account, const char* salt, const char* password)
