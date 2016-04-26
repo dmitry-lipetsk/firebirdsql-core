@@ -10,22 +10,6 @@
 
 using namespace Firebird;
 
-namespace{
-////////////////////////////////////////////////////////////////////////////////
-
-const char* const primeStr
-  ="E67D2E994B2F900C3F41F08F5BB2627ED0D49EE1FE767A52EFCD565C"
-   "D6E768812C3E1E9CE8F0A8BEA6CB13CD29DDEBF7A96D4A93B55D488D"
-   "F099A15C89DCB0640738EB2CBDD9A8F7BAB561AB1B0DC1C6CDABF303"
-   "264A08D1BCA932D1F1EE428B619D970F342ABA9A65793B8B2F041AE5"
-   "364350C16F735F56ECBCA87BD57B29E7";
-
-const char* const genStr
- ="02";
-
-////////////////////////////////////////////////////////////////////////////////
-}// anonumous namespace
-
 namespace Auth{
 ////////////////////////////////////////////////////////////////////////////////
 //class RemoteGroup
@@ -39,8 +23,8 @@ public:
 
 public:
 	explicit RemoteGroup(Firebird::MemoryPool&)
-		: prime(primeStr)
-        , generator(genStr)
+		: prime(sm_primeStr)
+        , generator(sm_genStr)
         , k()
 	{
 		Auth::Sha1 hash;
@@ -72,12 +56,30 @@ public:
 	}
 
 private:
+    static const char* const sm_primeStr;
+
+    static const char* const sm_genStr;
+
+private:
 	static InitInstance<RemoteGroup> sm_instance;
 };//class RemoteGroup
 
 ////////////////////////////////////////////////////////////////////////////////
+//class RemoteGroup
 
 InitInstance<RemoteGroup> RemoteGroup::sm_instance;
+
+//------------------------------------------------------------------------
+const char* const RemoteGroup::sm_primeStr
+  ="E67D2E994B2F900C3F41F08F5BB2627ED0D49EE1FE767A52EFCD565C"
+   "D6E768812C3E1E9CE8F0A8BEA6CB13CD29DDEBF7A96D4A93B55D488D"
+   "F099A15C89DCB0640738EB2CBDD9A8F7BAB561AB1B0DC1C6CDABF303"
+   "264A08D1BCA932D1F1EE428B619D970F342ABA9A65793B8B2F041AE5"
+   "364350C16F735F56ECBCA87BD57B29E7";
+
+//------------------------------------------------------------------------
+const char* const RemoteGroup::sm_genStr
+ ="02";
 
 ////////////////////////////////////////////////////////////////////////////////
 //class RemotePassword
