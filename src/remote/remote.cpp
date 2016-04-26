@@ -937,7 +937,7 @@ void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)co
 	}//if
 
 	// Add plugin name
-	Firebird::PathName pluginName = this->getPluginName();
+	const Firebird::PathName pluginName = this->getPluginName();
 
 	if (pluginName.hasData())
 	{
