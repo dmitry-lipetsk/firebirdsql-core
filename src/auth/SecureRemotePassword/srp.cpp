@@ -142,8 +142,11 @@ BigInteger RemotePassword::computeVerifier(const string& account,
 void RemotePassword::genClientKey(string& pubkey)
 {
 	dumpIt("privateKey(C)", this->privateKey);
+
 	this->clientPublicKey = group->generator.modPow(this->privateKey, group->prime);
+
 	this->clientPublicKey.getText(pubkey);
+
 	dumpIt("clientPublicKey", this->clientPublicKey);
 }//genClientKey
 
