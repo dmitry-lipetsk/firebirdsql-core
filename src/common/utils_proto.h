@@ -192,16 +192,16 @@ namespace fb_utils
 	bool containsErrorCode(const ISC_STATUS* v, ISC_STATUS code);
 
 	// Uppercase/strip string according to login rules
-	const char* dpbItemUpper(const char* s, FB_SIZE_T l, Firebird::string& buf);
+	bool dpbItemUpper(const char* s, FB_SIZE_T l, Firebird::string& buf);
 
 	// Uppercase/strip string according to login rules
 	template <typename STR>
 	void dpbItemUpper(STR& name)
 	{
 		Firebird::string buf;
-		const char* up = dpbItemUpper(name.c_str(), name.length(), buf);
-		if (up)
-			name = up;
+
+		if (dpbItemUpper(name.c_str(), name.length(), buf))
+			name = buf;
 	}
 } // namespace fb_utils
 

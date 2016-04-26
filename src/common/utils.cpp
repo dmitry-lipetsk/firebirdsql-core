@@ -1605,7 +1605,7 @@ const ISC_STATUS* const origen = v;
 	return false;
 }
 
-const char* dpbItemUpper(const char* s, FB_SIZE_T l, Firebird::string& buf)
+bool dpbItemUpper(const char* s, FB_SIZE_T l, Firebird::string& buf)
 {
 	if (l && (s[0] == '"' || s[0] == '\''))
 	{
@@ -1631,7 +1631,7 @@ const char* dpbItemUpper(const char* s, FB_SIZE_T l, Firebird::string& buf)
 		if (ascii && s[0] == '\'')
 			buf.upper();
 
-		return buf.c_str();
+		return true;
 	}
 
 	// non-quoted string - try to uppercase
@@ -1640,10 +1640,10 @@ const char* dpbItemUpper(const char* s, FB_SIZE_T l, Firebird::string& buf)
 		if (!(s[i] & 0x80))
 			buf += toupper(s[i]);
 		else
-			return NULL;				// contains non-ascii data
+			return false;				// contains non-ascii data
 	}
 
-	return buf.c_str();
+	return true;
 }
 
 } // namespace fb_utils
