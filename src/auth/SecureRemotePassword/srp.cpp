@@ -153,13 +153,13 @@ void RemotePassword::genServerKey(string&                      pubkey,
 {
 	dumpIt("privateKey(S)", privateKey);
 
-	BigInteger gb(group->generator.modPow(privateKey, group->prime));	// g^b
+	const BigInteger gb(group->generator.modPow(privateKey, group->prime));	// g^b
 
 	dumpIt("gb", gb);
 
-	BigInteger v(verifier);												// v
+	const BigInteger v(verifier);											// v
 
-	BigInteger kv = (group->k * v) % group->prime;
+	const BigInteger kv = (group->k * v) % group->prime;
 
 	dumpIt("kv", kv);
 
