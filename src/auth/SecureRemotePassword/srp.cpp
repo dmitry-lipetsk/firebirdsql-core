@@ -43,6 +43,7 @@ public:
 		Auth::Sha1 hash;
 
 		hash.processInt(prime);
+
 		if (prime.length() > generator.length())
 		{
 			unsigned int pad = prime.length() - generator.length();
@@ -51,10 +52,11 @@ public:
 
 			hash.process(pad, pb);
 		}
+
 		hash.processInt(generator);
 
 		hash.getInt(k);
-	}
+	}//RemoteGroup
 
 private:
 	static InitInstance<RemoteGroup> group;
