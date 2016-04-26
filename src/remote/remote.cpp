@@ -924,7 +924,7 @@ static void addMultiPartConnectParameter(const T& dataToAdd,
 }
 
 //------------------------------------------------------------------------
-void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)
+void ClntAuthBlock::extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)const
 {
 	// Add user login name
 	if (this->cliOrigUserName.hasData())

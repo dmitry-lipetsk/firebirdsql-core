@@ -793,7 +793,7 @@ public:
 
 	void loadClnt(Firebird::ClumpletWriter& dpb, const ParametersSet*);
 
-	void extractDataFromPluginTo(Firebird::ClumpletWriter& user_id);
+	void extractDataFromPluginTo(Firebird::ClumpletWriter& user_id)const;
 
 	void resetClnt(const Firebird::PathName* fileName, const CSTRING* listStr = NULL);
 
