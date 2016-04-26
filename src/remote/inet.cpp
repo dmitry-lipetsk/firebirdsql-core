@@ -702,8 +702,9 @@ rem_port* INET_analyze(ClntAuthBlock*  cBlock,
 		port->initCompression();
 
 	return port;
-}
+}//INET_analyze
 
+//------------------------------------------------------------------------
 rem_port* INET_connect(const TEXT* name,
 					   PACKET* packet,
 					   USHORT flag,
