@@ -637,14 +637,19 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	case op_accept_data:
 	case op_cond_accept:
 		accept = &packet->p_acpd;
+
 		if (cBlock)
 		{
 			cBlock->storeDataForPlugin(packet->p_acpd.p_acpt_data.cstr_length,
 									   packet->p_acpd.p_acpt_data.cstr_address);
+
 			cBlock->authComplete = packet->p_acpd.p_acpt_authenticated;
+
 			port->addServerKeys(&packet->p_acpd.p_acpt_keys);
+
 			cBlock->resetClnt(&file_name, &packet->p_acpd.p_acpt_keys);
-		}
+		}//if
+
 		break;
 
 	case op_accept:
@@ -652,7 +657,9 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		{
 			cBlock->resetClnt(&file_name);
 		}
+
 		accept = &packet->p_acpt;
+
 		break;
 
 	case op_response:
@@ -675,7 +682,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		delete rdb;
 		Arg::Gds(isc_connect_reject).raise();
 		break;
-	}
+	}//switch packet->p_operation
 
 	fb_assert(accept);
 	fb_assert(port);
@@ -684,8 +691,11 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	// once we've decided on a protocol, concatenate the version
 	// string to reflect it...
 	string temp;
+
 	temp.printf("%s/P%d", port->port_version->str_data, port->port_protocol & FB_PROTOCOL_MASK);
+
 	delete port->port_version;
+
 	port->port_version = REMOTE_make_string(temp.c_str());
 
 	if (accept->p_acpt_architecture == ARCHITECTURE) {
@@ -693,6 +703,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	}
 
 	bool compress = accept->p_acpt_type & pflag_compress;
+
 	accept->p_acpt_type &= ptype_MASK;
 
 	if (accept->p_acpt_type != ptype_out_of_band) {
