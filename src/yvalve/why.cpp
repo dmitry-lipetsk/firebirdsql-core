@@ -3871,6 +3871,7 @@ FB_API_HANDLE& YEvents::getHandle()
 void YEvents::destroy(unsigned dstrFlags)
 {
 	attachment->childEvents.remove(this);
+	attachment = NULL;
 	removeHandle(&events, handle);
 
 	if (!(dstrFlags & DF_RELEASE))
@@ -3932,6 +3933,7 @@ void YRequest::destroy(unsigned dstrFlags)
 	}
 
 	attachment->childRequests.remove(this);
+	attachment = NULL;
 
 	removeHandle(&requests, handle);
 
@@ -4066,7 +4068,9 @@ FB_API_HANDLE& YBlob::getHandle()
 void YBlob::destroy(unsigned dstrFlags)
 {
 	attachment->childBlobs.remove(this);
+	attachment = NULL;
 	transaction->childBlobs.remove(this);
+	transaction = NULL;
 
 	removeHandle(&blobs, handle);
 
@@ -4188,6 +4192,7 @@ void YStatement::destroy(unsigned dstrFlags)
 	}
 
 	attachment->childStatements.remove(this);
+	attachment = NULL;
 
 	removeHandle(&statements, handle);
 
@@ -4474,6 +4479,7 @@ void YResultSet::destroy(unsigned dstrFlags)
 
 	fb_assert(transaction);
 	transaction->childCursors.remove(this);
+	transaction = NULL;
 
 	destroy2(dstrFlags);
 }
@@ -4704,7 +4710,10 @@ void YTransaction::destroy(unsigned dstrFlags)
 	childCursors.destroy(dstrFlags & ~DF_RELEASE);
 
 	if (attachment)
+	{
 		attachment->childTransactions.remove(this);
+		attachment = NULL;
+	}
 
 	removeHandle(&transactions, handle);
 
@@ -4908,7 +4917,10 @@ YTransaction* YTransaction::enterDtc(CheckStatusWrapper* status)
 		next->addRef();		// We use NoIncr in YTransaction ctor
 
 		if (attachment)
+		{
 			attachment->childTransactions.remove(this);
+			attachment = NULL;
+		}
 
 		removeHandle(&transactions, handle);
 		next = nullptr;

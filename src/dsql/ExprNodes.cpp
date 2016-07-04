@@ -11087,7 +11087,7 @@ dsc* UdfCallNode::execute(thread_db* tdbb, jrd_req* request) const
 		}
 
 		jrd_tra* transaction = request->req_transaction;
-		const SLONG savePointNumber = transaction->tra_save_point ?
+		const SavNumber savNumber = transaction->tra_save_point ?
 			transaction->tra_save_point->sav_number : 0;
 
 		jrd_req* funcRequest = function->getStatement()->findRequest(tdbb);
@@ -11115,7 +11115,7 @@ dsc* UdfCallNode::execute(thread_db* tdbb, jrd_req* request) const
 			if (transaction != attachment->getSysTransaction())
 			{
 				while (transaction->tra_save_point &&
-					transaction->tra_save_point->sav_number > savePointNumber)
+					transaction->tra_save_point->sav_number > savNumber)
 				{
 					VIO_verb_cleanup(tdbb, transaction);
 				}
@@ -11204,9 +11204,14 @@ ValueExprNode* UdfCallNode::dsqlPass(DsqlCompilerScratch* dsqlScratch)
 		 ++ptr)
 	{
 		unsigned pos = ptr - node->args->items.begin();
+		dsc desc = node->dsqlFunction->udf_arguments[pos];
+
+		// UNICODE_FSS_HACK
+		if (node->dsqlFunction->udf_fld_system_arguments[pos])
+			DataTypeUtilBase::adjustSysFieldLength(&desc);
 
 		if (pos < node->dsqlFunction->udf_arguments.getCount())
-			PASS1_set_parameter_type(dsqlScratch, *ptr, &node->dsqlFunction->udf_arguments[pos], false);
+			PASS1_set_parameter_type(dsqlScratch, *ptr, &desc, false);
 		else
 		{
 			// We should complain here in the future! The parameter is

@@ -453,7 +453,8 @@ static rem_port*		inet_try_connect(	PACKET*,
 									const TEXT*,
 									ClumpletReader&,
 									RefPtr<Config>*,
-									const PathName*);
+									const PathName*,
+									int);
 static bool		inet_write(XDR*);
 static rem_port* listener_socket(rem_port* port, USHORT flag, const addrinfo* pai);
 
@@ -532,7 +533,8 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 					   bool            const uv_flag,
 					   ClumpletReader&       dpb,
 					   RefPtr<Config>* const config,
-					   const PathName* const ref_db_name)
+					   const PathName* const ref_db_name,
+					   int af)
 {
 /**************************************
  *
@@ -613,7 +615,8 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		REMOTE_PROTOCOL(PROTOCOL_VERSION10, ptype_lazy_send, 1),
 		REMOTE_PROTOCOL(PROTOCOL_VERSION11, ptype_lazy_send, 2),
 		REMOTE_PROTOCOL(PROTOCOL_VERSION12, ptype_lazy_send, 3),
-		REMOTE_PROTOCOL(PROTOCOL_VERSION13, ptype_lazy_send, 4)
+		REMOTE_PROTOCOL(PROTOCOL_VERSION13, ptype_lazy_send, 4),
+		REMOTE_PROTOCOL(PROTOCOL_VERSION14, ptype_lazy_send, 5)
 	};
 
 	fb_assert(FB_NELEM(protocols_to_try) <= FB_NELEM(cnct->p_cnct_versions));
@@ -632,7 +635,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 		}
 	}//for
 
-	rem_port* port = inet_try_connect(packet, rdb, file_name, node_name, dpb, config, ref_db_name);
+	rem_port* port = inet_try_connect(packet, rdb, file_name, node_name, dpb, config, ref_db_name, af);
 
 	P_ACPT* accept = NULL;
 
@@ -729,12 +732,12 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 	return port;
 }//INET_analyze
 
-//------------------------------------------------------------------------
 rem_port* INET_connect(const TEXT*           name,
 					   PACKET*         const packet,
 					   USHORT          const flag,
 					   ClumpletReader* const dpb,
-					   RefPtr<Config>* const config)
+					   RefPtr<Config>* const config,
+					   int             const af)
 {
 /**************************************
  *
@@ -831,7 +834,10 @@ rem_port* INET_connect(const TEXT*           name,
 
 	struct addrinfo gai_hints;
 	memset(&gai_hints, 0, sizeof(gai_hints));
-	gai_hints.ai_family = ((packet || host.hasData() || !ipv6) ? AF_UNSPEC : AF_INET6);
+	if (packet)
+		gai_hints.ai_family = af;
+	else
+		gai_hints.ai_family = ((host.hasData() || !ipv6) ? AF_UNSPEC : AF_INET6);
 	gai_hints.ai_socktype = SOCK_STREAM;
 
 #if !defined(WIN_NT) && !defined(__clang__)
@@ -842,7 +848,7 @@ rem_port* INET_connect(const TEXT*           name,
 
 	gai_hints.ai_flags =
 #ifndef ANDROID
-		AI_V4MAPPED |
+		((af == AF_UNSPEC) ? AI_V4MAPPED : 0) |
 #endif
 			AI_ADDRCONFIG | (packet ? 0 : AI_PASSIVE);
 
@@ -856,7 +862,8 @@ rem_port* INET_connect(const TEXT*           name,
 		retry_gai = false;
 		n = getaddrinfo(host_str, protocol.c_str(), &gai_hints, &gai_result);
 
-		if ((n == EAI_FAMILY || (!host_str && n == EAI_NONAME)) && (gai_hints.ai_family == AF_INET6))
+		if ((n == EAI_FAMILY || (!host_str && n == EAI_NONAME)) &&
+			(gai_hints.ai_family == AF_INET6) && (af != AF_INET6))
 		{
 			// May be on a system without IPv6 support, try IPv4
 			gai_hints.ai_family = AF_UNSPEC;
@@ -2666,14 +2673,14 @@ static bool packet_receive2(rem_port* port, UCHAR* p, SSHORT bufSize, SSHORT* le
 	return true;
 }
 
-//------------------------------------------------------------------------
 static rem_port* inet_try_connect(PACKET*         const packet,
 								  Rdb*            const rdb,
 								  const PathName&       file_name,
 								  const TEXT*     const node_name,
 								  ClumpletReader&       dpb,
 								  RefPtr<Config>* const config,
-								  const PathName* const ref_db_name)
+								  const PathName* const ref_db_name,
+								  int             const af)
 {
 /**************************************
  *
@@ -2712,7 +2719,7 @@ static rem_port* inet_try_connect(PACKET*         const packet,
 
 	try
 	{
-		port = INET_connect(node_name, packet, false, &dpb, config);
+		port = INET_connect(node_name, packet, false, &dpb, config, af);
 	}
 	catch (const Exception&)
 	{

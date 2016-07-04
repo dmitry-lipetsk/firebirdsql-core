@@ -244,22 +244,34 @@ bool putShutdownMode(char**& av, ClumpletWriter& spb, unsigned int tag)
 	return putSpecTag(av, spb, tag, shutSwitch, isc_fbsvcmgr_bad_sm);
 }
 
-// add numeric (int32) tag to spb
+// add integer (int32) tag to spb
 
-bool putNumericArgument(char**& av, ClumpletWriter& spb, unsigned int tag)
+bool putIntArgument(char**& av, ClumpletWriter& spb, unsigned int tag)
 {
 	if (! *av)
 		return false;
 
-	char* err = NULL;
-	SLONG n = strtol(*av++, &err, 10);
-
-	if (err && *err)
-	{
+	SLONG n;
+	if (sscanf(*av++, "%" SLONGFORMAT, &n) != 1)
 		(Arg::Gds(isc_fbsvcmgr_bad_arg) << av[-2]).raise();
-	}
 
 	spb.insertInt(tag, n);
+
+	return true;
+}
+
+// add big integer (int64) tag to spb
+
+bool putBigIntArgument(char**& av, ClumpletWriter& spb, unsigned int tag)
+{
+	if (! *av)
+		return false;
+
+	SINT64 n;
+	if (sscanf(*av++, "%" SQUADFORMAT, &n) != 1)
+		(Arg::Gds(isc_fbsvcmgr_bad_arg) << av[-2]).raise();
+
+	spb.insertBigInt(tag, n);
 
 	return true;
 }
@@ -351,8 +363,8 @@ const SvcSwitches backupOptions[] =
 	{"dbname", putStringArgument, 0, isc_spb_dbname, 0},
 	{"verbose", putSingleTag, 0, isc_spb_verbose, 0},
 	{"bkp_file", putStringArgument, 0, isc_spb_bkp_file, 0},
-	{"bkp_length", putNumericArgument, 0, isc_spb_bkp_length, 0},
-	{"bkp_factor", putNumericArgument, 0, isc_spb_bkp_factor, 0},
+	{"bkp_length", putIntArgument, 0, isc_spb_bkp_length, 0},
+	{"bkp_factor", putIntArgument, 0, isc_spb_bkp_factor, 0},
 	{"bkp_ignore_checksums", putOption, 0, isc_spb_bkp_ignore_checksums, 0},
 	{"bkp_ignore_limbo", putOption, 0, isc_spb_bkp_ignore_limbo, 0},
 	{"bkp_metadata_only", putOption, 0, isc_spb_bkp_metadata_only, 0},
@@ -361,7 +373,7 @@ const SvcSwitches backupOptions[] =
 	{"bkp_non_transportable", putOption, 0, isc_spb_bkp_non_transportable, 0},
 	{"bkp_convert", putOption, 0, isc_spb_bkp_convert, 0},
 	{"bkp_no_triggers", putOption, 0, isc_spb_bkp_no_triggers, 0},
-	{"verbint", putNumericArgument, 0, isc_spb_verbint, 0},
+	{"verbint", putIntArgument, 0, isc_spb_verbint, 0},
 	{"bkp_skip_data", putStringArgument, 0, isc_spb_bkp_skip_data, 0},
 	{"bkp_stat", putStringArgument, 0, isc_spb_bkp_stat, 0 },
 	{0, 0, 0, 0, 0}
@@ -371,10 +383,10 @@ const SvcSwitches restoreOptions[] =
 {
 	{"bkp_file", putStringArgument, 0, isc_spb_bkp_file, 0},
 	{"dbname", putStringArgument, 0, isc_spb_dbname, 0},
-	{"res_length", putNumericArgument, 0, isc_spb_res_length, 0},
+	{"res_length", putIntArgument, 0, isc_spb_res_length, 0},
 	{"verbose", putSingleTag, 0, isc_spb_verbose, 0},
-	{"res_buffers", putNumericArgument, 0, isc_spb_res_buffers, 0},
-	{"res_page_size", putNumericArgument, 0, isc_spb_res_page_size, 0},
+	{"res_buffers", putIntArgument, 0, isc_spb_res_buffers, 0},
+	{"res_page_size", putIntArgument, 0, isc_spb_res_page_size, 0},
 	{"res_access_mode", putAccessMode, 0, isc_spb_res_access_mode, 0},
 	{"res_deactivate_idx", putOption, 0, isc_spb_res_deactivate_idx, 0},
 	{"res_no_shadow", putOption, 0, isc_spb_res_no_shadow, 0},
@@ -386,7 +398,7 @@ const SvcSwitches restoreOptions[] =
 	{"res_fix_fss_data", putStringArgument, 0, isc_spb_res_fix_fss_data, 0},
 	{"res_fix_fss_metadata", putStringArgument, 0, isc_spb_res_fix_fss_metadata, 0},
 	{"res_metadata_only", putOption, 0, isc_spb_res_metadata_only, 0},
-	{"verbint", putNumericArgument, 0, isc_spb_verbint, 0},
+	{"verbint", putIntArgument, 0, isc_spb_verbint, 0},
 	{"res_skip_data", putStringArgument, 0, isc_spb_res_skip_data, 0},
 	{"res_stat", putStringArgument, 0, isc_spb_res_stat, 0 },
 	{0, 0, 0, 0, 0}
@@ -395,20 +407,20 @@ const SvcSwitches restoreOptions[] =
 const SvcSwitches propertiesOptions[] =
 {
 	{"dbname", putStringArgument, 0, isc_spb_dbname, 0},
-	{"prp_page_buffers", putNumericArgument, 0, isc_spb_prp_page_buffers, 0},
-	{"prp_sweep_interval", putNumericArgument, 0, isc_spb_prp_sweep_interval, 0},
-	{"prp_shutdown_db", putNumericArgument, 0, isc_spb_prp_shutdown_db, 0},
-	{"prp_deny_new_transactions", putNumericArgument, 0, isc_spb_prp_deny_new_transactions, 0},
-	{"prp_deny_new_attachments", putNumericArgument, 0, isc_spb_prp_deny_new_attachments, 0},
-	{"prp_set_sql_dialect", putNumericArgument, 0, isc_spb_prp_set_sql_dialect, 0},
+	{"prp_page_buffers", putIntArgument, 0, isc_spb_prp_page_buffers, 0},
+	{"prp_sweep_interval", putIntArgument, 0, isc_spb_prp_sweep_interval, 0},
+	{"prp_shutdown_db", putIntArgument, 0, isc_spb_prp_shutdown_db, 0},
+	{"prp_deny_new_transactions", putIntArgument, 0, isc_spb_prp_deny_new_transactions, 0},
+	{"prp_deny_new_attachments", putIntArgument, 0, isc_spb_prp_deny_new_attachments, 0},
+	{"prp_set_sql_dialect", putIntArgument, 0, isc_spb_prp_set_sql_dialect, 0},
 	{"prp_access_mode", putAccessMode, 0, isc_spb_prp_access_mode, 0},
 	{"prp_reserve_space", putReserveSpace, 0, isc_spb_prp_reserve_space, 0},
 	{"prp_write_mode", putWriteMode, 0, isc_spb_prp_write_mode, 0},
 	{"prp_activate", putOption, 0, isc_spb_prp_activate, 0},
 	{"prp_db_online", putOption, 0, isc_spb_prp_db_online, 0},
-	{"prp_force_shutdown", putNumericArgument, 0, isc_spb_prp_force_shutdown, 0},
-	{"prp_attachments_shutdown", putNumericArgument, 0, isc_spb_prp_attachments_shutdown, 0},
-	{"prp_transactions_shutdown", putNumericArgument, 0, isc_spb_prp_transactions_shutdown, 0},
+	{"prp_force_shutdown", putIntArgument, 0, isc_spb_prp_force_shutdown, 0},
+	{"prp_attachments_shutdown", putIntArgument, 0, isc_spb_prp_attachments_shutdown, 0},
+	{"prp_transactions_shutdown", putIntArgument, 0, isc_spb_prp_transactions_shutdown, 0},
 	{"prp_shutdown_mode", putShutdownMode, 0, isc_spb_prp_shutdown_mode, 0},
 	{"prp_online_mode", putShutdownMode, 0, isc_spb_prp_online_mode, 0},
 	{"prp_nolinger", putOption, 0, isc_spb_prp_nolinger, 0},
@@ -418,9 +430,12 @@ const SvcSwitches propertiesOptions[] =
 const SvcSwitches repairOptions[] =
 {
 	{"dbname", putStringArgument, 0, isc_spb_dbname, 0},
-	{"rpr_commit_trans", putNumericArgument, 0, isc_spb_rpr_commit_trans, 0},
-	{"rpr_rollback_trans", putNumericArgument, 0, isc_spb_rpr_rollback_trans, 0},
-	{"rpr_recover_two_phase", putNumericArgument, 0, isc_spb_rpr_recover_two_phase, 0},
+	{"rpr_commit_trans", putIntArgument, 0, isc_spb_rpr_commit_trans, 0},
+	{"rpr_rollback_trans", putIntArgument, 0, isc_spb_rpr_rollback_trans, 0},
+	{"rpr_recover_two_phase", putIntArgument, 0, isc_spb_rpr_recover_two_phase, 0},
+	{"rpr_commit_trans_64", putBigIntArgument, 0, isc_spb_rpr_commit_trans_64, 0},
+	{"rpr_rollback_trans_64", putBigIntArgument, 0, isc_spb_rpr_rollback_trans_64, 0},
+	{"rpr_recover_two_phase_64", putBigIntArgument, 0, isc_spb_rpr_recover_two_phase_64, 0},
 	{"rpr_check_db", putOption, 0, isc_spb_rpr_check_db, 0},
 	{"rpr_ignore_checksum", putOption, 0, isc_spb_rpr_ignore_checksum, 0},
 	{"rpr_kill_shadows", putOption, 0, isc_spb_rpr_kill_shadows, 0},
@@ -472,9 +487,9 @@ const SvcSwitches addmodOptions[] =
 	{"sec_firstname", putStringArgument, 0, isc_spb_sec_firstname, 0},
 	{"sec_middlename", putStringArgument, 0, isc_spb_sec_middlename, 0},
 	{"sec_lastname", putStringArgument, 0, isc_spb_sec_lastname, 0},
-	{"sec_userid", putNumericArgument, 0, isc_spb_sec_userid, 0},
-	{"sec_groupid", putNumericArgument, 0, isc_spb_sec_groupid, 0},
-	{"sec_admin", putNumericArgument, 0, isc_spb_sec_admin, 0},
+	{"sec_userid", putIntArgument, 0, isc_spb_sec_userid, 0},
+	{"sec_groupid", putIntArgument, 0, isc_spb_sec_groupid, 0},
+	{"sec_admin", putIntArgument, 0, isc_spb_sec_admin, 0},
 	{0, 0, 0, 0, 0}
 };
 
@@ -482,7 +497,7 @@ const SvcSwitches nbackOptions[] =
 {
 	{"dbname", putStringArgument, 0, isc_spb_dbname, 0},
 	{"nbk_file", putStringArgument, 0, isc_spb_nbk_file, 0},
-	{"nbk_level", putNumericArgument, 0, isc_spb_nbk_level, 0},
+	{"nbk_level", putIntArgument, 0, isc_spb_nbk_level, 0},
 	{"nbk_no_triggers", putOption, 0, isc_spb_nbk_no_triggers, 0},
 	{"nbk_direct", putStringArgument, 0, isc_spb_nbk_direct, 0},
 	{0, 0, 0, 0, 0}
@@ -504,7 +519,7 @@ const SvcSwitches traceStartOptions[] =
 
 const SvcSwitches traceChgStateOptions[] =
 {
-	{"trc_id", putNumericArgument, 0, isc_spb_trc_id, 0},
+	{"trc_id", putIntArgument, 0, isc_spb_trc_id, 0},
 	{0, 0, 0, 0, 0}
 };
 
@@ -515,7 +530,7 @@ const SvcSwitches validateOptions[] =
 	{"val_tab_excl", putStringArgument, 0, isc_spb_val_tab_excl, 0},
 	{"val_idx_incl", putStringArgument, 0, isc_spb_val_idx_incl, 0},
 	{"val_idx_excl", putStringArgument, 0, isc_spb_val_idx_excl, 0},
-	{"val_lock_timeout", putNumericArgument, 0, isc_spb_val_lock_timeout, 0},
+	{"val_lock_timeout", putIntArgument, 0, isc_spb_val_lock_timeout, 0},
 	{0, 0, 0, 0, 0}
 };
 
@@ -925,22 +940,26 @@ bool printInfo(const char* p, size_t pSize, UserPrint& up, ULONG& stdinRq)
 
 // print known switches help
 
+const char* const fileTest = "test.fbsvcmgr";
+
 struct TypeText
 {
 	PopulateFunction* populate;
 	const char* text;
+	const char* testArg;
 } typeText[] = {
-	{ putStringArgument, "string value" },
-	{ putFileArgument, "file name" },
-	{ putFileFromArgument, "file name" },
-	{ putAccessMode, "prp_am_readonly | prp_am_readwrite" },
-	{ putWriteMode, "prp_wm_async | prp_wm_sync" },
-	{ putReserveSpace, "prp_res_use_full | prp_res" },
-	{ putShutdownMode, "prp_sm_normal | prp_sm_multi | prp_sm_single | prp_sm_full" },
-	{ putNumericArgument, "numeric value" },
-	{ putOption, NULL },
-	{ putSingleTag, NULL },
-	{ NULL, NULL }
+	{ putStringArgument, "string value", "text" },
+	{ putFileArgument, "file name", fileTest },
+	{ putFileFromArgument, "file name", fileTest },
+	{ putAccessMode, "prp_am_readonly | prp_am_readwrite", "prp_am_readonly" },
+	{ putWriteMode, "prp_wm_async | prp_wm_sync", "prp_wm_sync" },
+	{ putReserveSpace, "prp_res_use_full | prp_res", "prp_res_use_full" },
+	{ putShutdownMode, "prp_sm_normal | prp_sm_multi | prp_sm_single | prp_sm_full", "prp_sm_single" },
+	{ putIntArgument, "int32 value", "123" },
+	{ putBigIntArgument, "int64 value", "456" },
+	{ putOption, NULL, "" },
+	{ putSingleTag, NULL, "" },
+	{ NULL, NULL , NULL }
 };
 
 void printHelp(unsigned int offset, const SvcSwitches* sw)
@@ -971,6 +990,82 @@ void printHelp(unsigned int offset, const SvcSwitches* sw)
 		fb_assert(tt->populate);
 	}
 }
+
+#ifdef DEV_BUILD
+void testSvc(isc_svc_handle* h, ClumpletWriter& spb, const SvcSwitches* sw)
+{
+	for (; sw->name; ++sw)
+	{
+		TypeText* tt = typeText;
+		for (; tt->populate; ++tt)
+		{
+			if (sw->populate == tt->populate)
+			{
+				// some tricks to emulate 'char* argv[]'
+				char x[100];
+				strcpy(x, tt->testArg);
+				char* y = x;
+				char** z = &y;
+
+				sw->populate(z, spb, sw->tag);
+				if (sw->options)
+					testSvc(NULL, spb, sw->options);
+
+				if (h)
+				{
+					ISC_STATUS_ARRAY status;
+					if (isc_service_start(status, h, 0,
+						static_cast<USHORT>(spb.getBufferLength()),
+						reinterpret_cast<const char*>(spb.getBuffer())))
+					{
+						isc_print_status(status);
+						isc_service_detach(status, h);
+						exit(1);
+					}
+					spb.clear();
+				}
+
+				break;
+			}
+		}
+
+		fb_assert(tt->populate);
+	}
+}
+
+void testServices()
+{
+	FILE* f = fopen(fileTest, "w");
+	if (!f)
+	{
+		perror(fileTest);
+		exit(1);
+	}
+	fputs(fileTest, f);
+	fclose(f);
+
+	ISC_STATUS_ARRAY status;
+
+	ClumpletWriter spbAtt(ClumpletWriter::spbList, 1024 * 1024);
+	//spbAtt.insertString(isc_spb_sql_role_name, "@@@");
+	testSvc(NULL, spbAtt, attSwitch);
+
+	isc_svc_handle svc_handle = 0;
+	if (isc_service_attach(status, 0, "@@@", &svc_handle,
+				static_cast<USHORT>(spbAtt.getBufferLength()),
+				reinterpret_cast<const char*>(spbAtt.getBuffer())))
+	{
+		isc_print_status(status);
+		exit(1);
+	}
+
+	ClumpletWriter spbStart(ClumpletWriter::SpbStart,  1024 * 1024);
+	testSvc(&svc_handle, spbStart, actionSwitch);
+
+	isc_service_detach(status, &svc_handle);
+}
+
+#endif //DEV_BUILD
 
 // short usage from firebird.msg
 
@@ -1019,6 +1114,14 @@ int main(int ac, char** av)
 		usage(ac == 2);
 		return 1;
 	}
+
+#ifdef DEV_BUILD
+	if (ac == 2 && strcmp(av[1], "-@") == 0)
+	{
+		testServices();
+		return 0;
+	}
+#endif
 
 	if (ac == 2 && (strcmp(av[1], "-z") == 0 || strcmp(av[1], "-Z") == 0))
 	{

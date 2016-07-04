@@ -795,6 +795,7 @@ void EXE_send(thread_db* tdbb, jrd_req* request, USHORT msg, ULONG length, const
 		{
 			const UCHAR* p = request->getImpure<UCHAR>(message->impureOffset +
 				(ULONG)(IPTR) desc->dsc_address);
+			USHORT descLen = desc->dsc_length;
 			USHORT len;
 
 			switch (desc->dsc_dtype)
@@ -804,6 +805,7 @@ void EXE_send(thread_db* tdbb, jrd_req* request, USHORT msg, ULONG length, const
 					break;
 
 				case dtype_varying:
+					descLen -= sizeof(USHORT);
 					len = reinterpret_cast<const vary*>(p)->vary_length;
 					p += sizeof(USHORT);
 					break;
@@ -813,6 +815,17 @@ void EXE_send(thread_db* tdbb, jrd_req* request, USHORT msg, ULONG length, const
 
 			if (!charSet->wellFormed(len, p))
 				ERR_post(Arg::Gds(isc_malformed_string));
+
+			const USHORT srcCharLen = charSet->length(len, p, false);
+			const USHORT dstCharLen = descLen / charSet->maxBytesPerChar();
+
+			if (srcCharLen > dstCharLen)
+			{
+				status_exception::raise(
+					Arg::Gds(isc_arith_except) <<
+					Arg::Gds(isc_string_truncation) <<
+					Arg::Gds(isc_trunc_limits) << Arg::Num(dstCharLen) << Arg::Num(srcCharLen));
+			}
 		}
 		else if (desc->isBlob())
 		{
@@ -882,13 +895,6 @@ void EXE_start(thread_db* tdbb, jrd_req* request, jrd_tra* transaction)
 	request->req_records_deleted = 0;
 
 	request->req_records_affected.clear();
-
-	// CVC: set up to count virtual operations on SQL views.
-
-	request->req_view_flags = 0;
-	request->req_top_view_store = NULL;
-	request->req_top_view_modify = NULL;
-	request->req_top_view_erase = NULL;
 
 	// Store request start time for timestamp work
 	request->req_timestamp.validate();
@@ -1267,7 +1273,7 @@ const StmtNode* EXE_looper(thread_db* tdbb, jrd_req* request, const StmtNode* no
 	fb_assert(request->req_caller == NULL);
 	request->req_caller = exeState.oldRequest;
 
-	const SLONG save_point_number = (request->req_transaction->tra_save_point) ?
+	const SavNumber savNumber = (request->req_transaction->tra_save_point) ?
 		request->req_transaction->tra_save_point->sav_number : 0;
 
 	tdbb->tdbb_flags &= ~(TDBB_stack_trace_done | TDBB_sys_error);
@@ -1314,7 +1320,7 @@ const StmtNode* EXE_looper(thread_db* tdbb, jrd_req* request, const StmtNode* no
 				if (request->req_transaction != sysTransaction)
 				{
 					while (request->req_transaction->tra_save_point &&
-						request->req_transaction->tra_save_point->sav_number >= save_point_number)
+						request->req_transaction->tra_save_point->sav_number >= savNumber)
 					{
 						++request->req_transaction->tra_save_point->sav_verb_count;
 						VIO_verb_cleanup(tdbb, request->req_transaction);
@@ -1389,7 +1395,7 @@ const StmtNode* EXE_looper(thread_db* tdbb, jrd_req* request, const StmtNode* no
 		if (request->req_transaction != sysTransaction)
 		{
 			while (request->req_transaction->tra_save_point &&
-				request->req_transaction->tra_save_point->sav_number >= save_point_number)
+				request->req_transaction->tra_save_point->sav_number >= savNumber)
 			{
 				++request->req_transaction->tra_save_point->sav_verb_count;
 				VIO_verb_cleanup(tdbb, request->req_transaction);

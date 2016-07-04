@@ -92,6 +92,8 @@
 
 
 const char* const PROTOCOL_INET = "inet";
+const char* const PROTOCOL_INET4 = "inet4";
+const char* const PROTOCOL_INET6 = "inet6";
 const char* const PROTOCOL_WNET = "wnet";
 const char* const PROTOCOL_XNET = "xnet";
 
@@ -5494,6 +5496,7 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
  **************************************/
 
 	rem_port* port = NULL;
+	int inet_af = AF_UNSPEC;
 
 	cBlock.loadClnt(pb, &parSet);
 
@@ -5532,7 +5535,12 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
 	else
 #endif
 
-	if (ISC_analyze_protocol(PROTOCOL_INET, attach_name, node_name, INET_SEPARATOR) ||
+	if (ISC_analyze_protocol(PROTOCOL_INET4, attach_name, node_name, INET_SEPARATOR))
+		inet_af = AF_INET;
+	else if (ISC_analyze_protocol(PROTOCOL_INET6, attach_name, node_name, INET_SEPARATOR))
+		inet_af = AF_INET6;
+	if (inet_af != AF_UNSPEC ||
+		ISC_analyze_protocol(PROTOCOL_INET, attach_name, node_name, INET_SEPARATOR) ||
 		ISC_analyze_tcp(attach_name, node_name))
 	{
 		if (node_name.isEmpty())
@@ -5551,7 +5559,8 @@ static rem_port* analyze(ClntAuthBlock&       cBlock,
                             flags & ANALYZE_UV,
                             pb,
 			                cBlock.getConfig(),
-                            ref_db_name);
+                            ref_db_name,
+                            inet_af);
 	}
 
 	// We have a local connection string. If it's a file on a network share,
@@ -6756,6 +6765,7 @@ static void receive_packet_with_callback(rem_port* port, PACKET* packet)
  *
  **************************************/
 
+	UCharBuffer buf;
 	for (;;)
 	{
 		if (!port->receive(packet))
@@ -6768,7 +6778,6 @@ static void receive_packet_with_callback(rem_port* port, PACKET* packet)
 		case op_crypt_key_callback:
 			{
 				P_CRYPT_CALLBACK* cc = &packet->p_cc;
-				UCharBuffer buf;
 
 				if (port->port_client_crypt_callback)
 				{
@@ -6779,15 +6788,19 @@ static void receive_packet_with_callback(rem_port* port, PACKET* packet)
 					UCHAR* reply = buf.getBuffer(cc->p_cc_reply);
 					unsigned l = port->port_client_crypt_callback->callback(cc->p_cc_data.cstr_length,
 						cc->p_cc_data.cstr_address, cc->p_cc_reply, reply);
+
+					REMOTE_free_packet(port, packet, true);
 					cc->p_cc_data.cstr_length = l;
 					cc->p_cc_data.cstr_address = reply;
 				}
 				else
 				{
+					REMOTE_free_packet(port, packet, true);
 					cc->p_cc_data.cstr_length = 0;
 				}
-				cc->p_cc_data.cstr_allocated = 0;
 
+				packet->p_operation = op_crypt_key_callback;
+				cc->p_cc_reply = 0;
 				port->send(packet);
 			}
 			break;

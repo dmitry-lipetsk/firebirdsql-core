@@ -777,9 +777,6 @@ void Trigger::compile(thread_db* tdbb)
 
 	if (!statement /*&& !compile_in_progress*/)
 	{
-		if (statement)
-			return;
-
 		compile_in_progress = true;
 		// Allocate statement memory pool
 		MemoryPool* new_pool = att->createPool();
@@ -7109,7 +7106,7 @@ static void getUserInfo(UserId& user, const DatabaseOptions& options,
 		else if (options.dpb_auth_block.hasData())
 		{
 			if (mapUser(name, trusted_role, &auth_method, &user.usr_auth_block, options.dpb_auth_block,
-				aliasName, dbName, (config ? (*config)->getSecurityDatabase() : NULL), cryptCb))
+				aliasName, dbName, (config ? (*config)->getSecurityDatabase() : NULL), cryptCb, NULL))
 			{
 				user.usr_flags |= USR_mapdown;
 			}
@@ -7447,7 +7444,7 @@ ISC_STATUS thread_db::checkCancelState()
 	// nor currently detaching, as these actions should never be interrupted.
 	// Also don't break wait in LM if it is not safe.
 
-	if (tdbb_flags & (TDBB_verb_cleanup | TDBB_detaching | TDBB_wait_cancel_disable))
+	if (tdbb_flags & (TDBB_verb_cleanup | TDBB_dfw_cleanup | TDBB_detaching | TDBB_wait_cancel_disable))
 		return FB_SUCCESS;
 
 	if (attachment)

@@ -2472,7 +2472,7 @@ void VIO_merge_proc_sav_points(thread_db* tdbb, jrd_tra* transaction, Savepoint*
 	for (Savepoint* sav_point = *sav_point_list; sav_point; sav_point = sav_point->sav_next)
 	{
 		Savepoint* const sav_next = sav_point->sav_next;
-		const SLONG sav_number = sav_point->sav_number;
+		const SavNumber sav_number = sav_point->sav_number;
 
 		if (!sav_point->sav_next)
 			sav_point->sav_next = org_save_point;
@@ -4034,7 +4034,9 @@ bool VIO_writelock(thread_db* tdbb, record_param* org_rpb, jrd_tra* transaction)
 
 	if (org_rpb->rpb_runtime_flags & (RPB_refetch | RPB_undo_read))
 	{
-		VIO_refetch_record(tdbb, org_rpb, transaction, false, true);
+		if (!VIO_refetch_record(tdbb, org_rpb, transaction, true, true))
+			return false;
+
 		org_rpb->rpb_runtime_flags &= ~RPB_refetch;
 		fb_assert(!(org_rpb->rpb_runtime_flags & RPB_undo_read));
 	}

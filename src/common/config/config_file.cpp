@@ -482,9 +482,9 @@ bool ConfigFile::translate(const char* fileName, const String& from, String& to)
 			TEXT temp[MAXPATHLEN];
 			const int n = readlink(fileName, temp, sizeof(temp));
 
-			if (n != -1 && unsigned(n) < sizeof(temp))
+			if (n != -1)
 			{
-				tempPath = temp;
+				tempPath.assign(temp, n);
 
 				if (PathUtils::isRelative(tempPath))
 				{
@@ -665,7 +665,7 @@ void ConfigFile::parse(Stream* stream)
 				}
 
 				previous->sub = FB_NEW_POOL(getPool())
-					ConfigFile(getPool(), &subStream, flags & ~HAS_SUB_CONF);
+					ConfigFile(getPool(), &subStream, flags);
 			}
 			break;
 		}

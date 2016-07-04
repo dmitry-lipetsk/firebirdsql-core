@@ -304,7 +304,8 @@ rem_port* XNET_analyze(ClntAuthBlock* cBlock,
 		REMOTE_PROTOCOL(PROTOCOL_VERSION10, ptype_batch_send, 1),
 		REMOTE_PROTOCOL(PROTOCOL_VERSION11, ptype_batch_send, 2),
 		REMOTE_PROTOCOL(PROTOCOL_VERSION12, ptype_batch_send, 3),
-		REMOTE_PROTOCOL(PROTOCOL_VERSION13, ptype_batch_send, 4)
+		REMOTE_PROTOCOL(PROTOCOL_VERSION13, ptype_batch_send, 4),
+		REMOTE_PROTOCOL(PROTOCOL_VERSION14, ptype_batch_send, 5)
 	};
 	fb_assert(FB_NELEM(protocols_to_try) <= FB_NELEM(cnct->p_cnct_versions));
 	cnct->p_cnct_count = FB_NELEM(protocols_to_try);
@@ -2228,7 +2229,7 @@ bool XnetServerEndPoint::server_init(USHORT flag)
 
 		make_obj_name(name_buffer, sizeof(name_buffer), XNET_CONNECT_MUTEX);
 		xnet_connect_mutex = CreateMutex(ISC_get_security_desc(), FALSE, name_buffer);
-		if (!xnet_connect_mutex || (xnet_connect_mutex && ERRNO == ERROR_ALREADY_EXISTS))
+		if (!xnet_connect_mutex || ERRNO == ERROR_ALREADY_EXISTS)
 		{
 			system_error::raise(ERR_STR("CreateMutex"));
 		}
@@ -2530,7 +2531,7 @@ rem_port* XnetServerEndPoint::get_server_port(ULONG client_pid,
 	{
 		if (port)
 			cleanup_port(port);
-		else if (xcc)
+		else
 			cleanup_comm(xcc);
 
 		throw;
