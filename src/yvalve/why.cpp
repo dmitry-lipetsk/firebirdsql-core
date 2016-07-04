@@ -5709,9 +5709,9 @@ YAttachment*
 
             fb_assert(provider);
 
-			if (cryptCallback)
+			if (this->cryptCallback)
 			{
-				provider->setDbCryptCallback(currentStatus, cryptCallback);
+				provider->setDbCryptCallback(currentStatus, this->cryptCallback);
 
 				if (currentStatus->getState() & Firebird::IStatus::STATE_ERRORS)
 					continue;
