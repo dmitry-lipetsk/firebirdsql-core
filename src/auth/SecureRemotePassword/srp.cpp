@@ -75,7 +75,9 @@ RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
 
 	hash.processInt(this->prime);
 
-	if (this->prime.length() > this->generator.length())
+	assert(sizeof(sm_primeStr) > sizeof(sm_genStr));
+
+	//if (this->prime.length() > this->generator.length())
 	{
 		size_t const pad = (sizeof(sm_primeStr) - sizeof(this->sm_genStr));
 
