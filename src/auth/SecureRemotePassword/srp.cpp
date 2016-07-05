@@ -12,46 +12,12 @@ using namespace Firebird;
 
 namespace Auth{
 ////////////////////////////////////////////////////////////////////////////////
-//class RemoteGroup
+//class RemotePassword
 
-class RemoteGroup
-{
-private:
-    typedef RemoteGroup                     self_type;
-
-    RemoteGroup(const self_type&);
-    self_type& operator = (const self_type&);
-
-public:
-    BigInteger const prime;
-    BigInteger const generator;
-    BigInteger       k;
-
-public:
-	explicit RemoteGroup(Firebird::MemoryPool&);
-
-public:
-	static RemoteGroup* getGroup()
-	{
-		return &sm_instance();
-	}
-
-private:
-    static const unsigned char sm_primeStr[];
-
-    static const unsigned char sm_genStr[];
-
-private:
-	static InitInstance<RemoteGroup> sm_instance;
-};//class RemoteGroup
-
-////////////////////////////////////////////////////////////////////////////////
-//class RemoteGroup
-
-InitInstance<RemoteGroup> RemoteGroup::sm_instance;
+const char* const RemotePassword::plugName = "Srp";
 
 //------------------------------------------------------------------------
-const unsigned char RemoteGroup::sm_primeStr[]
+const unsigned char RemotePassword::sm_primeStr[]
   ={0xE6,0x7D,0x2E,0x99,0x4B,0x2F,0x90,0x0C,0x3F,0x41,0xF0,0x8F,0x5B,0xB2,0x62,0x7E,0xD0,0xD4,0x9E,0xE1,0xFE,0x76,0x7A,0x52,0xEF,0xCD,0x56,0x5C,
     0xD6,0xE7,0x68,0x81,0x2C,0x3E,0x1E,0x9C,0xE8,0xF0,0xA8,0xBE,0xA6,0xCB,0x13,0xCD,0x29,0xDD,0xEB,0xF7,0xA9,0x6D,0x4A,0x93,0xB5,0x5D,0x48,0x8D,
     0xF0,0x99,0xA1,0x5C,0x89,0xDC,0xB0,0x64,0x07,0x38,0xEB,0x2C,0xBD,0xD9,0xA8,0xF7,0xBA,0xB5,0x61,0xAB,0x1B,0x0D,0xC1,0xC6,0xCD,0xAB,0xF3,0x03,
@@ -59,14 +25,14 @@ const unsigned char RemoteGroup::sm_primeStr[]
     0x36,0x43,0x50,0xC1,0x6F,0x73,0x5F,0x56,0xEC,0xBC,0xA8,0x7B,0xD5,0x7B,0x29,0xE7};
 
 //------------------------------------------------------------------------
-const unsigned char const RemoteGroup::sm_genStr[]
+const unsigned char const RemotePassword::sm_genStr[]
  ={0x02};
 
 //------------------------------------------------------------------------
-RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
- : prime(sizeof(sm_primeStr),sm_primeStr)
- , generator(sizeof(sm_genStr),sm_genStr)
- , k()
+RemotePassword::RemotePassword()
+	: prime(sizeof(sm_primeStr),sm_primeStr)
+    , generator(sizeof(sm_genStr),sm_genStr)
+    , k()
 {
     fb_assert(sizeof(sm_primeStr)==this->prime.length());
     fb_assert(sizeof(sm_genStr)==this->generator.length());
@@ -93,23 +59,14 @@ RemoteGroup::RemoteGroup(Firebird::MemoryPool&)
 	hash.processInt(this->generator);
 
 	hash.getInt(k);
-}//RemoteGroup
 
-////////////////////////////////////////////////////////////////////////////////
-//class RemotePassword
-
-const char* const RemotePassword::plugName = "Srp";
-
-//------------------------------------------------------------------------
-RemotePassword::RemotePassword()
-	: group(RemoteGroup::getGroup())
-{
+    //--------------------------------------
 #if SRP_DEBUG > 1
 	this->privateKey = BigInteger("60975527035CF2AD1989806F0407210BC81EDC04E2762A56AFD529DDDA2D4393");
 #else
 	this->privateKey.random(RemotePassword::SRP_KEY_SIZE);
 #endif
-	this->privateKey %= this->group->prime;
+	this->privateKey %= this->prime;
 }//RemotePassword
 
 //------------------------------------------------------------------------
@@ -140,7 +97,7 @@ BigInteger RemotePassword::computeVerifier(const string& account,
 {
 	const BigInteger x(getUserHash(account.c_str(), salt.c_str(), password.c_str()));
 
-	return this->group->generator.modPow(x, this->group->prime);
+	return this->generator.modPow(x, this->prime);
 }//computeVerifier
 
 //------------------------------------------------------------------------
@@ -148,7 +105,7 @@ void RemotePassword::genClientKey(string& pubkey)
 {
 	dumpIt("privateKey(C)", this->privateKey);
 
-	this->clientPublicKey = this->group->generator.modPow(this->privateKey, this->group->prime);
+	this->clientPublicKey = this->generator.modPow(this->privateKey, this->prime);
 
 	this->clientPublicKey.getText(pubkey);
 
@@ -161,17 +118,17 @@ void RemotePassword::genServerKey(string&                      pubkey,
 {
 	dumpIt("privateKey(S)", this->privateKey);
 
-	const BigInteger gb(this->group->generator.modPow(this->privateKey, this->group->prime));	// g^b
+	const BigInteger gb(this->generator.modPow(this->privateKey, this->prime));	// g^b
 
 	dumpIt("gb", gb);
 
 	const BigInteger v(verifier);											// v
 
-	const BigInteger kv = (this->group->k * v) % this->group->prime;
+	const BigInteger kv = (this->k * v) % this->prime;
 
 	dumpIt("kv", kv);
 
-	this->serverPublicKey = (kv + gb) % this->group->prime;
+	this->serverPublicKey = (kv + gb) % this->prime;
 
 	this->serverPublicKey.getText(pubkey);
 
@@ -213,23 +170,23 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("x", x);
 
-	const BigInteger gx = this->group->generator.modPow(x, this->group->prime);	// g^x
+	const BigInteger gx = this->generator.modPow(x, this->prime);	// g^x
 
-	const BigInteger kgx = (this->group->k * gx) % this->group->prime;			// kg^x
+	const BigInteger kgx = (this->k * gx) % this->prime;			// kg^x
 
 	dumpIt("kgx", kgx);
 
-	const BigInteger diff = (this->serverPublicKey - kgx) % this->group->prime;	// B - kg^x
+	const BigInteger diff = (this->serverPublicKey - kgx) % this->prime;	// B - kg^x
 
-	const BigInteger ux = (scramble * x) % this->group->prime;			// ux
+	const BigInteger ux = (scramble * x) % this->prime;			// ux
 
-	const BigInteger aux = (this->privateKey + ux) % this->group->prime;	// A + ux
+	const BigInteger aux = (this->privateKey + ux) % this->prime;	// A + ux
 
 	dumpIt("clientPrivateKey", this->privateKey);
 
 	dumpIt("aux", aux);
 
-	const BigInteger sessionSecret = diff.modPow(aux, this->group->prime);// (B - kg^x) ^ (a + ux)
+	const BigInteger sessionSecret = diff.modPow(aux, this->prime);// (B - kg^x) ^ (a + ux)
 
 	dumpIt("sessionSecret", sessionSecret);
 
@@ -251,13 +208,13 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	const BigInteger v = BigInteger(verifier);
 
-	const BigInteger vu = v.modPow(scramble, this->group->prime);					// v^u
+	const BigInteger vu = v.modPow(scramble, this->prime);					// v^u
 
-	const BigInteger Avu = (this->clientPublicKey * vu) % this->group->prime;		// Av^u
+	const BigInteger Avu = (this->clientPublicKey * vu) % this->prime;		// Av^u
 
 	dumpIt("Avu", Avu);
 
-	const BigInteger sessionSecret = Avu.modPow(this->privateKey, this->group->prime);	// (Av^u) ^ b
+	const BigInteger sessionSecret = Avu.modPow(this->privateKey, this->prime);	// (Av^u) ^ b
 
 	dumpIt("serverPrivateKey", this->privateKey);
 
@@ -277,15 +234,15 @@ BigInteger RemotePassword::clientProof(const char*  const account,
                                        const UCharBuffer& sessionKey)
 {
 	this->hash.reset();
-	this->hash.processInt(this->group->prime);
+	this->hash.processInt(this->prime);
 	BigInteger n1;
 	this->hash.getInt(n1);
 
 	this->hash.reset();
-	this->hash.processInt(this->group->generator);
+	this->hash.processInt(this->generator);
 	BigInteger n2;
 	this->hash.getInt(n2);
-	n1 = n1.modPow(n2, this->group->prime);
+	n1 = n1.modPow(n2, this->prime);
 
 	this->hash.reset();
 	this->hash.process(account);

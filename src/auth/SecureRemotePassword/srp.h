@@ -45,8 +45,6 @@ namespace Auth{
  *
  */
 
-class RemoteGroup;
-
 ////////////////////////////////////////////////////////////////////////////////
 //class Sha1
 
@@ -144,10 +142,18 @@ public:
 									 const Firebird::UCharBuffer& sessionKey);
 
 private:
-	const RemoteGroup* const group;
 	Auth::Sha1               hash;
 	Firebird::BigInteger     privateKey;
 	Firebird::BigInteger     scramble;
+
+    Firebird::BigInteger const prime;
+    Firebird::BigInteger const generator;
+    Firebird::BigInteger       k;
+
+private:
+    static const unsigned char sm_primeStr[];
+
+    static const unsigned char sm_genStr[];
 };//class RemotePassword
 
 ////////////////////////////////////////////////////////////////////////////////
