@@ -66,7 +66,7 @@ public:
 	void getInt(Firebird::BigInteger& hash)
 	{
 		Firebird::UCharBuffer tmp;
-		getHash(tmp);
+		this->getHash(tmp);
 		hash.assign(tmp.getCount(), tmp.begin());
 	}
 
@@ -74,7 +74,7 @@ public:
 	{
 		Firebird::UCharBuffer bytes;
 		data.getBytes(bytes);
-		process(bytes);
+		this->process(bytes);
 	}
 
 	void processStrippedInt(const Firebird::BigInteger& data)
@@ -83,8 +83,9 @@ public:
 		data.getBytes(bytes);
 		if (bytes.getCount())
 		{
-			unsigned int n = (bytes[0] == 0) ? 1u : 0;
-			process(bytes.getCount() - n, bytes.begin() + n);
+			const unsigned int n = (bytes[0] == 0) ? 1u : 0;
+
+			this->process(bytes.getCount() - n, bytes.begin() + n);
 		}
 	}
 };//class Sha1
