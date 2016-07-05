@@ -173,29 +173,30 @@ public:
 	{ }
 	void init()
 	{
-		if (!flag)
+		if (!this->flag)
 		{
 			MutexLockGuard guard(*StaticMutex::mutex, FB_LOCKED_FROM);
-			if (!flag)
+			if (!this->flag)
 			{
 				C::init();
-				flag = true;
+				this->flag = true;
 			}
 		}
 	}
 	void cleanup()
 	{
-		if (flag)
+		if (this->flag)
 		{
 			MutexLockGuard guard(*StaticMutex::mutex, FB_LOCKED_FROM);
-			if (flag)
+			if (this->flag)
 			{
 				C::cleanup();
-				flag = false;
+				this->flag = false;
 			}
 		}
 	}
-};
+};//class InitMutex
+
 #undef FB_LOCKED_FROM
 
 ////////////////////////////////////////////////////////////////////////////////
