@@ -343,14 +343,14 @@ public:
 	MutexLockGuard(Mutex& aLock, const char* aReason)
 		: lock(&aLock)
 	{
-		lock->enter(aReason);
+		this->lock->enter(aReason);
 	}
 
 	~MutexLockGuard()
 	{
 		try
 		{
-			lock->leave();
+			this->lock->leave();
 		}
 		catch (const Exception&)
 		{
