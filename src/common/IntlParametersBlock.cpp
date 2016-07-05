@@ -107,24 +107,26 @@ namespace Firebird
 
 void IntlParametersBlock::toUtf8(ClumpletWriter& pb)
 {
-	UCHAR utf8Tag = getUtf8Tag();
+	const UCHAR utf8Tag = this->getUtf8Tag();
+
 	if (utf8Tag)
 	{
 		pb.insertTag(utf8Tag);
 	}
 
-	processParametersBlock(strToUtf8, pb);
+	this->processParametersBlock(strToUtf8, pb);
 }
 
 void IntlParametersBlock::fromUtf8(ClumpletWriter& pb)
 {
-	UCHAR utf8Tag = getUtf8Tag();
+	const UCHAR utf8Tag = this->getUtf8Tag();
+
 	if (utf8Tag)
 	{
 		pb.deleteWithTag(utf8Tag);
 	}
 
-	processParametersBlock(strFromUtf8, pb);
+	this->processParametersBlock(strFromUtf8, pb);
 }
 
 
