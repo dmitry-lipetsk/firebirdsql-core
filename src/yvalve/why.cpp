@@ -5656,7 +5656,8 @@ YAttachment*
 			status_exception::raise(Arg::Gds(isc_bad_dpb_form));
 
 		ClumpletWriter newDpb(ClumpletReader::dpbList, MAX_DPB_SIZE, dpb, dpbLength);
-		bool utfData = newDpb.find(isc_dpb_utf8_filename);
+
+		const bool utfData = newDpb.find(isc_dpb_utf8_filename);
 
 		// Take care about DPB
 		setLogin(newDpb, false);
