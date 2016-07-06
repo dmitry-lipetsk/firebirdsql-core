@@ -126,7 +126,6 @@ private:
 	}
 
 private:
-	Firebird::Sha1           hash;
 	Firebird::BigInteger     privateKey;
 	Firebird::BigInteger     scramble;
 

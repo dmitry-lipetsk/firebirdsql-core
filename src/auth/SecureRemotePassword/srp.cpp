@@ -75,18 +75,20 @@ BigInteger RemotePassword::getUserHash(const char* const account,
                                        const char* const salt,
                                        const char* const password)
 {
-	this->hash.reset();
-	this->hash.process(account);
-	this->hash.process(":");
-	this->hash.process(password);
-	UCharBuffer hash1;
-	this->hash.getHash(hash1);
+	Firebird::Sha1 hash;
 
-	this->hash.reset();
-	this->hash.process(salt);
-	this->hash.process(hash1);
+	//hash.reset();
+	hash.process(account);
+	hash.process(":");
+	hash.process(password);
+	UCharBuffer hash1;
+	hash.getHash(hash1);
+
+	hash.reset();
+	hash.process(salt);
+	hash.process(hash1);
 	BigInteger rc;
-	helper__getInt(this->hash,&rc);
+	helper__getInt(hash,&rc);
 
 	return rc;
 }//getUserHash
@@ -139,17 +141,19 @@ void RemotePassword::genServerKey(string&                      pubkey,
 //------------------------------------------------------------------------
 void RemotePassword::computeScramble()
 {
-	this->hash.reset();
+	Firebird::Sha1 hash;
+
+	//hash.reset();
 
 	dumpIt("computeScramble: clientPublicKey", this->clientPublicKey);
 
-	helper__processStrippedInt(this->clientPublicKey,&this->hash);
+	helper__processStrippedInt(this->clientPublicKey,&hash);
 
 	dumpIt("computeScramble: serverPublicKey", this->serverPublicKey);
 
-	helper__processStrippedInt(this->serverPublicKey,&this->hash);
+	helper__processStrippedInt(this->serverPublicKey,&hash);
 
-	helper__getInt(this->hash,&this->scramble);
+	helper__getInt(hash,&this->scramble);
 }//computeScramble
 
 //------------------------------------------------------------------------
@@ -191,9 +195,11 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("sessionSecret", sessionSecret);
 
-	this->hash.reset();
-	helper__processStrippedInt(sessionSecret,&this->hash);
-	this->hash.getHash(sessionKey);
+	Firebird::Sha1 hash;
+
+	//hash.reset();
+	helper__processStrippedInt(sessionSecret,&hash);
+	hash.getHash(sessionKey);
 }//clientSessionKey
 
 //------------------------------------------------------------------------
@@ -221,9 +227,11 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	dumpIt("sessionSecret", sessionSecret);
 
-	this->hash.reset();
-	helper__processStrippedInt(sessionSecret,&this->hash);
-	this->hash.getHash(sessionKey);
+	Firebird::Sha1 hash;
+
+	//hash.reset();
+	helper__processStrippedInt(sessionSecret,&hash);
+	hash.getHash(sessionKey);
 }//serverSessionKey
 
 //------------------------------------------------------------------------
@@ -234,31 +242,33 @@ BigInteger RemotePassword::clientProof(const char*  const account,
                                        const char*  const salt,
                                        const UCharBuffer& sessionKey)
 {
-	this->hash.reset();
-	helper__processInt(this->prime,&this->hash);
-	BigInteger n1;
-	helper__getInt(this->hash,&n1);
+	Firebird::Sha1 hash;
 
-	this->hash.reset();
-	helper__processInt(this->generator,&this->hash);
+	//hash.reset();
+	helper__processInt(this->prime,&hash);
+	BigInteger n1;
+	helper__getInt(hash,&n1);
+
+	hash.reset();
+	helper__processInt(this->generator,&hash);
 	BigInteger n2;
-	helper__getInt(this->hash,&n2);
+	helper__getInt(hash,&n2);
 	n1 = n1.modPow(n2, this->prime);
 
-	this->hash.reset();
-	this->hash.process(account);
-	helper__getInt(this->hash,&n2);
+	hash.reset();
+	hash.process(account);
+	helper__getInt(hash,&n2);
 
-	this->hash.reset();
-	helper__processInt(n1,&this->hash);				// H(prime) ^ H(g)
-	helper__processInt(n2,&this->hash);				// H(I)
-	this->hash.process(salt);					// s
-	helper__processInt(this->clientPublicKey,&this->hash);	// A
-	helper__processInt(this->serverPublicKey,&this->hash);	// B
-	this->hash.process(sessionKey);			// K
+	hash.reset();
+	helper__processInt(n1,&hash);				// H(prime) ^ H(g)
+	helper__processInt(n2,&hash);				// H(I)
+	hash.process(salt);					// s
+	helper__processInt(this->clientPublicKey,&hash);	// A
+	helper__processInt(this->serverPublicKey,&hash);	// B
+	hash.process(sessionKey);			// K
 
 	BigInteger rc;
-	helper__getInt(this->hash,&rc);
+	helper__getInt(hash,&rc);
 	return rc;
 }//clientProof
 
