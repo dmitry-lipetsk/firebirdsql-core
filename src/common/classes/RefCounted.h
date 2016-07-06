@@ -216,6 +216,11 @@ public:
 		return this->ptr;
 	}
 
+	void Release()
+	{
+		this->helper__release();
+	}
+
 private:
 	self_type& helper__assign(T* const p)
 	{
