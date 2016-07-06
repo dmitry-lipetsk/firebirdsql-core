@@ -39,7 +39,9 @@ RemotePassword::RemotePassword()
 
 	Firebird::Sha1 hash;
 
-	helper__processInt(this->prime,&hash);
+    Firebird::UCharBuffer tmp_bytes;
+
+    helper__processInt(tmp_bytes,this->prime,&hash);
 
 	assert(sizeof(sm_primeStr) > sizeof(sm_genStr));
 
@@ -56,10 +58,10 @@ RemotePassword::RemotePassword()
 		hash.process(pad, pb);
 	}//if
 
-	helper__processInt(this->generator,&hash);
+	helper__processInt(tmp_bytes,this->generator,&hash);
 
 	//finish initialization of members
-	helper__getInt(hash,&const_cast<Firebird::BigInteger&>(this->k));
+	helper__getInt(tmp_bytes,hash,&const_cast<Firebird::BigInteger&>(this->k));
 
     //--------------------------------------
 #if SRP_DEBUG > 1
@@ -77,6 +79,8 @@ BigInteger RemotePassword::getUserHash(const char* const account,
 {
 	Firebird::Sha1 hash;
 
+    Firebird::UCharBuffer tmp_bytes;
+
 	//hash.reset();
 	hash.process(account);
 	hash.process(":");
@@ -88,7 +92,7 @@ BigInteger RemotePassword::getUserHash(const char* const account,
 	hash.process(salt);
 	hash.process(hash1);
 	BigInteger rc;
-	helper__getInt(hash,&rc);
+	helper__getInt(tmp_bytes,hash,&rc);
 
 	return rc;
 }//getUserHash
@@ -143,17 +147,19 @@ void RemotePassword::computeScramble()
 {
 	Firebird::Sha1 hash;
 
+    Firebird::UCharBuffer tmp_bytes;
+
 	//hash.reset();
 
 	dumpIt("computeScramble: clientPublicKey", this->clientPublicKey);
 
-	helper__processStrippedInt(this->clientPublicKey,&hash);
+	helper__processStrippedInt(tmp_bytes,this->clientPublicKey,&hash);
 
 	dumpIt("computeScramble: serverPublicKey", this->serverPublicKey);
 
-	helper__processStrippedInt(this->serverPublicKey,&hash);
+	helper__processStrippedInt(tmp_bytes,this->serverPublicKey,&hash);
 
-	helper__getInt(hash,&this->scramble);
+	helper__getInt(tmp_bytes,hash,&this->scramble);
 }//computeScramble
 
 //------------------------------------------------------------------------
@@ -197,8 +203,10 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 
 	Firebird::Sha1 hash;
 
+    Firebird::UCharBuffer tmp_bytes;
+
 	//hash.reset();
-	helper__processStrippedInt(sessionSecret,&hash);
+	helper__processStrippedInt(tmp_bytes,sessionSecret,&hash);
 	hash.getHash(sessionKey);
 }//clientSessionKey
 
@@ -229,8 +237,10 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 
 	Firebird::Sha1 hash;
 
+    Firebird::UCharBuffer tmp_bytes;
+
 	//hash.reset();
-	helper__processStrippedInt(sessionSecret,&hash);
+	helper__processStrippedInt(tmp_bytes,sessionSecret,&hash);
 	hash.getHash(sessionKey);
 }//serverSessionKey
 
@@ -244,31 +254,33 @@ BigInteger RemotePassword::clientProof(const char*  const account,
 {
 	Firebird::Sha1 hash;
 
+    Firebird::UCharBuffer tmp_bytes;
+
 	//hash.reset();
-	helper__processInt(this->prime,&hash);
+	helper__processInt(tmp_bytes,this->prime,&hash);
 	BigInteger n1;
-	helper__getInt(hash,&n1);
+	helper__getInt(tmp_bytes,hash,&n1);
 
 	hash.reset();
-	helper__processInt(this->generator,&hash);
+	helper__processInt(tmp_bytes,this->generator,&hash);
 	BigInteger n2;
-	helper__getInt(hash,&n2);
+	helper__getInt(tmp_bytes,hash,&n2);
 	n1 = n1.modPow(n2, this->prime);
 
 	hash.reset();
 	hash.process(account);
-	helper__getInt(hash,&n2);
+	helper__getInt(tmp_bytes,hash,&n2);
 
 	hash.reset();
-	helper__processInt(n1,&hash);				// H(prime) ^ H(g)
-	helper__processInt(n2,&hash);				// H(I)
+	helper__processInt(tmp_bytes,n1,&hash);				// H(prime) ^ H(g)
+	helper__processInt(tmp_bytes,n2,&hash);				// H(I)
 	hash.process(salt);					// s
-	helper__processInt(this->clientPublicKey,&hash);	// A
-	helper__processInt(this->serverPublicKey,&hash);	// B
+	helper__processInt(tmp_bytes,this->clientPublicKey,&hash);	// A
+	helper__processInt(tmp_bytes,this->serverPublicKey,&hash);	// B
 	hash.process(sessionKey);			// K
 
 	BigInteger rc;
-	helper__getInt(hash,&rc);
+	helper__getInt(tmp_bytes,hash,&rc);
 	return rc;
 }//clientProof
 

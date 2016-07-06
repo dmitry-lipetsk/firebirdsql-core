@@ -99,29 +99,35 @@ public:
 									 const Firebird::UCharBuffer& sessionKey);
 
 private:
-	static void helper__getInt(Firebird::Sha1& sha1,Firebird::BigInteger* const hash)
+	static void helper__getInt(Firebird::UCharBuffer&      tmp_bytes,
+							   Firebird::Sha1&             sha1,
+							   Firebird::BigInteger* const hash)
 	{
-		Firebird::UCharBuffer tmp;
-		sha1.getHash(tmp);
-		hash->assign(tmp.getCount(), tmp.begin());
+		sha1.getHash(tmp_bytes);
+
+		hash->assign(tmp_bytes.getCount(), tmp_bytes.begin());
 	}
 
-	static void helper__processInt(const Firebird::BigInteger& data,Firebird::Sha1* const sha1)
+	static void helper__processInt(Firebird::UCharBuffer&      tmp_bytes,
+							       const Firebird::BigInteger& data,
+								   Firebird::Sha1* const       sha1)
 	{
-		Firebird::UCharBuffer bytes;
-		data.getBytes(bytes);
-		sha1->process(bytes);
+		data.getBytes(tmp_bytes);
+
+		sha1->process(tmp_bytes);
 	}
 
-	static void helper__processStrippedInt(const Firebird::BigInteger& data,Firebird::Sha1* const sha1)
+	static void helper__processStrippedInt(Firebird::UCharBuffer&      tmp_bytes,
+										   const Firebird::BigInteger& data,
+										   Firebird::Sha1* const       sha1)
 	{
-		Firebird::UCharBuffer bytes;
-		data.getBytes(bytes);
-		if (bytes.getCount())
+		data.getBytes(tmp_bytes);
+
+		if (tmp_bytes.getCount())
 		{
-			const unsigned int n = (bytes[0] == 0) ? 1u : 0;
+			const unsigned int n = (tmp_bytes[0] == 0) ? 1u : 0;
 
-			sha1->process(bytes.getCount() - n, bytes.begin() + n);
+			sha1->process(tmp_bytes.getCount() - n, tmp_bytes.begin() + n);
 		}
 	}
 
