@@ -143,11 +143,11 @@ void RemotePassword::computeScramble()
 
 	dumpIt("computeScramble: clientPublicKey", this->clientPublicKey);
 
-	this->hash.processStrippedInt(this->clientPublicKey);
+	helper__processStrippedInt(this->clientPublicKey,&this->hash);
 
 	dumpIt("computeScramble: serverPublicKey", this->serverPublicKey);
 
-	this->hash.processStrippedInt(this->serverPublicKey);
+	helper__processStrippedInt(this->serverPublicKey,&this->hash);
 
 	helper__getInt(this->hash,&this->scramble);
 }//computeScramble
@@ -192,7 +192,7 @@ void RemotePassword::clientSessionKey(UCharBuffer&       sessionKey,
 	dumpIt("sessionSecret", sessionSecret);
 
 	this->hash.reset();
-	this->hash.processStrippedInt(sessionSecret);
+	helper__processStrippedInt(sessionSecret,&this->hash);
 	this->hash.getHash(sessionKey);
 }//clientSessionKey
 
@@ -222,7 +222,7 @@ void RemotePassword::serverSessionKey(UCharBuffer&       sessionKey,
 	dumpIt("sessionSecret", sessionSecret);
 
 	this->hash.reset();
-	this->hash.processStrippedInt(sessionSecret);
+	helper__processStrippedInt(sessionSecret,&this->hash);
 	this->hash.getHash(sessionKey);
 }//serverSessionKey
 
