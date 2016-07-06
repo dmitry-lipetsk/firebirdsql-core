@@ -61,13 +61,6 @@ public:
     {
     }
 
-	void processInt(const Firebird::BigInteger& data)
-	{
-		Firebird::UCharBuffer bytes;
-		data.getBytes(bytes);
-		this->process(bytes);
-	}
-
 	void processStrippedInt(const Firebird::BigInteger& data)
 	{
 		Firebird::UCharBuffer bytes;
@@ -140,6 +133,13 @@ private:
 		Firebird::UCharBuffer tmp;
 		sha1.getHash(tmp);
 		hash->assign(tmp.getCount(), tmp.begin());
+	}
+
+	static void helper__processInt(const Firebird::BigInteger& data,Firebird::Sha1* const sha1)
+	{
+		Firebird::UCharBuffer bytes;
+		data.getBytes(bytes);
+		sha1->process(bytes);
 	}
 
 private:

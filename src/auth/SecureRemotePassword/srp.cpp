@@ -39,7 +39,7 @@ RemotePassword::RemotePassword()
 
 	Auth::Sha1 hash;
 
-	hash.processInt(this->prime);
+	helper__processInt(this->prime,&hash);
 
 	assert(sizeof(sm_primeStr) > sizeof(sm_genStr));
 
@@ -56,7 +56,7 @@ RemotePassword::RemotePassword()
 		hash.process(pad, pb);
 	}//if
 
-	hash.processInt(this->generator);
+	helper__processInt(this->generator,&hash);
 
 	//finish initialization of members
 	helper__getInt(hash,&const_cast<Firebird::BigInteger&>(this->k));
@@ -235,12 +235,12 @@ BigInteger RemotePassword::clientProof(const char*  const account,
                                        const UCharBuffer& sessionKey)
 {
 	this->hash.reset();
-	this->hash.processInt(this->prime);
+	helper__processInt(this->prime,&this->hash);
 	BigInteger n1;
 	helper__getInt(this->hash,&n1);
 
 	this->hash.reset();
-	this->hash.processInt(this->generator);
+	helper__processInt(this->generator,&this->hash);
 	BigInteger n2;
 	helper__getInt(this->hash,&n2);
 	n1 = n1.modPow(n2, this->prime);
@@ -250,11 +250,11 @@ BigInteger RemotePassword::clientProof(const char*  const account,
 	helper__getInt(this->hash,&n2);
 
 	this->hash.reset();
-	this->hash.processInt(n1);				// H(prime) ^ H(g)
-	this->hash.processInt(n2);				// H(I)
+	helper__processInt(n1,&this->hash);				// H(prime) ^ H(g)
+	helper__processInt(n2,&this->hash);				// H(I)
 	this->hash.process(salt);					// s
-	this->hash.processInt(this->clientPublicKey);	// A
-	this->hash.processInt(this->serverPublicKey);	// B
+	helper__processInt(this->clientPublicKey,&this->hash);	// A
+	helper__processInt(this->serverPublicKey,&this->hash);	// B
 	this->hash.process(sessionKey);			// K
 
 	BigInteger rc;
