@@ -37,7 +37,7 @@ RemotePassword::RemotePassword()
     fb_assert(sizeof(sm_primeStr)==this->prime.length());
     fb_assert(sizeof(sm_genStr)==this->generator.length());
 
-	Auth::Sha1 hash;
+	Firebird::Sha1 hash;
 
 	helper__processInt(this->prime,&hash);
 
