@@ -25,7 +25,7 @@ const unsigned char RemotePassword::sm_primeStr[]
     0x36,0x43,0x50,0xC1,0x6F,0x73,0x5F,0x56,0xEC,0xBC,0xA8,0x7B,0xD5,0x7B,0x29,0xE7};
 
 //------------------------------------------------------------------------
-const unsigned char const RemotePassword::sm_genStr[]
+const unsigned char RemotePassword::sm_genStr[]
  ={0x02};
 
 //------------------------------------------------------------------------
