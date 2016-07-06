@@ -59,7 +59,7 @@ RemotePassword::RemotePassword()
 	hash.processInt(this->generator);
 
 	//finish initialization of members
-	hash.getInt(const_cast<Firebird::BigInteger&>(this->k));
+	helper__getInt(hash,&const_cast<Firebird::BigInteger&>(this->k));
 
     //--------------------------------------
 #if SRP_DEBUG > 1
@@ -86,7 +86,7 @@ BigInteger RemotePassword::getUserHash(const char* const account,
 	this->hash.process(salt);
 	this->hash.process(hash1);
 	BigInteger rc;
-	this->hash.getInt(rc);
+	helper__getInt(this->hash,&rc);
 
 	return rc;
 }//getUserHash
@@ -149,7 +149,7 @@ void RemotePassword::computeScramble()
 
 	this->hash.processStrippedInt(this->serverPublicKey);
 
-	this->hash.getInt(scramble);
+	helper__getInt(this->hash,&this->scramble);
 }//computeScramble
 
 //------------------------------------------------------------------------
@@ -237,17 +237,17 @@ BigInteger RemotePassword::clientProof(const char*  const account,
 	this->hash.reset();
 	this->hash.processInt(this->prime);
 	BigInteger n1;
-	this->hash.getInt(n1);
+	helper__getInt(this->hash,&n1);
 
 	this->hash.reset();
 	this->hash.processInt(this->generator);
 	BigInteger n2;
-	this->hash.getInt(n2);
+	helper__getInt(this->hash,&n2);
 	n1 = n1.modPow(n2, this->prime);
 
 	this->hash.reset();
 	this->hash.process(account);
-	this->hash.getInt(n2);
+	helper__getInt(this->hash,&n2);
 
 	this->hash.reset();
 	this->hash.processInt(n1);				// H(prime) ^ H(g)
@@ -258,7 +258,7 @@ BigInteger RemotePassword::clientProof(const char*  const account,
 	this->hash.process(sessionKey);			// K
 
 	BigInteger rc;
-	this->hash.getInt(rc);
+	helper__getInt(this->hash,&rc);
 	return rc;
 }//clientProof
 

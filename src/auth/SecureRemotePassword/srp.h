@@ -61,13 +61,6 @@ public:
     {
     }
 
-	void getInt(Firebird::BigInteger& hash)
-	{
-		Firebird::UCharBuffer tmp;
-		this->getHash(tmp);
-		hash.assign(tmp.getCount(), tmp.begin());
-	}
-
 	void processInt(const Firebird::BigInteger& data)
 	{
 		Firebird::UCharBuffer bytes;
@@ -140,6 +133,14 @@ public:
 	Firebird::BigInteger clientProof(const char*                  account,
 									 const char*                  salt,
 									 const Firebird::UCharBuffer& sessionKey);
+
+private:
+	static void helper__getInt(Firebird::Sha1& sha1,Firebird::BigInteger* const hash)
+	{
+		Firebird::UCharBuffer tmp;
+		sha1.getHash(tmp);
+		hash->assign(tmp.getCount(), tmp.begin());
+	}
 
 private:
 	Auth::Sha1               hash;
