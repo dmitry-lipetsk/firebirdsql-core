@@ -58,7 +58,8 @@ RemotePassword::RemotePassword()
 
 	hash.processInt(this->generator);
 
-	hash.getInt(k);
+	//finish initialization of members
+	hash.getInt(const_cast<Firebird::BigInteger&>(this->k));
 
     //--------------------------------------
 #if SRP_DEBUG > 1

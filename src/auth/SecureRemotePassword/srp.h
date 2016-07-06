@@ -148,7 +148,7 @@ private:
 
     Firebird::BigInteger const prime;
     Firebird::BigInteger const generator;
-    Firebird::BigInteger       k;
+    Firebird::BigInteger const k;
 
 private:
     static const unsigned char sm_primeStr[];
