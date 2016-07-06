@@ -284,6 +284,41 @@ BigInteger RemotePassword::clientProof(const char*  const account,
 	return rc;
 }//clientProof
 
+//------------------------------------------------------------------------
+void RemotePassword::helper__getInt(Firebird::UCharBuffer&      tmp_bytes,
+							        Firebird::Sha1&             sha1,
+							        Firebird::BigInteger* const hash)
+{
+	sha1.getHash(tmp_bytes);
+
+	hash->assign(tmp_bytes.getCount(), tmp_bytes.begin());
+}//helper__getInt
+
+//------------------------------------------------------------------------
+void RemotePassword::helper__processInt(Firebird::UCharBuffer&      tmp_bytes,
+							            const Firebird::BigInteger& data,
+								        Firebird::Sha1* const       sha1)
+{
+	data.getBytes(tmp_bytes);
+
+	sha1->process(tmp_bytes);
+}//helper__processInt
+
+//------------------------------------------------------------------------
+void RemotePassword::helper__processStrippedInt(Firebird::UCharBuffer&      tmp_bytes,
+										        const Firebird::BigInteger& data,
+										        Firebird::Sha1* const       sha1)
+{
+	data.getBytes(tmp_bytes);
+
+	if (tmp_bytes.getCount())
+	{
+		const unsigned int n = (tmp_bytes[0] == 0) ? 1u : 0;
+
+		sha1->process(tmp_bytes.getCount() - n, tmp_bytes.begin() + n);
+	}
+}//helper__processStrippedInt
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #if SRP_DEBUG > 0

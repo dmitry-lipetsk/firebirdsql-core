@@ -101,35 +101,15 @@ public:
 private:
 	static void helper__getInt(Firebird::UCharBuffer&      tmp_bytes,
 							   Firebird::Sha1&             sha1,
-							   Firebird::BigInteger* const hash)
-	{
-		sha1.getHash(tmp_bytes);
-
-		hash->assign(tmp_bytes.getCount(), tmp_bytes.begin());
-	}
+							   Firebird::BigInteger* const hash);
 
 	static void helper__processInt(Firebird::UCharBuffer&      tmp_bytes,
 							       const Firebird::BigInteger& data,
-								   Firebird::Sha1* const       sha1)
-	{
-		data.getBytes(tmp_bytes);
-
-		sha1->process(tmp_bytes);
-	}
+								   Firebird::Sha1* const       sha1);
 
 	static void helper__processStrippedInt(Firebird::UCharBuffer&      tmp_bytes,
 										   const Firebird::BigInteger& data,
-										   Firebird::Sha1* const       sha1)
-	{
-		data.getBytes(tmp_bytes);
-
-		if (tmp_bytes.getCount())
-		{
-			const unsigned int n = (tmp_bytes[0] == 0) ? 1u : 0;
-
-			sha1->process(tmp_bytes.getCount() - n, tmp_bytes.begin() + n);
-		}
-	}
+										   Firebird::Sha1* const       sha1);
 
 private:
 	Firebird::BigInteger     privateKey;
