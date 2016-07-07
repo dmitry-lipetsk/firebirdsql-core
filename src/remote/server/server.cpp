@@ -4965,7 +4965,7 @@ static void release_request( Rrq* request, bool rlsIface)
 	if (rlsIface && request->rrq_iface)
 	{
 		request->rrq_iface->release();
-		request->rrq_iface = NULL;
+		request->rrq_iface = nullptr;
 	}
 
 	Rdb* rdb = request->rrq_rdb;
