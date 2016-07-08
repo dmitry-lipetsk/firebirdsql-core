@@ -123,6 +123,8 @@ private:
     static const unsigned char sm_primeStr[];
 
     static const unsigned char sm_genStr[];
+
+    static const unsigned char sm_kStr[];
 };//class RemotePassword
 
 ////////////////////////////////////////////////////////////////////////////////

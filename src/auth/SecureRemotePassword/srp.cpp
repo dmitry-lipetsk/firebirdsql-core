@@ -29,41 +29,15 @@ const unsigned char RemotePassword::sm_genStr[]
  ={0x02};
 
 //------------------------------------------------------------------------
+const unsigned char RemotePassword::sm_kStr[]
+ ={0xDF,0xC2,0x12,0xB4,0xBD,0x69,0x67,0x48,0x55,0xCF,0xCE,0xB3,0x00,0x02,0xB5,0xC3,0x06,0xAC,0x60,0xB5};
+
+//------------------------------------------------------------------------
 RemotePassword::RemotePassword()
 	: prime(sizeof(sm_primeStr),sm_primeStr)
     , generator(sizeof(sm_genStr),sm_genStr)
-    , k()
+    , k(sizeof(sm_kStr),sm_kStr)
 {
-    fb_assert(sizeof(sm_primeStr)==this->prime.length());
-    fb_assert(sizeof(sm_genStr)==this->generator.length());
-
-	Firebird::Sha1 hash;
-
-    Firebird::UCharBuffer tmp_bytes;
-
-    helper__processInt(tmp_bytes,this->prime,&hash);
-
-	assert(sizeof(sm_primeStr) > sizeof(sm_genStr));
-
-	//if (this->prime.length() > this->generator.length())
-	{
-		size_t const pad = (sizeof(sm_primeStr) - sizeof(this->sm_genStr));
-
-		char pb[1024];
-
-        fb_assert(pad<=sizeof(pb));
-
-		memset(pb, 0, pad);
-
-		hash.process(pad, pb);
-	}//if
-
-	helper__processInt(tmp_bytes,this->generator,&hash);
-
-	//finish initialization of members
-	helper__getInt(tmp_bytes,hash,&const_cast<Firebird::BigInteger&>(this->k));
-
-    //--------------------------------------
 #if SRP_DEBUG > 1
 	this->privateKey = BigInteger("60975527035CF2AD1989806F0407210BC81EDC04E2762A56AFD529DDDA2D4393");
 #else
@@ -77,6 +51,11 @@ BigInteger RemotePassword::getUserHash(const char* const account,
                                        const char* const salt,
                                        const char* const password)
 {
+    //[2016-07-08]
+    fb_assert(account);
+    fb_assert(salt);
+    fb_assert(password);
+
 	Firebird::Sha1 hash;
 
     Firebird::UCharBuffer tmp_bytes;
