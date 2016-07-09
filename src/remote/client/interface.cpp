@@ -7855,13 +7855,19 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* const status)
 
 	try
 	{
-		InternalCryptKey* k = FB_NEW InternalCryptKey;
+		InternalCryptKey* k = FB_NEW InternalCryptKey; //throw
 
 		fb_assert(this->plugins.hasData());
 
-		k->t = this->plugins.name();
+		k->t = this->plugins.name(); //throw
 
-		this->cryptKeys.add(k);
+        //! \todo
+        //!  BUG: possible memory leaks (k) ?
+
+		this->cryptKeys.add(k); //throw
+
+        //! \todo
+        //!  BUG: possible memory leaks (k) ?
 
 		return k;
 	}
