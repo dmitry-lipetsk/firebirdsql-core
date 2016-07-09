@@ -899,7 +899,7 @@ LegacyPlugin REMOTE_legacy_auth(const char* nm, int p)
 //------------------------------------------------------------------------
 Firebird::PathName ClntAuthBlock::getPluginName()const
 {
-	return plugins.hasData() ? plugins.name() : "";
+	return this->plugins.hasData() ? this->plugins.name() : "";
 }//getPluginName
 
 //------------------------------------------------------------------------
