@@ -1710,7 +1710,7 @@ const void* InternalCryptKey::getDecryptKey(unsigned* length)
 }
 
 
-signed char wcCompatible[3][3] = {
+const signed char wcCompatible[3][3] = {
 /*				 DISABLED				ENABLED					REQUIRED */
 /* DISABLED */	{WIRECRYPT_DISABLED,	WIRECRYPT_DISABLED,		WIRECRYPT_BROKEN},
 /* ENABLED  */	{WIRECRYPT_DISABLED,	WIRECRYPT_ENABLED,		WIRECRYPT_REQUIRED},

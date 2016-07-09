@@ -77,7 +77,7 @@ static inline void REMOTE_makeList(Firebird::PathName& list, const Remote::Parse
 	Auth::makeList(list, parsed);
 }
 
-extern signed char wcCompatible[3][3];
+extern const signed char wcCompatible[3][3];
 
 #define HANDSHAKE_DEBUG(A)
 #define WIRECRYPT_DEBUG(A)
