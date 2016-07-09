@@ -1669,9 +1669,9 @@ void InternalCryptKey::setSymmetric(Firebird::CheckStatusWrapper* const status,
 	try
 	{
 		if (type)
-			t = type;
-		encrypt.set(keyLength, key);
-		decrypt.clear();
+			this->t = type;
+		this->encrypt.set(keyLength, key);
+		this->decrypt.clear();
 	}
 	catch (const Firebird::Exception& ex)
 	{
@@ -1689,9 +1689,9 @@ void InternalCryptKey::setAsymmetric(Firebird::CheckStatusWrapper* const status,
 	try
 	{
 		if (type)
-			t = type;
-		encrypt.set(encryptKeyLength, encryptKey);
-		decrypt.set(decryptKeyLength, decryptKey);
+			this->t = type;
+		this->encrypt.set(encryptKeyLength, encryptKey);
+		this->decrypt.set(decryptKeyLength, decryptKey);
 	}
 	catch (const Firebird::Exception& ex)
 	{
@@ -1701,12 +1701,12 @@ void InternalCryptKey::setAsymmetric(Firebird::CheckStatusWrapper* const status,
 
 const void* InternalCryptKey::getEncryptKey(unsigned* length)
 {
-	return encrypt.get(length);
+	return this->encrypt.get(length);
 }
 
 const void* InternalCryptKey::getDecryptKey(unsigned* length)
 {
-	return decrypt.getCount() > 0 ? decrypt.get(length) : encrypt.get(length);
+	return this->decrypt.getCount() > 0 ? this->decrypt.get(length) : this->encrypt.get(length);
 }
 
 
