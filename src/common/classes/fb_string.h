@@ -699,6 +699,9 @@ namespace Firebird
 		}
 		StringType& operator=(const_pointer s)
 		{
+            //[2016-07-09]
+            fb_assert(s);
+
 			return assign(s, static_cast<size_type>(strlen(s)));
 		}
 		StringType& operator=(char_type c)
