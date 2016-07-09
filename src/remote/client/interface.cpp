@@ -7749,7 +7749,7 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* const to)
 {
 	this->extractDataFromPluginTo(&to->p_data);
 
-	PathName pluginName = getPluginName();
+	const PathName pluginName = getPluginName();
 
 	to->p_name.cstr_length = (ULONG) pluginName.length();
 
