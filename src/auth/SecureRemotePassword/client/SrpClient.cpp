@@ -123,7 +123,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				Arg::Num(expectedLength) << "data").raise();
 		}
 
-		string salt, key;
+		string salt;
 
 		unsigned charSize = *saltAndKey++;
 
@@ -152,7 +152,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				Arg::Num(length - 2) << "key").raise();
 		}
 
-		key.assign(saltAndKey, charSize);
+		const string key(saltAndKey, charSize);
 
 		dumpIt("Clnt: key(srvPub)", key);
 
