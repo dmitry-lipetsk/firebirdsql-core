@@ -123,8 +123,6 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				Arg::Num(expectedLength) << "data").raise();
 		}
 
-		string salt;
-
 		unsigned charSize = *saltAndKey++;
 
 		charSize += ((unsigned) *saltAndKey++) << 8;
@@ -135,7 +133,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				Arg::Num(RemotePassword::SRP_SALT_SIZE * 2) << "salt").raise();
 		}
 
-		salt.assign(saltAndKey, charSize);
+		const string salt(saltAndKey, charSize);
 
 		dumpIt("Clnt: salt", salt);
 
