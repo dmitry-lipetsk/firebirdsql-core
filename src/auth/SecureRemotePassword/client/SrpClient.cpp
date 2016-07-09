@@ -163,7 +163,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 
 		dumpIt("Clnt: sessionKey", sessionKey);
 
-		BigInteger cProof = this->client->clientProof(cb->getLogin(), salt.c_str(), sessionKey);
+		const BigInteger cProof = this->client->clientProof(cb->getLogin(), salt.c_str(), sessionKey);
 
 		cProof.getText(this->data);
 
@@ -175,7 +175,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 		}
 
 		// output the key
-		ICryptKey* cKey = cb->newKey(status);
+		ICryptKey* const cKey = cb->newKey(status);
 
 		if (status->getState() & IStatus::STATE_ERRORS)
 		{
