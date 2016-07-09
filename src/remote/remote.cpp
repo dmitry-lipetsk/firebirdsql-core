@@ -880,14 +880,14 @@ Firebird::string rem_port::getRemoteId() const
 //------------------------------------------------------------------------
 LegacyPlugin REMOTE_legacy_auth(const char* nm, int p)
 {
-	const char* legacyTrusted = "WIN_SSPI";
+	const char* const legacyTrusted = "WIN_SSPI";
 	if (fb_utils::stricmp(legacyTrusted, nm) == 0 &&
 		(p == PROTOCOL_VERSION11 || p == PROTOCOL_VERSION12))
 	{
 		return PLUGIN_TRUSTED;
 	}
 
-	const char* legacyAuth = "LEGACY_AUTH";
+	const char* const legacyAuth = "LEGACY_AUTH";
 	if (fb_utils::stricmp(legacyAuth, nm) == 0 && p < PROTOCOL_VERSION13)
 	{
 		return PLUGIN_LEGACY;
