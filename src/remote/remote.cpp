@@ -1182,7 +1182,8 @@ static void setCStr(CSTRING& to, const char* from)
 void rem_port::addServerKeys(const CSTRING* const passedStr)
 {
 	Firebird::ClumpletReader newKeys(Firebird::ClumpletReader::UnTagged,
-									 passedStr->cstr_address, passedStr->cstr_length);
+									 passedStr->cstr_address,
+                                     passedStr->cstr_length);
 
 	for (newKeys.rewind(); !newKeys.isEof(); newKeys.moveNext())
 	{
@@ -1191,22 +1192,30 @@ void rem_port::addServerKeys(const CSTRING* const passedStr)
 			continue;
 		}
 
-		KnownServerKey key;
 		fb_assert(newKeys.getClumpTag() == TAG_KEY_TYPE);
+
+		KnownServerKey key;
+
 		newKeys.getPath(key.type);
+
 		newKeys.moveNext();
+
 		if (newKeys.isEof())
 		{
 			break;
 		}
+
 		fb_assert(newKeys.getClumpTag() == TAG_KEY_PLUGINS);
+
 		newKeys.getPath(key.plugins);
+
 		key.plugins += ' ';
+
 		key.plugins.insert(0, " ");
 
 		this->port_known_server_keys.add(key);
-	}
-}
+	}//for
+}//addServerKeys
 
 bool rem_port::tryNewKey(InternalCryptKey* cryptKey)
 {
