@@ -1295,7 +1295,7 @@ public:
 
 	Firebird::string getRemoteId() const;
 	void auxAcceptError(PACKET* packet);
-	void addServerKeys(CSTRING* str);
+	void addServerKeys(const CSTRING* str);
 	bool tryNewKey(InternalCryptKey* cryptKey);
 	void checkResponse(Firebird::IStatus* warning, PACKET* packet, bool checkKeys = false);
 
