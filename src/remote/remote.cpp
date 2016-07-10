@@ -1204,7 +1204,7 @@ void rem_port::addServerKeys(CSTRING* passedStr)
 		key.plugins += ' ';
 		key.plugins.insert(0, " ");
 
-		port_known_server_keys.add(key);
+		this->port_known_server_keys.add(key);
 	}
 }
 
