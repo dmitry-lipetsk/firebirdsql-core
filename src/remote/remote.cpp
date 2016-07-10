@@ -1179,7 +1179,7 @@ static void setCStr(CSTRING& to, const char* from)
 	to.cstr_allocated = 0;
 }
 
-void rem_port::addServerKeys(CSTRING* passedStr)
+void rem_port::addServerKeys(CSTRING* const passedStr)
 {
 	Firebird::ClumpletReader newKeys(Firebird::ClumpletReader::UnTagged,
 									 passedStr->cstr_address, passedStr->cstr_length);
