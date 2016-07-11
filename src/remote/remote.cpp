@@ -1277,11 +1277,13 @@ bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
 				Firebird::CheckStatusWrapper statusWrapper(&st);
 
 				// Looks like we've found correct crypt plugin and key for it
-				port_crypt_plugin = cp.plugin();
-				port_crypt_plugin->addRef();
+				this->port_crypt_plugin = cp.plugin();
+
+				this->port_crypt_plugin->addRef();
 
 				// Pass key to plugin
-				port_crypt_plugin->setKey(&statusWrapper, cryptKey);
+				this->port_crypt_plugin->setKey(&statusWrapper, cryptKey);
+
 				if (st.getState() & Firebird::IStatus::STATE_ERRORS)
 				{
 					Firebird::status_exception::raise(&st);
