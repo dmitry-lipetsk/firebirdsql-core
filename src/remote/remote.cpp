@@ -1249,7 +1249,7 @@ bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
 		return false;
 	}
 
-	if (getPortConfig()->getWireCrypt(WC_CLIENT) == WIRE_CRYPT_DISABLED)
+	if (this->getPortConfig()->getWireCrypt(WC_CLIENT) == WIRE_CRYPT_DISABLED)
 	{
 		this->port_crypt_complete = true;
 
@@ -1260,7 +1260,7 @@ bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
 	// check what about crypt plugin for it
 	Remote::ParsedList clientPlugins;
 
-	REMOTE_parseList(clientPlugins, getPortConfig()->getPlugins(Firebird::IPluginManager::TYPE_WIRE_CRYPT));
+	REMOTE_parseList(clientPlugins, this->getPortConfig()->getPlugins(Firebird::IPluginManager::TYPE_WIRE_CRYPT));
 
 	for (unsigned n = 0; n < clientPlugins.getCount(); ++n)
 	{
