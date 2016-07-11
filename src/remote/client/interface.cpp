@@ -7861,7 +7861,7 @@ Firebird::ICryptKey* ClntAuthBlock::newKey(CheckStatusWrapper* const status)
 
 	try
 	{
-		InternalCryptKey* k = FB_NEW InternalCryptKey; //throw
+		InternalCryptKey* const k = FB_NEW InternalCryptKey; //throw
 
 		fb_assert(this->plugins.hasData());
 
