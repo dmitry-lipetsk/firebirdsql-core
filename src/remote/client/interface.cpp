@@ -6376,13 +6376,13 @@ static void REMOTE_free_string(CSTRING* tmp)
 }
 #endif // NOT_USED_OR_REPLACED
 
-static void authReceiveResponse(bool           havePacket,
-                                ClntAuthBlock& cBlock,
-                                rem_port*      port,
-                                Rdb*           rdb,
-                                IStatus*       status,
-                                PACKET*        packet,
-                                bool           checkKeys)
+static void authReceiveResponse(bool            havePacket,
+                                ClntAuthBlock&  cBlock,
+                                rem_port* const port,
+                                Rdb*      const rdb,
+                                IStatus*  const status,
+                                PACKET*   const packet,
+                                bool      const checkKeys)
 {
 	LocalStatus ls;
 	CheckStatusWrapper s(&ls);
