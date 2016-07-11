@@ -5443,7 +5443,8 @@ static void authenticateStep0(ClntAuthBlock& cBlock)
 }
 
 
-static void secureAuthentication(ClntAuthBlock& cBlock, rem_port* port)
+static void secureAuthentication(ClntAuthBlock& cBlock,
+                                 rem_port*      port)
 {
 	HANDSHAKE_DEBUG(fprintf(stderr, "Cli: secureAuthentication\n"));
 
@@ -5465,7 +5466,7 @@ static void secureAuthentication(ClntAuthBlock& cBlock, rem_port* port)
 		if (st.getState() & Firebird::IStatus::STATE_ERRORS)
 			status_exception::raise(&st);
 	}
-}
+}//secureAuthentication
 
 ////////////////////////////////////////////////////////////////////////////////
 
