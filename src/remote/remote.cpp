@@ -1239,7 +1239,7 @@ bool rem_port::tryNewKey(InternalCryptKey* cryptKey)
 bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
                           InternalCryptKey* const cryptKey)
 {
-	if (port_crypt_complete)
+	if (this->port_crypt_complete)
 	{
 		return true;
 	}
@@ -1251,7 +1251,7 @@ bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
 
 	if (getPortConfig()->getWireCrypt(WC_CLIENT) == WIRE_CRYPT_DISABLED)
 	{
-		port_crypt_complete = true;
+		this->port_crypt_complete = true;
 
 		return true;
 	}
@@ -1302,7 +1302,7 @@ bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
 				checkResponse(&statusWrapper, &crypt);
 
 				// Complete port-crypt init
-				port_crypt_complete = true;
+				this->port_crypt_complete = true;
 
 				REMOTE_free_packet(this, &crypt, true);
 
