@@ -1053,9 +1053,10 @@ Firebird::RefPtr<Config>* ClntAuthBlock::getConfig()
 	return clntConfig.hasData() ? &clntConfig : NULL;
 }
 
-void ClntAuthBlock::storeDataForPlugin(unsigned int length, const unsigned char* data)
+void ClntAuthBlock::storeDataForPlugin(unsigned int         const length,
+                                       const unsigned char* const data)
 {
-	dataForPlugin.assign(data, length);
+	this->dataForPlugin.assign(data, length);
 	HANDSHAKE_DEBUG(fprintf(stderr, "Cli: accepted data for plugin length=%d\n", length));
 }
 
