@@ -124,6 +124,8 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				Arg::Num(expectedLength) << "data").raise();
 		}
 
+        fb_assert(length>=2);
+
 		unsigned charSize = *saltAndKey++;
 
 		charSize += ((unsigned) *saltAndKey++) << 8;
@@ -134,6 +136,8 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 				Arg::Num(RemotePassword::SRP_SALT_SIZE * 2) << "salt").raise();
 		}
 
+        fb_assert(charSize<=(length-2));
+
 		const string salt(saltAndKey, charSize);
 
 		dumpIt("Clnt: salt", salt);
@@ -142,10 +146,12 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 
 		length -= (charSize + 2);
 
+        assert(length>=2);
+
 		charSize = *saltAndKey++;
 		charSize += ((unsigned) *saltAndKey++) << 8;
 
-		if (charSize != length - 2)
+		if (charSize != (length - 2))
 		{
 			(Arg::Gds(isc_auth_datalength) << Arg::Num(charSize) <<
 				Arg::Num(length - 2) << "key").raise();
