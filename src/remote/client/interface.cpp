@@ -5450,9 +5450,9 @@ static void secureAuthentication(ClntAuthBlock& cBlock, rem_port* port)
 	if (!port)
 		return;
 
-	Rdb* rdb = port->port_context;
+	Rdb* const rdb = port->port_context;
 	fb_assert(rdb);
-	PACKET* packet = &rdb->rdb_packet;
+	PACKET* const packet = &rdb->rdb_packet;
 
 	HANDSHAKE_DEBUG(fprintf(stderr, "Cli: secureAuthentication: port OK, op=%d\n", packet->p_operation));
 
