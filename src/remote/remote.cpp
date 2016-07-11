@@ -1670,7 +1670,7 @@ void rem_port::initCompression()
 #endif
 }
 
-
+//------------------------------------------------------------------------
 void InternalCryptKey::setSymmetric(Firebird::CheckStatusWrapper* const status,
                                     const char*                   const type,
                                     unsigned                      const keyLength,
@@ -1680,15 +1680,18 @@ void InternalCryptKey::setSymmetric(Firebird::CheckStatusWrapper* const status,
 	{
 		if (type)
 			this->t = type;
+
 		this->encrypt.set(keyLength, key);
+
 		this->decrypt.clear();
 	}
 	catch (const Firebird::Exception& ex)
 	{
 		ex.stuffException(status);
 	}
-}
+}//setSymmetric
 
+//------------------------------------------------------------------------
 void InternalCryptKey::setAsymmetric(Firebird::CheckStatusWrapper* const status,
                                      const char*                   const type,
                                      unsigned                      const encryptKeyLength,
@@ -1700,15 +1703,18 @@ void InternalCryptKey::setAsymmetric(Firebird::CheckStatusWrapper* const status,
 	{
 		if (type)
 			this->t = type;
+
 		this->encrypt.set(encryptKeyLength, encryptKey);
+
 		this->decrypt.set(decryptKeyLength, decryptKey);
 	}
 	catch (const Firebird::Exception& ex)
 	{
 		ex.stuffException(status);
 	}
-}
+}//setAsymmetric
 
+//------------------------------------------------------------------------
 const void* InternalCryptKey::getEncryptKey(unsigned* length)
 {
 	return this->encrypt.get(length);
