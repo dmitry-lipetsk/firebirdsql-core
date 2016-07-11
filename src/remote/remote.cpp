@@ -1180,6 +1180,7 @@ static void setCStr(CSTRING& to, const char* from)
 	to.cstr_allocated = 0;
 }
 
+//------------------------------------------------------------------------
 void rem_port::addServerKeys(const CSTRING* const passedStr)
 {
 	Firebird::ClumpletReader newKeys(Firebird::ClumpletReader::UnTagged,
@@ -1218,6 +1219,7 @@ void rem_port::addServerKeys(const CSTRING* const passedStr)
 	}//for
 }//addServerKeys
 
+//------------------------------------------------------------------------
 bool rem_port::tryNewKey(InternalCryptKey* cryptKey)
 {
 	for (unsigned t = 0; t < port_known_server_keys.getCount(); ++t)
@@ -1229,10 +1231,13 @@ bool rem_port::tryNewKey(InternalCryptKey* cryptKey)
 	}
 
 	port_crypt_keys.push(cryptKey);
-	return false;
-}
 
-bool rem_port::tryKeyType(const KnownServerKey& srvKey, InternalCryptKey* cryptKey)
+	return false;
+}//tryNewKey
+
+//------------------------------------------------------------------------
+bool rem_port::tryKeyType(const KnownServerKey& srvKey,
+                          InternalCryptKey*     cryptKey)
 {
 	if (port_crypt_complete)
 	{
@@ -1247,20 +1252,25 @@ bool rem_port::tryKeyType(const KnownServerKey& srvKey, InternalCryptKey* cryptK
 	if (getPortConfig()->getWireCrypt(WC_CLIENT) == WIRE_CRYPT_DISABLED)
 	{
 		port_crypt_complete = true;
+
 		return true;
 	}
 
 	// we got correct key's type pair
 	// check what about crypt plugin for it
 	Remote::ParsedList clientPlugins;
+
 	REMOTE_parseList(clientPlugins, getPortConfig()->getPlugins(Firebird::IPluginManager::TYPE_WIRE_CRYPT));
+
 	for (unsigned n = 0; n < clientPlugins.getCount(); ++n)
 	{
 		Firebird::PathName p(clientPlugins[n]);
+
 		if (srvKey.plugins.find(" " + p + " ") != Firebird::PathName::npos)
 		{
 			Firebird::GetPlugins<Firebird::IWireCryptPlugin>
 				cp(Firebird::IPluginManager::TYPE_WIRE_CRYPT, p.c_str());
+
 			if (cp.hasData())
 			{
 				Firebird::LocalStatus st;
@@ -1299,11 +1309,12 @@ bool rem_port::tryKeyType(const KnownServerKey& srvKey, InternalCryptKey* cryptK
 				return true;
 			}
 		}
-	}
+	}//for n
 
 	return false;
-}
+}//tryKeyType
 
+//------------------------------------------------------------------------
 const char* SrvAuthBlock::getLogin()
 {
 	return userName.nullStr();
