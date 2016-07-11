@@ -6493,7 +6493,7 @@ static void authReceiveResponse(bool            havePacket,
 
 	// If we have exited from the cycle, this mean auth failed
 	(Arg::Gds(isc_login) << Arg::StatusVector(&s)).raise();
-}
+}//authReceiveResponse
 
 static void init(CheckStatusWrapper*  const status,
                  ClntAuthBlock&             cBlock,
