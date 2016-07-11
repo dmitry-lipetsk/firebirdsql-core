@@ -5465,7 +5465,7 @@ static void secureAuthentication(ClntAuthBlock&  cBlock,
 
 		if (st.getState() & Firebird::IStatus::STATE_ERRORS)
 			status_exception::raise(&st);
-	}
+	}//if
 }//secureAuthentication
 
 ////////////////////////////////////////////////////////////////////////////////
