@@ -5443,8 +5443,8 @@ static void authenticateStep0(ClntAuthBlock& cBlock)
 }
 
 
-static void secureAuthentication(ClntAuthBlock& cBlock,
-                                 rem_port*      port)
+static void secureAuthentication(ClntAuthBlock&  cBlock,
+                                 rem_port* const port)
 {
 	HANDSHAKE_DEBUG(fprintf(stderr, "Cli: secureAuthentication\n"));
 
