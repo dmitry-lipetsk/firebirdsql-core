@@ -6440,7 +6440,7 @@ static void authReceiveResponse(bool            havePacket,
 			// try to start crypt
 			cBlock.tryNewKeys(port);
 			return;
-		}
+		}//switch(packet->p_operation)
 
 		if (n && n->cstr_length && cBlock.plugins.hasData())
 		{
@@ -6489,7 +6489,7 @@ static void authReceiveResponse(bool            havePacket,
 		send_packet(port, packet);
 		REMOTE_free_packet(port, packet, true);
 		memset(&packet->p_auth_cont, 0, sizeof packet->p_auth_cont);
-	}
+	}//for[ever]
 
 	// If we have exited from the cycle, this mean auth failed
 	(Arg::Gds(isc_login) << Arg::StatusVector(&s)).raise();
