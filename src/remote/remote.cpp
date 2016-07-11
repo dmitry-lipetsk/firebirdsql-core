@@ -1236,8 +1236,8 @@ bool rem_port::tryNewKey(InternalCryptKey* cryptKey)
 }//tryNewKey
 
 //------------------------------------------------------------------------
-bool rem_port::tryKeyType(const KnownServerKey& srvKey,
-                          InternalCryptKey*     cryptKey)
+bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
+                          InternalCryptKey* const cryptKey)
 {
 	if (port_crypt_complete)
 	{
@@ -1264,11 +1264,11 @@ bool rem_port::tryKeyType(const KnownServerKey& srvKey,
 
 	for (unsigned n = 0; n < clientPlugins.getCount(); ++n)
 	{
-		Firebird::PathName p(clientPlugins[n]);
+		const Firebird::PathName p(clientPlugins[n]);
 
 		if (srvKey.plugins.find(" " + p + " ") != Firebird::PathName::npos)
 		{
-			Firebird::GetPlugins<Firebird::IWireCryptPlugin>
+			const Firebird::GetPlugins<Firebird::IWireCryptPlugin>
 				cp(Firebird::IPluginManager::TYPE_WIRE_CRYPT, p.c_str());
 
 			if (cp.hasData())
