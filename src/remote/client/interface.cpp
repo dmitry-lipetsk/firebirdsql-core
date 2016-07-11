@@ -7890,7 +7890,7 @@ void ClntAuthBlock::tryNewKeys(rem_port* const port)
 {
 	for (FB_SIZE_T k = 0; k < this->cryptKeys.getCount(); ++k)
 	{
-		if (port->tryNewKey(cryptKeys[k]))
+		if (port->tryNewKey(this->cryptKeys[k]))
 		{
 			this->releaseKeys(k);
 
