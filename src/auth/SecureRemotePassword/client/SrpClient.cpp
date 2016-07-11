@@ -107,7 +107,7 @@ int SrpClient::authenticate(CheckStatusWrapper* const status,
 
 		unsigned length;
 
-		//saltAndKey contains the data received from server in p_acpd.p_acpt_data
+        //saltAndKey contains the data received from server in p_acpd.p_acpt_data
         const unsigned char* saltAndKey = cb->getData(&length);
 
 		if (!saltAndKey || length == 0)
