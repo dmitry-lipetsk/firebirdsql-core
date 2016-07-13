@@ -703,7 +703,7 @@ rem_port* INET_analyze(ClntAuthBlock*  const cBlock,
 
 	delete port->port_version;
 
-	port->port_version = REMOTE_make_string(temp.c_str());
+	port->port_version = REMOTE_make_string(temp.c_str()); //throw
 
 	if (accept->p_acpt_architecture == ARCHITECTURE)
     {
