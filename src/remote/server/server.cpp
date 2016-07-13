@@ -1899,6 +1899,8 @@ static bool accept_connection(rem_port* port, P_CNCT* connect, PACKET* send)
 		return false;
 	}//if
 
+    fb_assert(accepted);
+
 	// extractNewKeys() will also send to client list of known plugins
 	if (version >= PROTOCOL_VERSION13 &&
 		port->extractNewKeys(&send->p_acpd.p_acpt_keys, returnData))
