@@ -1886,7 +1886,7 @@ static bool accept_connection(rem_port* port, P_CNCT* connect, PACKET* send)
 				}
 			}
 		}
-	}
+	}//if (accepted && version >= PROTOCOL_VERSION13)
 
 	// Send off out gracious acceptance or flag rejection
 	if (!accepted)
@@ -1897,7 +1897,7 @@ static bool accept_connection(rem_port* port, P_CNCT* connect, PACKET* send)
 		else
 			port->send(send);
 		return false;
-	}
+	}//if
 
 	// extractNewKeys() will also send to client list of known plugins
 	if (version >= PROTOCOL_VERSION13 &&
