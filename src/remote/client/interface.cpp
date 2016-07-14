@@ -7756,7 +7756,7 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* const to)
 {
 	this->extractDataFromPluginTo(&to->p_data);
 
-	const PathName pluginName = getPluginName();
+	const PathName pluginName = this->getPluginName();
 
 	to->p_name.cstr_length = (ULONG) pluginName.length();
 
@@ -7771,9 +7771,9 @@ void ClntAuthBlock::extractDataFromPluginTo(P_AUTH_CONT* const to)
 
 	if (this->firstTime)
 	{
-		to->p_list.cstr_length = (ULONG) pluginList.length();
+		to->p_list.cstr_length = (ULONG) this->pluginList.length();
 
-		to->p_list.cstr_address = (UCHAR*) pluginList.c_str();
+		to->p_list.cstr_address = (UCHAR*) this->pluginList.c_str();
 
 		to->p_list.cstr_allocated = 0;
 
