@@ -746,6 +746,8 @@ void* MemoryPool::allocate_nothrow(size_t size, size_t upper_size
 		blk->mbk_pool = this;
 		blk->mbk_flags = MBK_LARGE | MBK_USED;
 		blk->mbk_type = 0;
+
+		fb_assert(size + MEM_ALIGN(sizeof(MemoryRedirectList)) <= (size_t) MAX_ULONG);
 		blk->mbk_large_length = size + MEM_ALIGN(sizeof(MemoryRedirectList));
 #ifdef DEBUG_GDS_ALLOC
 		blk->mbk_file = file;
@@ -2071,6 +2073,24 @@ void MemoryPool::deallocate(void* block)
 		updateSpare();
     }//local
 }//deallocate
+
+void* MemoryPool::allocateHugeBlock(size_t size)
+{
+	void* mem = external_alloc(size);
+	if (!mem)
+		Firebird::BadAlloc::raise();
+
+	increment_usage(size);
+	return mem;
+}
+
+
+void MemoryPool::deallocateHugeBlock(void* block, size_t size)
+{
+	external_free(block, size, false, false);
+	decrement_usage(size);
+}
+
 
 MemoryPool& AutoStorage::getAutoMemoryPool()
 {

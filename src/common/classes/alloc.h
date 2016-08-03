@@ -360,7 +360,7 @@ public:
 #endif
 
 	// Allocate memory block. Result is not zero-initialized.
-	// It case of problems this method throws Firebird::BadAlloc
+	// In case of problems this method throws Firebird::BadAlloc
 	void* allocate(size_t size
 #ifdef DEBUG_GDS_ALLOC
 		, const char* file = NULL, int line = 0
@@ -375,6 +375,13 @@ public:
 	);
 
 	void deallocate(void* block);
+
+	// Allocate huge memory block directly from OS. 
+	// In case of problems this method throws Firebird::BadAlloc
+	void* allocateHugeBlock(size_t size);
+
+	// Return huge memory block to the OS directly. 
+	void deallocateHugeBlock(void* block, size_t size);
 
 	// Check pool for internal consistent. When enabled, call is very expensive
 	bool verify_pool(bool fast_checks_only = false);
