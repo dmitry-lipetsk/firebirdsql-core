@@ -312,7 +312,7 @@ void sha_final(unsigned char digest[SHA_DIGESTSIZE], SHA_INFO *sha_info)
 	}
 	sha_info->data[56] = (unsigned char) ((hi_bit_count >> 24) & 0xff);
 	sha_info->data[57] = (unsigned char) ((hi_bit_count >> 16) & 0xff);
-		sha_info->data[58] = (unsigned char) ((hi_bit_count >>  8) & 0xff);
+	sha_info->data[58] = (unsigned char) ((hi_bit_count >>  8) & 0xff);
 	sha_info->data[59] = (unsigned char) ((hi_bit_count >>  0) & 0xff);
 	sha_info->data[60] = (unsigned char) ((lo_bit_count >> 24) & 0xff);
 	sha_info->data[61] = (unsigned char) ((lo_bit_count >> 16) & 0xff);
