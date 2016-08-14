@@ -1152,7 +1152,7 @@ void rem_port::checkResponse(Firebird::IStatus* warning, PACKET* packet, bool ch
 	}
 	else if (checkKeys)
 	{
-		addServerKeys(&packet->p_resp.p_resp_data);
+		this->addServerKeys(&packet->p_resp.p_resp_data);
 	}
 
 	if ((packet->p_operation == op_response || packet->p_operation == op_response_piggyback) &&
