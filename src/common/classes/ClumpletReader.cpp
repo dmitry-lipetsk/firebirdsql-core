@@ -501,7 +501,7 @@ void ClumpletReader::adjustSpbState()
 
 FB_SIZE_T ClumpletReader::getClumpletSize(bool wTag, bool wLength, bool wData) const
 {
-	const UCHAR* clumplet = getBuffer() + cur_offset;
+	const UCHAR* const clumplet = getBuffer() + cur_offset;
 	const UCHAR* const buffer_end = getBufferEnd();
 
 	// Check for EOF
@@ -680,8 +680,12 @@ bool ClumpletReader::next(UCHAR tag)
 // Methods which work with currently selected clumplet
 UCHAR ClumpletReader::getClumpTag() const
 {
-	const UCHAR* clumplet = getBuffer() + cur_offset;
-	const UCHAR* const buffer_end = getBufferEnd();
+	const UCHAR* const clumplet   = this->getBuffer() + cur_offset;
+	const UCHAR* const buffer_end = this->getBufferEnd();
+
+    fb_assert(clumplet);
+    fb_assert(clumplet >= this->getBuffer());
+    fb_assert(clumplet <  buffer_end);
 
 	// Check for EOF
 	if (clumplet >= buffer_end)
@@ -690,8 +694,8 @@ UCHAR ClumpletReader::getClumpTag() const
 		return 0;
 	}
 
-	return clumplet[0];
-}
+	return *clumplet;
+}//getClumpTag
 
 FB_SIZE_T ClumpletReader::getClumpLength() const
 {
