@@ -499,10 +499,12 @@ void ClumpletReader::adjustSpbState()
 	}
 }
 
-FB_SIZE_T ClumpletReader::getClumpletSize(bool wTag, bool wLength, bool wData) const
+FB_SIZE_T ClumpletReader::getClumpletSize(bool const wTag,
+                                          bool const wLength,
+                                          bool const wData) const
 {
-	const UCHAR* const clumplet = getBuffer() + cur_offset;
-	const UCHAR* const buffer_end = getBufferEnd();
+	const UCHAR* const clumplet   = this->getBuffer() + cur_offset;
+	const UCHAR* const buffer_end = this->getBufferEnd();
 
 	// Check for EOF
 	if (clumplet >= buffer_end)
