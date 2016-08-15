@@ -1220,17 +1220,17 @@ void rem_port::addServerKeys(const CSTRING* const passedStr)
 }//addServerKeys
 
 //------------------------------------------------------------------------
-bool rem_port::tryNewKey(InternalCryptKey* cryptKey)
+bool rem_port::tryNewKey(InternalCryptKey* const cryptKey)
 {
-	for (unsigned t = 0; t < port_known_server_keys.getCount(); ++t)
+	for (unsigned t = 0; t < this->port_known_server_keys.getCount(); ++t)
 	{
-		if (tryKeyType(port_known_server_keys[t], cryptKey))
+		if (this->tryKeyType(this->port_known_server_keys[t], cryptKey))
 		{
 			return true;
 		}
 	}
 
-	port_crypt_keys.push(cryptKey);
+	this->port_crypt_keys.push(cryptKey);
 
 	return false;
 }//tryNewKey
