@@ -100,10 +100,14 @@ public:
 
 	// ICryptPlugin implementation
 	virtual const char* getKnownTypes(CheckStatusWrapper* status)override final;
-	virtual void setKey(CheckStatusWrapper* status, ICryptKey* key)override final;
-	virtual void encrypt(CheckStatusWrapper* status, unsigned int length, const void* from, void* to)override final;
-	virtual void decrypt(CheckStatusWrapper* status, unsigned int length, const void* from, void* to)override final;
-	virtual int release()override final;
+
+    virtual void setKey(CheckStatusWrapper* status, ICryptKey* key)override final;
+	
+    virtual void encrypt(CheckStatusWrapper* status, unsigned int length, const void* from, void* to)override final;
+	
+    virtual void decrypt(CheckStatusWrapper* status, unsigned int length, const void* from, void* to)override final;
+	
+    virtual int release()override final;
 
 private:
 	Cypher* createCypher(unsigned int l, const void* key);
