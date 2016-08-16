@@ -2937,7 +2937,7 @@ static bool packet_receive(rem_port* port,
 			{
 				return false;
 			}
-		}
+		}//if !(port->port_flags & PORT_async)
 
 		n = recv(port->port_handle, reinterpret_cast<char*>(buffer), buffer_length, 0);
 		inetErrNo = INET_ERRNO;
