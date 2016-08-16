@@ -2804,7 +2804,11 @@ static void packet_print(const TEXT* string, const UCHAR* packet, int length, UL
 }
 #endif
 
-static bool packet_receive(rem_port* port, UCHAR* buffer, SSHORT buffer_length, SSHORT* length)
+//------------------------------------------------------------------------
+static bool packet_receive(rem_port* port,
+                           UCHAR*    buffer,
+                           SHORT     buffer_length,
+                           SSHORT*   length)
 {
 /**************************************
  *
@@ -2998,10 +3002,12 @@ static bool packet_receive(rem_port* port, UCHAR* buffer, SSHORT buffer_length, 
 	*length = n;
 
 	return true;
-}
+}//packet_receive
 
-
-static bool packet_send( rem_port* port, const SCHAR* buffer, SSHORT buffer_length)
+//------------------------------------------------------------------------
+static bool packet_send(rem_port*    port,
+                        const SCHAR* buffer,
+                        SSHORT       buffer_length)
 {
 /**************************************
  *
@@ -3169,8 +3175,9 @@ static bool packet_send( rem_port* port, const SCHAR* buffer, SSHORT buffer_leng
 	port->port_snd_bytes += buffer_length;
 
 	return true;
-}
+}//packet_send
 
+//------------------------------------------------------------------------
 static bool setNoNagleOption(rem_port* port)
 {
 /**************************************
