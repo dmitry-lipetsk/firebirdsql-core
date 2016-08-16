@@ -1241,6 +1241,9 @@ bool rem_port::tryKeyType(const KnownServerKey&   srvKey,
 {
 	if (this->port_crypt_complete)
 	{
+        //[2016-08-15] Research assert.
+        fb_assert(false);
+
 		return true;
 	}
 
