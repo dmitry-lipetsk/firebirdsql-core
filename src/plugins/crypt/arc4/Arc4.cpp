@@ -31,8 +31,9 @@
 
 using namespace Firebird;
 
-namespace
-{
+namespace{
+////////////////////////////////////////////////////////////////////////////////
+//class Cypher
 
 class Cypher : public GlobalStorage
 {
@@ -48,9 +49,10 @@ public:
 		for (unsigned int k1 = 0, k2 = 0; k1 < sizeof(state); ++k1)
 		{
 			k2 = (k2 + key[k1 % l] + this->state[k1]) & 0xff;
+
 			swap(this->state[k1], this->state[k2]);
 		}
-	}
+	}//Cypher
 
 	void transform(unsigned int length, const void* from, void* to) throw()
 	{
@@ -60,12 +62,16 @@ public:
 		while (length--)
 		{
 			this->s2 += this->state[++this->s1];
+
 			swap(this->state[this->s1], this->state[this->s2]);
+
 			unsigned char k = this->state[this->s1] + this->state[this->s2];
+
 			k = this->state[k];
+
 			*t++ = k ^ *f++;
 		}
-	}
+	}//transform
 
 private:
 	unsigned char state[256];
@@ -78,8 +84,9 @@ private:
 		c1 = c2;
 		c2 = temp;
 	}
-};
+};//class Cypher
 
+////////////////////////////////////////////////////////////////////////////////
 } // anonymous namespace
 
 
