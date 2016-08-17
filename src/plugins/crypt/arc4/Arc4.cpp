@@ -40,15 +40,15 @@ public:
 	Cypher(unsigned int l, const unsigned char* key) throw()
 		: s1(0), s2(0)
 	{
-		for (unsigned int n = 0; n < sizeof(state); ++n)
+		for (unsigned int n = 0; n < sizeof(this->state); ++n)
 		{
-			state[n] = n;
+			this->state[n] = n;
 		}
 
 		for (unsigned int k1 = 0, k2 = 0; k1 < sizeof(state); ++k1)
 		{
-			k2 = (k2 + key[k1 % l] + state[k1]) & 0xff;
-			swap(state[k1], state[k2]);
+			k2 = (k2 + key[k1 % l] + this->state[k1]) & 0xff;
+			swap(this->state[k1], this->state[k2]);
 		}
 	}
 
@@ -59,10 +59,10 @@ public:
 
 		while (length--)
 		{
-			s2 += state[++s1];
-			swap(state[s1], state[s2]);
-			unsigned char k = state[s1] + state[s2];
-			k = state[k];
+			this->s2 += this->state[++this->s1];
+			swap(this->state[this->s1], this->state[this->s2]);
+			unsigned char k = this->state[this->s1] + this->state[this->s2];
+			k = this->state[k];
 			*t++ = k ^ *f++;
 		}
 	}
@@ -72,9 +72,9 @@ private:
 	unsigned char s1;
 	unsigned char s2;
 
-	void swap(unsigned char& c1, unsigned char& c2) throw()
+	static void swap(unsigned char& c1, unsigned char& c2) throw()
 	{
-		unsigned char temp = c1;
+		const unsigned char temp = c1;
 		c1 = c2;
 		c2 = temp;
 	}
