@@ -6509,34 +6509,35 @@ void SrvAuthBlock::reset()
 	plugins = NULL;
 }
 
-bool SrvAuthBlock::extractNewKeys(CSTRING* to, ULONG flags)
+bool SrvAuthBlock::extractNewKeys(CSTRING* const to,
+                                  ULONG    const flags)
 {
-	lastExtractedKeys.reset();
+	this->lastExtractedKeys.reset();
 
 	if (!(flags & ONLY_CLEANUP))
 	{
-		for (unsigned n = 0; n < newKeys.getCount(); ++n)
+		for (unsigned n = 0; n < this->newKeys.getCount(); ++n)
 		{
-			const PathName& t = newKeys[n]->t;
+			const PathName& t = this->newKeys[n]->t;
 			PathName plugins = knownCryptKeyTypes()[t];
 			if (plugins.hasData())
 			{
-				lastExtractedKeys.insertPath(TAG_KEY_TYPE, t);
-				lastExtractedKeys.insertPath(TAG_KEY_PLUGINS, plugins);
+				this->lastExtractedKeys.insertPath(TAG_KEY_TYPE, t);
+				this->lastExtractedKeys.insertPath(TAG_KEY_PLUGINS, plugins);
 			}
 		}
 
 		if ((flags & EXTRACT_PLUGINS_LIST) && (dataFromPlugin.getCount() == 0))
 		{
-			lastExtractedKeys.insertPath(TAG_KNOWN_PLUGINS, pluginList);
+			this->lastExtractedKeys.insertPath(TAG_KNOWN_PLUGINS, this->pluginList);
 		}
 	}
 
-	to->cstr_length = (ULONG) lastExtractedKeys.getBufferLength();
-	to->cstr_address = const_cast<UCHAR*>(lastExtractedKeys.getBuffer());
+	to->cstr_length = (ULONG) this->lastExtractedKeys.getBufferLength();
+	to->cstr_address = const_cast<UCHAR*>(this->lastExtractedKeys.getBuffer());
 	to->cstr_allocated = 0;
 
-	newKeys.clear();		// Very important - avoids sending same key type more than once
+	this->newKeys.clear();		// Very important - avoids sending same key type more than once
 
 	return to->cstr_length > 0;
 }
