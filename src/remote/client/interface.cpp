@@ -6427,7 +6427,10 @@ static void authReceiveResponse(bool            havePacket,
 				d->cstr_length, n->cstr_length,
 				n->cstr_length, n->cstr_address, n->cstr_address ? n->cstr_address[0] : 0));
 			if (packet->p_acpd.p_acpt_type & pflag_compress)
+			{
 				port->initCompression();
+				port->port_flags |= PORT_compressed;
+			}
 			packet->p_acpd.p_acpt_type &= ptype_MASK;
 			break;
 

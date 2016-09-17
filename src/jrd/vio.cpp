@@ -761,7 +761,7 @@ bool VIO_chase_record_version(thread_db* tdbb, record_param* rpb,
 
 	// Take care about modifications performed by our own transaction
 
-	rpb->rpb_runtime_flags &= ~(RPB_undo_data | RPB_undo_read);
+	rpb->rpb_runtime_flags &= ~RPB_UNDO_FLAGS;
 	int forceBack = 0;
 
 	if (state == tra_us && !noundo && !(transaction->tra_flags & TRA_system))
@@ -3226,7 +3226,6 @@ void VIO_store(thread_db* tdbb, record_param* rpb, jrd_tra* transaction)
 		case rel_rcon:
 		case rel_refc:
 		case rel_ccon:
-		case rel_roles:
 		case rel_sec_users:
 		case rel_sec_user_attributes:
 		case rel_msgs:
@@ -3238,6 +3237,12 @@ void VIO_store(thread_db* tdbb, record_param* rpb, jrd_tra* transaction)
 		case rel_segments:
 			protect_system_table_insert(tdbb, request, relation);
 			break;
+
+		case rel_roles:
+			protect_system_table_insert(tdbb, request, relation);
+			EVL_field(0, rpb->rpb_record, f_rol_name, &desc);
+			if (set_security_class(tdbb, rpb->rpb_record, f_rol_class))
+				DFW_post_work(transaction, dfw_grant, &desc, obj_sql_role);
 
 		case rel_db_creators:
 			if (!tdbb->getAttachment()->locksmith())
@@ -4988,6 +4993,11 @@ static THREAD_ENTRY_DECLARE garbage_collector(THREAD_ENTRY_PARAM arg)
 	try
 	{
 		// Notify the finalization caller that we're finishing.
+		if (dbb->dbb_flags & DBB_gc_starting)
+		{
+			dbb->dbb_flags &= ~DBB_gc_starting;
+			dbb->dbb_gc_init.release();
+		}
 		dbb->dbb_gc_fini.release();
 	}
 	catch (const Firebird::Exception& ex)
@@ -5055,6 +5065,8 @@ static UndoDataRet get_undo_data(thread_db* tdbb, jrd_tra* transaction,
 				return udNone;
 
 			rpb->rpb_runtime_flags |= RPB_undo_read;
+			if (rpb->rpb_flags & rpb_deleted)
+				rpb->rpb_runtime_flags |= RPB_undo_deleted;
 
 			if (!action->vct_undo || !action->vct_undo->locate(recno))
 				return udForceBack;

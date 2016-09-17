@@ -616,9 +616,14 @@ namespace Jrd {
 		lockAndReadHeader(tdbb, CRYPT_HDR_INIT);
 	}
 
-	void CryptoManager::terminateCryptThread(thread_db*)
+	void CryptoManager::terminateCryptThread(thread_db*, bool wait)
 	{
 		down = true;
+		if (wait && cryptThreadId)
+		{
+			Thread::waitForCompletion(cryptThreadId);
+			cryptThreadId = 0;
+		}
 	}
 
 	void CryptoManager::stopThreadUsing(thread_db* tdbb, Attachment* att)
@@ -749,6 +754,11 @@ namespace Jrd {
 				writer.insertString(isc_dpb_user_name, "SYSDBA");
 				writer.insertByte(isc_dpb_no_db_triggers, TRUE);
 
+				// Avoid races with release_attachment() in jrd.cpp
+				MutexEnsureUnlock releaseGuard(cryptAttMutex, FB_FUNCTION);
+				releaseGuard.enter();
+				if (!down)
+				{
 				RefPtr<JAttachment> jAtt(REF_NO_INCR, dbb.dbb_provider->attachDatabase(&status_vector,
 					dbb.dbb_filename.c_str(), writer.getBufferLength(), writer.getBuffer()));
 				check(&status_vector);
@@ -757,6 +767,9 @@ namespace Jrd {
 				Attachment* att = jAtt->getHandle();
 				if (!att)
 					Arg::Gds(isc_att_shutdown).raise();
+				att->att_flags |= ATT_crypt_thread;
+				releaseGuard.leave();
+
 				ThreadContextHolder tdbb(att->att_database, att, &status_vector);
 				tdbb->tdbb_quantum = SWEEP_QUANTUM;
 
@@ -848,6 +861,7 @@ namespace Jrd {
 				{
 					writeDbHeader(tdbb, 0);
 				}
+				}
 
 				// Release exclusive lock on StartCryptThread
 				lckRelease = true;
@@ -913,10 +927,10 @@ namespace Jrd {
 		// Therefore use old (status vector based) method
 		try
 		{
+			// Normal case (almost always get here)
+			// Take shared lock on crypto manager and read data
 			if (!slowIO)
 			{
-				// Normal case (almost always get here)
-				// Take shared lock on crypto manager and read data
 				BarSync::IoGuard ioGuard(tdbb, sync);
 				if (!slowIO)
 					return internalRead(tdbb, sv, page, io) == SUCCESS_ALL;
@@ -994,10 +1008,18 @@ namespace Jrd {
 		// Therefore use old (status vector based) method
 		try
 		{
+			// Sanity check
+			if (page->pag_type > pag_max)
+				Arg::Gds(isc_page_type_err).raise();
+
+			// Page is never going to be encrypted. No locks needed.
+			if (!Ods::pag_crypt_page[page->pag_type])
+				return internalWrite(tdbb, sv, page, io) == SUCCESS_ALL;
+
+			// Normal case (almost always get here)
+			// Take shared lock on crypto manager and write data
 			if (!slowIO)
 			{
-				// Normal case (almost always get here)
-				// Take shared lock on crypto manager and write data
 				BarSync::IoGuard ioGuard(tdbb, sync);
 				if (!slowIO)
 					return internalWrite(tdbb, sv, page, io) == SUCCESS_ALL;
@@ -1047,7 +1069,7 @@ namespace Jrd {
 		Ods::pag* dest = page;
 		UCHAR savedFlags = page->pag_flags;
 
-		if (crypt && Ods::pag_crypt_page[page->pag_type % (pag_max + 1)])
+		if (crypt && Ods::pag_crypt_page[page->pag_type])
 		{
 			fb_assert(cryptPlugin);
 			if (!cryptPlugin)

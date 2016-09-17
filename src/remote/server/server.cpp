@@ -501,9 +501,11 @@ public:
 					}
 				}
 
-				authPort->send(send);
 				if (send->p_acpt.p_acpt_type & pflag_compress)
 					authPort->initCompression();
+				authPort->send(send);
+				if (send->p_acpt.p_acpt_type & pflag_compress)
+					authPort->port_flags |= PORT_compressed;
 				memset(&send->p_auth_cont, 0, sizeof send->p_auth_cont);
 				return false;
 
@@ -1911,9 +1913,11 @@ static bool accept_connection(rem_port* port, P_CNCT* connect, PACKET* send)
 	HANDSHAKE_DEBUG(fprintf(stderr, "Srv: accept_connection: accepted ud=%d protocol=%x\n", returnData, port->port_protocol));
 
 	send->p_operation = returnData ? op_accept_data : op_accept;
-	port->send(send);
 	if (send->p_acpt.p_acpt_type & pflag_compress)
 		port->initCompression();
+	port->send(send);
+	if (send->p_acpt.p_acpt_type & pflag_compress)
+		port->port_flags |= PORT_compressed;
 
 	return true;
 }
@@ -1938,9 +1942,11 @@ void ConnectAuth::accept(PACKET* send, Auth::WriterImplementation*)
 		CSTRING* const s = &send->p_acpd.p_acpt_keys;
 		authPort->extractNewKeys(s);
 		send->p_acpd.p_acpt_authenticated = 1;
-		authPort->send(send);
 		if (send->p_acpt.p_acpt_type & pflag_compress)
 			authPort->initCompression();
+		authPort->send(send);
+		if (send->p_acpt.p_acpt_type & pflag_compress)
+			authPort->port_flags |= PORT_compressed;
 	}
 }
 
@@ -4663,10 +4669,15 @@ ISC_STATUS rem_port::que_events(P_EVENT * stuff, PACKET* sendL)
 	event->rvnt_rdb = rdb;
 
 	rem_port* asyncPort = rdb->rdb_port->port_async;
-	RefMutexGuard portGuard(*asyncPort->port_sync, FB_FUNCTION);
+	if (!asyncPort || (asyncPort->port_flags & PORT_detached))
+		Arg::Gds(isc_net_event_connect_err).copyTo(&status_vector);
+	else
+	{
+		RefMutexGuard portGuard(*asyncPort->port_sync, FB_FUNCTION);
 
-	event->rvnt_iface = rdb->rdb_iface->queEvents(&status_vector, event->rvnt_callback,
-		stuff->p_event_items.cstr_length, stuff->p_event_items.cstr_address);
+		event->rvnt_iface = rdb->rdb_iface->queEvents(&status_vector, event->rvnt_callback,
+			stuff->p_event_items.cstr_length, stuff->p_event_items.cstr_address);
+	}
 
 	return this->send_response(sendL, 0, 0, &status_vector, false);
 }
