@@ -2,6 +2,16 @@
   * v3.0.1
   **************************
 
+    * Bugfix CORE-5355
+        XpbBuilder fails to create new TPB
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5351
+        LEFT JOIN incorrectly pushes UDF into the inner stream causing wrong results
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
     * Bugfix CORE-5348
         Databases created at build process are owned by Windows administrator, not SYSDBA
       Contributor(s):
@@ -295,11 +305,6 @@
 
     * Improvement CORE-5205
         Add a switch to build linux binaries with builtin libtommath
-      Contributor(s):
-        Alex Peshkov <peshkoff at mail.ru>
-
-    * Improvement CORE-5204
-        Build the Linux code with --enable-binreloc and create an option in the installer to install in different locations than /opt/firebird
       Contributor(s):
         Alex Peshkov <peshkoff at mail.ru>
 
