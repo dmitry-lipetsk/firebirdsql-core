@@ -31,7 +31,7 @@ if errorlevel 1 call :ERROR build failed - see make_all_%FB_TARGET_PLATFORM%.log
 ::===========
 :MOVE
 @echo Copying files to output
-@set FB_OUTPUT_DIR=%FB_ROOT_PATH%\output_%FB_TARGET_PLATFORM%
+@set FB_OUTPUT_DIR=%FB_ROOT_PATH%\output\%VS_VER%_%FB_TARGET_PLATFORM%_%FB_CFG_NAME%
 @del %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\*.exp 2>nul
 @del %FB_ROOT_PATH%\temp\%FB_OBJ_DIR%\firebird\*.lib 2>nul
 @rmdir /q /s %FB_OUTPUT_DIR% 2>nul
