@@ -1,6 +1,6 @@
 /*
  *	PROGRAM:		Firebird interface.
- *	MODULE:			ImplementHelper.h
+ *	MODULE:			GetPlugins.h
  *	DESCRIPTION:	Tools to help access plugins.
  *
  *  The contents of this file are subject to the Initial
@@ -49,24 +49,92 @@ private:
     self_type& operator = (const self_type&);
 
 public:
-    GetPlugins(unsigned int const interfaceType,
-               const char*        namesList = nullptr);
+	GetPlugins(unsigned int interfaceType, const char* namesList = NULL)
+		: masterInterface(), pluginInterface(),
+		  pluginSet(NULL), currentPlugin(NULL),
+		  ls(*getDefaultMemoryPool()), status(&ls)
+	{
+		pluginSet.assignRefNoIncr(pluginInterface->getPlugins(&status, interfaceType,
+			(namesList ? namesList : Config::getDefaultConfig()->getPlugins(interfaceType)),
+			NULL));
+		check(&status);
 
-    GetPlugins(unsigned int const interfaceType,
-               Config*      const knownConfig,
-               const char*        namesList = nullptr);
+		getPlugin();
+	}
 
-    ~GetPlugins();
+	GetPlugins(unsigned int interfaceType,
+			   Config* knownConfig, const char* namesList = NULL)
+		: masterInterface(), pluginInterface(),
+		  pluginSet(NULL), currentPlugin(NULL),
+		  ls(*getDefaultMemoryPool()), status(&ls)
+	{
+		pluginSet.assignRefNoIncr(pluginInterface->getPlugins(&status, interfaceType,
+			(namesList ? namesList : knownConfig->getPlugins(interfaceType)),
+			FB_NEW FirebirdConf(knownConfig)));
+		check(&status);
 
-    bool hasData() const;
+		getPlugin();
+	}
 
-    const char* name() const;
+	bool hasData() const
+	{
+		return currentPlugin;
+	}
 
-    P* plugin() const;
+	const char* name() const
+	{
+		return hasData() ? pluginSet->getName() : NULL;
+	}
 
-    void next();
+	P* plugin() const
+	{
+		return currentPlugin;
+	}
 
-    void set(const char* newName);
+	P* makeInstance()
+	{
+		if (!hasData())
+			return NULL;
+
+		P* p = (P*) pluginSet->getPlugin(&status);
+		check(&status);
+		return p;
+	}
+
+	void next()
+	{
+		if (hasData())
+		{
+			pluginInterface->releasePlugin(currentPlugin);
+			currentPlugin = NULL;
+
+			pluginSet->next(&status);
+			check(&status);
+			getPlugin();
+		}
+	}
+
+	void set(const char* newName)
+	{
+		if (hasData())
+		{
+			pluginInterface->releasePlugin(currentPlugin);
+			currentPlugin = NULL;
+		}
+
+		pluginSet->set(&status, newName);
+		check(&status);
+		getPlugin();
+	}
+
+	~GetPlugins()
+	{
+		if (hasData())
+		{
+			pluginInterface->releasePlugin(currentPlugin);
+			currentPlugin = NULL;
+		}
+	}
 
 private:
     void getPlugin();

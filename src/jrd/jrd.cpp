@@ -653,38 +653,53 @@ namespace
 		static const unsigned ATT_LOCK_ASYNC			= 1;
 		static const unsigned ATT_DONT_LOCK				= 2;
 		static const unsigned ATT_NO_SHUTDOWN_CHECK		= 4;
+		static const unsigned ATT_NON_BLOCKING			= 8;
 
 		AttachmentHolder(thread_db* tdbb, StableAttachmentPart* sa, unsigned lockFlags, const char* from)
 			: sAtt(sa),
 			  async(lockFlags & ATT_LOCK_ASYNC),
-			  nolock(lockFlags & ATT_DONT_LOCK)
+			  nolock(lockFlags & ATT_DONT_LOCK),
+			  blocking(!(lockFlags & ATT_NON_BLOCKING))
 		{
-			if (!nolock)
-				sAtt->getMutex(async)->enter(from);
-
-			Jrd::Attachment* attachment = sAtt->getHandle();	// Must be done after entering mutex
+			if (blocking)
+				sAtt->getBlockingMutex()->enter(from);
 
 			try
 			{
-				if (!attachment || (engineShutdown && !(lockFlags & ATT_NO_SHUTDOWN_CHECK)))
+
+				if (!nolock)
+					sAtt->getMutex(async)->enter(from);
+
+				Jrd::Attachment* attachment = sAtt->getHandle();	// Must be done after entering mutex
+
+				try
 				{
-					// This shutdown check is an optimization, threads can still enter engine
-					// with the flag set cause shutdownMutex mutex is not locked here.
-					// That's not a danger cause check of att_use_count
-					// in shutdown code makes it anyway safe.
-					status_exception::raise(Arg::Gds(isc_att_shutdown));
+					if (!attachment || (engineShutdown && !(lockFlags & ATT_NO_SHUTDOWN_CHECK)))
+					{
+						// This shutdown check is an optimization, threads can still enter engine
+						// with the flag set cause shutdownMutex mutex is not locked here.
+						// That's not a danger cause check of att_use_count
+						// in shutdown code makes it anyway safe.
+						status_exception::raise(Arg::Gds(isc_att_shutdown));
+					}
+
+					tdbb->setAttachment(attachment);
+					tdbb->setDatabase(attachment->att_database);
+
+					if (!async)
+						attachment->att_use_count++;
 				}
-
-				tdbb->setAttachment(attachment);
-				tdbb->setDatabase(attachment->att_database);
-
-				if (!async)
-					attachment->att_use_count++;
+				catch (const Firebird::Exception&)
+				{
+					if (!nolock)
+						sAtt->getMutex(async)->leave();
+					throw;
+				}
 			}
 			catch (const Firebird::Exception&)
 			{
-				if (!nolock)
-					sAtt->getMutex(async)->leave();
+				if (blocking)
+					sAtt->getBlockingMutex()->leave();
 				throw;
 			}
 		}
@@ -698,12 +713,16 @@ namespace
 
 			if (!nolock)
 				sAtt->getMutex(async)->leave();
+
+			if (blocking)
+				sAtt->getBlockingMutex()->leave();
 		}
 
 	private:
 		RefPtr<StableAttachmentPart> sAtt;
-		bool async;
-		bool nolock; // if locked manually, no need to take lock recursively
+		bool async;			// async mutex should be locked instead normal
+		bool nolock; 		// if locked manually, no need to take lock recursively
+		bool blocking;		// holder instance is blocking other instances
 
 	private:
 		// copying is prohibited
@@ -2099,7 +2118,8 @@ void JAttachment::cancelOperation(CheckStatusWrapper* user_status, int option)
  **************************************/
 	try
 	{
-		EngineContextHolder tdbb(user_status, this, FB_FUNCTION, AttachmentHolder::ATT_LOCK_ASYNC);
+		EngineContextHolder tdbb(user_status, this, FB_FUNCTION,
+			AttachmentHolder::ATT_LOCK_ASYNC | AttachmentHolder::ATT_NON_BLOCKING);
 
 		try
 		{
@@ -7447,16 +7467,8 @@ void thread_db::setDatabase(Database* val)
 {
 	if (database != val)
 	{
-		const bool wasActive = database && (priorThread || nextThread || database->dbb_active_threads == this);
-
-		if (wasActive)
-			deactivate();
-
 		database = val;
 		dbbStat = val ? &val->dbb_stats : RuntimeStatistics::getDummy();
-
-		if (wasActive)
-			activate();
 	}
 }
 
