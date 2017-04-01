@@ -21,7 +21,10 @@
 @set FB_CFG_NAME=Release
 @set FB_CLEAN=/build
 
+@set FB_VS2017_CE_PATH=c:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
+
 for %%v in ( %* ) do (
+  ( if /I "%%v"=="MSVC15XP" (set FB_BUILD__COMPILER=msvc15xp) )
   ( if /I "%%v"=="MSVC14XP" (set FB_BUILD__COMPILER=msvc14xp) )
   ( if /I "%%v"=="MSVC12XP" (set FB_BUILD__COMPILER=msvc12xp) )
   ( if /I "%%v"=="MSVC11XP" (set FB_BUILD__COMPILER=msvc11xp) )
@@ -37,6 +40,7 @@ for %%v in ( %* ) do (
   ( if /I "%%v"=="CLEAN"    (set FB_CLEAN=/rebuild) )
 )
 
+if "%FB_BUILD__COMPILER%"=="msvc15xp" if NOT EXIST "%FB_VS2017_CE_PATH%" goto :ERROR__NO_VS2017CE
 if "%FB_BUILD__COMPILER%"=="msvc14xp" if NOT DEFINED VS140COMNTOOLS goto :ERROR__NO_VS140COMNTOOLS
 if "%FB_BUILD__COMPILER%"=="msvc12xp" if NOT DEFINED VS120COMNTOOLS goto :ERROR__NO_VS120COMNTOOLS
 if "%FB_BUILD__COMPILER%"=="msvc11xp" if NOT DEFINED VS110COMNTOOLS goto :ERROR__NO_VS110COMNTOOLS
@@ -45,6 +49,7 @@ if "%FB_BUILD__COMPILER%"=="msvc9"    if NOT DEFINED VS90COMNTOOLS  goto :ERROR_
 if "%FB_BUILD__COMPILER%"=="msvc8"    if NOT DEFINED VS80COMNTOOLS  goto :ERROR__NO_VS80COMNTOOLS
 if "%FB_BUILD__COMPILER%"=="msvc7"    if NOT DEFINED VS71COMNTOOLS  goto :ERROR__NO_VS71COMNTOOLS
 
+if "%FB_BUILD__COMPILER%"=="" if EXIST "%FB_VS2017_CE_PATH%" set FB_BUILD__COMPILER=msvc15xp
 if "%FB_BUILD__COMPILER%"=="" if DEFINED VS140COMNTOOLS set FB_BUILD__COMPILER=msvc14xp
 if "%FB_BUILD__COMPILER%"=="" if DEFINED VS120COMNTOOLS set FB_BUILD__COMPILER=msvc12xp
 if "%FB_BUILD__COMPILER%"=="" if DEFINED VS110COMNTOOLS set FB_BUILD__COMPILER=msvc11xp
@@ -65,6 +70,7 @@ set FB_PROCESSOR_ARCHITECTURE=%PROCESSOR_ARCHITECTURE%
 ::echo FB_CFG__NAME              : [%FB_CFG_NAME%]
 
 ::===============================
+if "%FB_BUILD__COMPILER%"=="msvc15xp" set MSVC_VERSION=15
 if "%FB_BUILD__COMPILER%"=="msvc14xp" set MSVC_VERSION=14
 if "%FB_BUILD__COMPILER%"=="msvc12xp" set MSVC_VERSION=12
 if "%FB_BUILD__COMPILER%"=="msvc11xp" set MSVC_VERSION=11
@@ -79,6 +85,11 @@ if %MSVC_VERSION%=="" goto :HELP
 
 ::===============================
 ::Set up the compiler environment
+
+if "%FB_BUILD__COMPILER%"=="msvc15xp" (
+@devenv /? >nul 2>nul
+@if errorlevel 9009 (call "%FB_VS2017_CE_PATH%\vcvarsall.bat" %FB_PROCESSOR_ARCHITECTURE%) else ( echo    The file: & @echo      "%FB_VS2017_CE_PATH%\vcvarsall.bat" %FB_PROCESSOR_ARCHITECTURE% & echo    has already been executed.)
+)
 
 if "%FB_BUILD__COMPILER%"=="msvc14xp" (
 @devenv /? >nul 2>nul
@@ -182,6 +193,11 @@ rem @if not defined MSVC_VERSION goto :HELP
 
 goto :END
 
+
+::===========
+:ERROR__NO_VS2017CE
+@echo "ERROR: VS2017 (CE) not installed"
+@exit /B 1
 
 ::===========
 :ERROR__NO_VS140COMNTOOLS

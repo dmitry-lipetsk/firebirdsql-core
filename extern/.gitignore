@@ -1,5 +1,4 @@
-**/Win32/
-**/x64/
+icu/builds/win32/msvc15xp/.vs
 icu/**/out
 icu/include/
 *.log
