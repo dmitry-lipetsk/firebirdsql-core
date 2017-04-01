@@ -1162,7 +1162,10 @@ void VIO_data(thread_db* tdbb, record_param* rpb, MemoryPool* pool)
 	UCHAR* tail;
 	const UCHAR* tail_end;
 	UCHAR differences[MAX_DIFFERENCES];
-	Record* prior = rpb->rpb_prior;
+	
+	// Primary record version not uses prior version
+	Record* prior = (rpb->rpb_flags & rpb_chained) ? rpb->rpb_prior : NULL;
+
 	if (prior)
 	{
 		tail = differences;

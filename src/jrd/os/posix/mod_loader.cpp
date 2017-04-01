@@ -28,6 +28,7 @@
 #include "firebird.h"
 #include "../jrd/os/mod_loader.h"
 #include "../../common.h"
+#include "../jrd/os/path_utils.h"
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -47,14 +48,16 @@
 class DlfcnModule : public ModuleLoader::Module
 {
 public:
-	DlfcnModule(void* m)
-		: module(m)
+	DlfcnModule(MemoryPool& pool, const Firebird::PathName& aFileName, void* m)
+		: fileName(pool, aFileName),
+		  module(m)
 	{}
 
 	~DlfcnModule();
 	void *findSymbol(const Firebird::string&);
 
 private:
+	Firebird::PathName fileName;
 	void *module;
 };
 
@@ -84,7 +87,7 @@ void ModuleLoader::doctorModuleExtention(Firebird::PathName& name)
 #define FB_RTLD_MODE RTLD_LAZY	// save time when loading library
 #endif
 
-ModuleLoader::Module *ModuleLoader::loadModule(const Firebird::PathName& modPath)
+ModuleLoader::Module* ModuleLoader::loadModule(const Firebird::PathName& modPath)
 {
 	void* module = dlopen(modPath.c_str(), FB_RTLD_MODE);
 	if (module == NULL)
@@ -95,7 +98,7 @@ ModuleLoader::Module *ModuleLoader::loadModule(const Firebird::PathName& modPath
 		return 0;
 	}
 
-	return FB_NEW(*getDefaultMemoryPool()) DlfcnModule(module);
+	return FB_NEW(*getDefaultMemoryPool()) DlfcnModule(*getDefaultMemoryPool(), modPath, module);
 }
 
 DlfcnModule::~DlfcnModule()
@@ -104,7 +107,7 @@ DlfcnModule::~DlfcnModule()
 		dlclose(module);
 }
 
-void *DlfcnModule::findSymbol(const Firebird::string& symName)
+void* DlfcnModule::findSymbol(const Firebird::string& symName)
 {
 	void *result = dlsym(module, symName.c_str());
 	if (result == NULL)
@@ -113,6 +116,18 @@ void *DlfcnModule::findSymbol(const Firebird::string& symName)
 
 		result = dlsym(module, newSym.c_str());
 	}
+
+#ifdef HAVE_DLADDR
+	if (!PathUtils::isRelative(fileName))
+	{
+		Dl_info info;
+		if (!dladdr(result, &info))
+			return NULL;
+		if (fileName != info.dli_fname)
+			return NULL;
+	}
+#endif
+
 	return result;
 }
 

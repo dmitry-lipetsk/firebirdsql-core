@@ -162,6 +162,8 @@ public:
 	explicit Trigger(MemoryPool& p)
 		: blr(p), debugInfo(p), name(p)
 	{}
+
+	~Trigger() {}
 };
 
 
