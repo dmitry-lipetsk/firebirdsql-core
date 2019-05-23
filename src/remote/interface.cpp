@@ -1903,7 +1903,6 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 				statement->raiseException();
 			}
 		}
-
 		statement->rsr_msgs_waiting--;
 
 		message = statement->rsr_message;
@@ -1914,7 +1913,6 @@ ISC_STATUS GDS_DSQL_FETCH(ISC_STATUS* user_status,
 			status_exception::raise(Arg::Gds(isc_port_len) <<
 				Arg::Num(msg_length) << Arg::Num(statement->rsr_user_select_format->fmt_length));
 		}
-
 		if (statement->rsr_user_select_format == statement->rsr_select_format) {
 			memcpy(msg, message->msg_address, msg_length);
 		}
@@ -2612,8 +2610,7 @@ ISC_STATUS GDS_GET_SEGMENT(ISC_STATUS* user_status,
 				blob->rbl_offset += l;
 				buffer_length -= l;
 
-				if (l)
-                {
+				if (l) {
 					memcpy(buffer, p, l);
 				}
 
@@ -4895,8 +4892,7 @@ static bool clear_stmt_que(rem_port* port, ISC_STATUS* user_status, Rsr* stateme
 
 	// hvlad: clear isc_req_sync error as it is received because of our batch
 	// fetching code, not because of wrong client application
-	if (statement->haveException() == isc_req_sync)
-    {
+	if (statement->haveException() == isc_req_sync) {
 		statement->clearException();
 	}
 
@@ -4963,9 +4959,7 @@ static bool batch_dsql_fetch(rem_port*	port,
 	// In addtion to the above we grab all the records in case of XNET as
 	// we need to clear the queue
 	bool clear_queue = false;
-
-	if (id != statement->rsr_id || port->port_type == rem_port::XNET)
-    {
+	if (id != statement->rsr_id || port->port_type == rem_port::XNET) {
 		clear_queue = true;
 	}
 
@@ -4991,11 +4985,9 @@ static bool batch_dsql_fetch(rem_port*	port,
 			prior->msg_next = new_msg;
 			new_msg->msg_prior = prior;
 #else
-			while (message->msg_next != new_msg->msg_next)
-			{
+			while (message->msg_next != new_msg->msg_next) {
 				message = message->msg_next;
 			}
-
 			message->msg_next = new_msg;
 #endif
 		}
@@ -5029,8 +5021,7 @@ static bool batch_dsql_fetch(rem_port*	port,
 
 		// See if we're at end of the batch
 
-		if (packet->p_sqldata.p_sqldata_status ||
-			!packet->p_sqldata.p_sqldata_messages ||
+		if (packet->p_sqldata.p_sqldata_status || !packet->p_sqldata.p_sqldata_messages ||
 			(port->port_flags & PORT_rpc))
 		{
 			if (packet->p_sqldata.p_sqldata_status == 100)
@@ -5042,22 +5033,16 @@ static bool batch_dsql_fetch(rem_port*	port,
 						   statement->rsr_rows_pending);
 #endif
 			}
-
 			--statement->rsr_batch_count;
-
-			if (statement->rsr_batch_count == 0)
-			{
+			if (statement->rsr_batch_count == 0) {
 				statement->rsr_rows_pending = 0;
 			}
-
 			dequeue_receive(port);
 
 			// clear next queued batch(es) if present
-			if (packet->p_sqldata.p_sqldata_status == 100)
-			{
+			if (packet->p_sqldata.p_sqldata_status == 100) {
 				clear_stmt_que(port, tmp_status, statement);
 			}
-
 			break;
 		}
 		statement->rsr_msgs_waiting++;
@@ -5066,14 +5051,11 @@ static bool batch_dsql_fetch(rem_port*	port,
 		fprintf(stdout, "Decrementing Rows Pending in batch_dsql_fetch=%lu\n",
 				   statement->rsr_rows_pending);
 #endif
-		if (!clear_queue)
-		{
+		if (!clear_queue) {
 			break;
 		}
 	}
-
 	packet->p_resp.p_resp_status_vector = save_status;
-
 	return true;
 }
 
