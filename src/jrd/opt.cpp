@@ -1437,7 +1437,9 @@ static void check_indices(const CompilerScratch::csb_repeat* csb_tail)
 	// if there were no indices fetched at all but the
 	// user specified some, error out using the first index specified
 	const jrd_nod* access_type = 0;
-	if (!csb_tail->csb_indices && (access_type = plan->nod_arg[e_retrieve_access_type]))
+	if (!csb_tail->csb_indices &&
+		(access_type = plan->nod_arg[e_retrieve_access_type]) &&
+		!(tdbb->getAttachment()->att_flags & ATT_gbak_attachment))
 	{
 		// index %s cannot be used in the specified plan
 		const char* iname =
@@ -7837,6 +7839,8 @@ static void set_position(const jrd_nod* from_clause, jrd_nod* to_clause, const j
 		{
 			if ((map && map_equal(*to_ptr, *from_ptr, map)) ||
 				(!map &&
+					(*from_ptr)->nod_type == nod_field &&
+					(*to_ptr)->nod_type == nod_field &&
 					(*from_ptr)->nod_arg[e_fld_stream] == (*to_ptr)->nod_arg[e_fld_stream] &&
 					(*from_ptr)->nod_arg[e_fld_id] == (*to_ptr)->nod_arg[e_fld_id]))
 			{

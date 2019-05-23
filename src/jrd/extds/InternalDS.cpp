@@ -188,7 +188,7 @@ void InternalConnection::doDetach(thread_db* tdbb)
 	fb_assert(!m_attachment);
 }
 
-bool InternalConnection::cancelExecution(thread_db* tdbb)
+bool InternalConnection::cancelExecution(thread_db* tdbb, bool /*forced*/)
 {
 	if (m_isCurrent)
 		return true;
@@ -291,6 +291,14 @@ void InternalTransaction::doCommit(ISC_STATUS* status, thread_db* tdbb, bool ret
 void InternalTransaction::doRollback(ISC_STATUS* status, thread_db* tdbb, bool retain)
 {
 	fb_assert(m_transaction);
+
+	Database* dbb = tdbb->getDatabase();
+	if (dbb && (dbb->dbb_flags & DBB_bugcheck))
+	{
+		m_transaction = NULL;
+		m_jrdTran = NULL;
+		return;
+	}
 
 	if (m_scope == traCommon && m_IntConnection.isCurrent()) {
 		if (!retain) {

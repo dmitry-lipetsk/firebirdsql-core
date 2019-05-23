@@ -78,6 +78,40 @@ static void adjustLength(dsc* desc)
 	desc->dsc_length += adjust;
 }
 
+static void composeDesc(dsc* desc,
+						USHORT dtype,
+						SSHORT scale,
+						SSHORT sub_type,
+						FLD_LENGTH length,
+						SSHORT character_set_id,
+						SSHORT collation_id,
+						USHORT flags)
+{
+	desc->dsc_dtype = static_cast<UCHAR>(dtype);
+	desc->dsc_scale = static_cast<SCHAR>(scale);
+	desc->dsc_sub_type = sub_type;
+	desc->dsc_length = length;
+	desc->dsc_flags = (flags & FLD_nullable) ? DSC_nullable : 0;
+
+	if (desc->dsc_dtype <= dtype_any_text) {
+		INTL_ASSIGN_DSC(desc, character_set_id, collation_id);
+	}
+	else if (desc->dsc_dtype == dtype_blob)
+	{
+		desc->dsc_scale = static_cast<SCHAR>(character_set_id);
+		desc->dsc_flags |= collation_id << 8;
+	}
+
+	// UNICODE_FSS_HACK
+	// check if the field is a system domain and CHARACTER SET is UNICODE_FSS
+	if ((desc->dsc_dtype <= dtype_any_text) &&
+		(INTL_GET_CHARSET(desc) == CS_UNICODE_FSS) &&
+		(flags & FLD_system))
+	{
+		adjustLength(desc);
+	}
+}
+
 
 // Firebird provides transparent conversion from string to date in
 // contexts where it makes sense.  This macro checks a descriptor to
@@ -623,7 +657,7 @@ void MAKE_desc(CompiledStatement* statement, dsc* desc, dsql_nod* node, dsql_nod
 
 	case nod_cast:
 		field = (dsql_fld*) node->nod_arg[e_cast_target];
-		MAKE_desc_from_field(desc, field, /*IsElement*/false);
+		MAKE_desc_from_field(desc, field);
 		MAKE_desc(statement, &desc1, node->nod_arg[e_cast_source], NULL);
 		desc->dsc_flags = desc1.dsc_flags & DSC_nullable;
 		return;
@@ -1387,6 +1421,7 @@ void MAKE_desc(CompiledStatement* statement, dsc* desc, dsql_nod* node, dsql_nod
 		return;
 
 	case nod_current_time:
+	case nod_local_time:
 		desc->dsc_dtype = dtype_sql_time;
 		desc->dsc_sub_type = 0;
 		desc->dsc_scale = 0;
@@ -1403,6 +1438,7 @@ void MAKE_desc(CompiledStatement* statement, dsc* desc, dsql_nod* node, dsql_nod
 		return;
 
 	case nod_current_timestamp:
+	case nod_local_timestamp:
 		desc->dsc_dtype = dtype_timestamp;
 		desc->dsc_sub_type = 0;
 		desc->dsc_scale = 0;
@@ -1511,6 +1547,27 @@ void MAKE_desc(CompiledStatement* statement, dsc* desc, dsql_nod* node, dsql_nod
 
 /**
 
+ 	MAKE_desc_from_element
+
+    @brief	Compute a DSC from an element's description information.
+
+
+    @param desc
+    @param field
+
+ **/
+void MAKE_desc_from_element(dsc* desc, const dsql_fld* field)
+{
+	DEV_BLKCHK(field, dsql_type_fld);
+
+	composeDesc(desc,
+		field->fld_element_dtype, field->fld_scale, field->fld_sub_type, field->fld_element_length,
+		field->fld_character_set_id, field->fld_collation_id, field->fld_flags);
+}
+
+
+/**
+
  	MAKE_desc_from_field
 
     @brief	Compute a DSC from a field's description information.
@@ -1518,49 +1575,15 @@ void MAKE_desc(CompiledStatement* statement, dsc* desc, dsql_nod* node, dsql_nod
 
     @param desc
     @param field
-    @param IsElement
 
  **/
-void MAKE_desc_from_field(dsc*            const desc,
-                          const dsql_fld* const field,
-                          bool            const IsElement)
+void MAKE_desc_from_field(dsc* desc, const dsql_fld* field)
 {
-
 	DEV_BLKCHK(field, dsql_type_fld);
 
-    if(IsElement)
-    {
-     desc->dsc_dtype = static_cast<UCHAR>(field->fld_element_dtype);
-	 desc->dsc_length = field->fld_element_length;
-    }
-    else
-    {
-     desc->dsc_dtype = static_cast<UCHAR>(field->fld_dtype);
-     desc->dsc_length = field->fld_length;
-    }
-
-	desc->dsc_scale = static_cast<SCHAR>(field->fld_scale);
-	desc->dsc_sub_type = field->fld_sub_type;
-	desc->dsc_flags = (field->fld_flags & FLD_nullable) ? DSC_nullable : 0;
-
-	if (desc->dsc_dtype <= dtype_any_text)
-    {
-		INTL_ASSIGN_DSC(desc, field->fld_character_set_id, field->fld_collation_id);
-	}
-	else
-    if (desc->dsc_dtype == dtype_blob)
-	{
-		desc->dsc_scale = static_cast<SCHAR>(field->fld_character_set_id);
-		desc->dsc_flags |= field->fld_collation_id << 8;
-	}
-
-	// UNICODE_FSS_HACK
-	// check if the field is a system domain and CHARACTER SET is UNICODE_FSS
-	if ((desc->dsc_dtype <= dtype_any_text) && (INTL_GET_CHARSET(desc) == CS_UNICODE_FSS) &&
-		(field->fld_flags & FLD_system))
-	{
-		adjustLength(desc);
-	}
+	composeDesc(desc,
+		field->fld_dtype, field->fld_scale, field->fld_sub_type, field->fld_length,
+		field->fld_character_set_id, field->fld_collation_id, field->fld_flags);
 }
 
 
@@ -1630,8 +1653,7 @@ dsql_nod* MAKE_field(dsql_ctx* context, dsql_fld* field, dsql_nod* indices)
 		if (indices)
 		{
 			node->nod_arg[e_fld_indices] = indices;
-
-			MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/true);
+			MAKE_desc_from_element(&node->nod_desc, field);
 		}
 		else
 		{
@@ -1649,7 +1671,7 @@ dsql_nod* MAKE_field(dsql_ctx* context, dsql_fld* field, dsql_nod* indices)
 					  Arg::Gds(isc_dsql_only_can_subscript_array) << Arg::Str(field->fld_name));
 		}
 
-		MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/false);
+		MAKE_desc_from_field(&node->nod_desc, field);
 	}
 
 	if ((field->fld_flags & FLD_nullable) || (context->ctx_flags & CTX_outer_join))
@@ -1948,7 +1970,7 @@ dsql_nod* MAKE_variable(dsql_fld* field, const TEXT* name, const dsql_var_type t
 	//variable->var_flags = 0;
 	variable->var_type = type;
 	if (field)
-		MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/false);
+		MAKE_desc_from_field(&node->nod_desc, field);
 
 	return node;
 }
@@ -2007,41 +2029,25 @@ static void make_parameter_names(dsql_par* parameter, const dsql_nod* item)
 		context = (dsql_ctx*) item->nod_arg[0]->nod_arg[0];
 		break;
 	case nod_alias:
+		alias = item->nod_arg[e_alias_value];
+		make_parameter_names(parameter, alias);
 		string = (dsql_str*) item->nod_arg[e_alias_alias];
 		parameter->par_alias = string->str_data;
-		alias = item->nod_arg[e_alias_value];
-		if (alias->nod_type == nod_field)
-        {
-			field = (dsql_fld*) alias->nod_arg[e_fld_field];
-			parameter->par_name = field->fld_name.c_str();
-			context = (dsql_ctx*) alias->nod_arg[e_fld_context];
-		}
-		else
-        if (alias->nod_type == nod_dbkey)
-        {
-			parameter->par_name = DB_KEY_NAME;
-			context = (dsql_ctx*) alias->nod_arg[0]->nod_arg[0];
-		}
 		break;
 	case nod_via:
 		// subquery, aka sub-select
 		make_parameter_names(parameter, item->nod_arg[e_via_value_1]);
 		break;
 	case nod_derived_field:
+		alias = item->nod_arg[e_derived_field_value];
+		while (alias->nod_type == nod_derived_field) 
+			alias = alias->nod_arg[e_derived_field_value];
+		make_parameter_names(parameter, alias);
 		string = (dsql_str*) item->nod_arg[e_derived_field_name];
 		parameter->par_alias = string->str_data;
-		alias = item->nod_arg[e_derived_field_value];
-		if (alias->nod_type == nod_field)
-        {
-			field = (dsql_fld*) alias->nod_arg[e_fld_field];
-			parameter->par_name = field->fld_name.c_str();
-			context = (dsql_ctx*) alias->nod_arg[e_fld_context];
-		}
-		else if (alias->nod_type == nod_dbkey)
-        {
-			parameter->par_name = DB_KEY_NAME;
-			context = (dsql_ctx*) alias->nod_arg[0]->nod_arg[0];
-		}
+		context = (dsql_ctx*) item->nod_arg[e_derived_field_context];
+		parameter->par_rel_alias = context->ctx_alias;
+		context = NULL;
 		break;
 	case nod_map:
 		{
@@ -2239,9 +2245,15 @@ static void make_parameter_names(dsql_par* parameter, const dsql_nod* item)
 		if ( !Config::getOldColumnNaming() )
 			name_alias = "CURRENT_TIME";
 		break;
+	case nod_local_time:
+		name_alias = "LOCALTIME";
+		break;
 	case nod_current_timestamp:
 		if ( !Config::getOldColumnNaming() )
 			name_alias = "CURRENT_TIMESTAMP";
+		break;
+	case nod_local_timestamp:
+		name_alias = "LOCALTIMESTAMP";
 		break;
 	case nod_extract:
 		if ( !Config::getOldColumnNaming() )

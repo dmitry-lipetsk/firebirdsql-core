@@ -262,7 +262,7 @@ int  CLIB_ROUTINE main( int argc, char **argv)
 	if (startup_file.length())
 		LEX_push_file(startup_file.c_str(), false);
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER != 1900 && _MSC_VER != 1910
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && _MSC_VER != 1900 && !(_MSC_VER >= 1910 && _MSC_VER < 1920)
 	_set_output_format(_TWO_DIGIT_EXPONENT);
 #endif
 

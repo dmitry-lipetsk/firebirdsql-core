@@ -361,8 +361,10 @@
 #define BIND_PARAM 614
 #define BIN_NOT 615
 #define SQLSTATE 616
-#define UMINUS 617
-#define UPLUS 618
+#define LOCALTIME 617
+#define LOCALTIMESTAMP 618
+#define UMINUS 619
+#define UPLUS 620
 #define YYERRCODE 256
 
 #endif

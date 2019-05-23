@@ -1024,7 +1024,9 @@ ISC_STATUS GDS_ATTACH_DATABASE(ISC_STATUS* user_status,
 
 	DatabaseContextHolder dbbHolder(tdbb);
 
+#ifdef SUPERSERVER
 	if (!(dbb->dbb_flags & DBB_new))
+#endif
 	{
 		// That's already initialized DBB
 		// No need keeping dbInitMutex locked any more
@@ -1143,7 +1145,9 @@ ISC_STATUS GDS_ATTACH_DATABASE(ISC_STATUS* user_status,
 
 		// Init complete - we can release dbInitMutex
 		dbb->dbb_flags &= ~DBB_new;
+#ifdef SUPERSERVER
 		guardDbInit.leave();
+#endif
 	}
 	else
 	{
@@ -1722,6 +1726,11 @@ ISC_STATUS FB_CANCEL_OPERATION(ISC_STATUS* user_status, Attachment** handle, USH
 		case fb_cancel_raise:
 			if (!(attachment->att_flags & ATT_cancel_disable))
 				attachment->signalCancel(tdbb);
+			break;
+
+		case fb_cancel_abort:
+			if (!(attachment->att_flags & ATT_shutdown))
+				attachment->signalShutdown(tdbb);
 			break;
 
 		default:
@@ -2751,6 +2760,9 @@ ISC_STATUS GDS_OPEN_BLOB2(ISC_STATUS* user_status,
 			check_database(tdbb);
 
 			jrd_tra* const transaction = find_transaction(tdbb, isc_segstr_wrong_db);
+
+			if (blob_id->bid_internal.bid_relation_id)
+				transaction->checkBlob(tdbb, blob_id, true);
 
 			*blob_handle = BLB_open2(tdbb, transaction, blob_id, bpb_length, bpb, true);
 		}
@@ -5778,7 +5790,7 @@ void Attachment::signalCancel(thread_db* tdbb)
 	att_flags |= ATT_cancel_raise;
 
 	if (att_ext_connection)
-		att_ext_connection->cancelExecution(tdbb);
+		att_ext_connection->cancelExecution(tdbb, false);
 
 	LCK_cancel_wait(this);
 }
@@ -5788,7 +5800,7 @@ void Attachment::signalShutdown(thread_db* tdbb)
 	att_flags |= ATT_shutdown;
 
 	if (att_ext_connection)
-		att_ext_connection->cancelExecution(tdbb);
+		att_ext_connection->cancelExecution(tdbb, true);
 
 	LCK_cancel_wait(this);
 }
@@ -6830,6 +6842,7 @@ static THREAD_ENTRY_DECLARE shutdown_thread(THREAD_ENTRY_PARAM arg)
 		// Extra shutdown operations
 		Service::shutdownServices();
 		TraceManager::shutdown();
+		TRA_wait_for_sweep_completion();
 	}
 	catch (const Exception&)
 	{

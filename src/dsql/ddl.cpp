@@ -822,7 +822,9 @@ static bool is_array_or_blob(CompiledStatement* statement, const dsql_nod* node)
 	case nod_dbkey:
 	case nod_current_date:
 	case nod_current_time:
+	case nod_local_time:
 	case nod_current_timestamp:
+	case nod_local_timestamp:
 	case nod_constant:
 	case nod_strlen:
 	case nod_null:
@@ -6312,7 +6314,7 @@ static void put_local_variables(CompiledStatement* statement, dsql_nod* paramete
 				// Some field attributes are calculated inside
 				// put_local_variable(), so we reinitialize the
 				// descriptor
-				MAKE_desc_from_field(&var_node->nod_desc, field, /*IsElement*/false);
+				MAKE_desc_from_field(&var_node->nod_desc, field);
 
 				locals++;
 			}

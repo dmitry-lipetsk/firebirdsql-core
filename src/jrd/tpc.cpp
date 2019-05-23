@@ -474,9 +474,11 @@ static SLONG cache_transactions(thread_db* tdbb, TxPageCache** tip_cache_ptr, SL
 	WIN window(HEADER_PAGE_NUMBER);
 	const Ods::header_page* header = (Ods::header_page*) CCH_FETCH(tdbb, &window, LCK_read, pag_header);
 	const SLONG top = header->hdr_next_transaction;
-	const SLONG hdr_oldest = header->hdr_oldest_transaction;
+	const SLONG hdr_oldest = MAX(header->hdr_oldest_transaction, dbb->dbb_oldest_transaction);
 	CCH_RELEASE(tdbb, &window);
 #endif
+	// Don't try to ask for non-existing TIP page
+	oldest = MIN(oldest, top);
 	oldest = MAX(oldest, hdr_oldest);
 
 	// allocate TxPageCache blocks to hold all transaction states --

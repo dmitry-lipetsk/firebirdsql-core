@@ -335,10 +335,23 @@ int RESTORE_restore (const TEXT* file_name, const TEXT* database_name)
 		}
 	END_ERROR;
 
-	// Activate the indices for foreign keys and do another commit
+	if (tdgbl->global_trans)
+	{
+		BURP_verbose (68);
+		// msg 68 committing meta data
+		EXEC SQL COMMIT TRANSACTION tdgbl->global_trans;
+		if (gds_status[1])
+			general_on_error ();
+		// Check to see if there is a warning
+		if (gds_status[0] == isc_arg_gds && gds_status[1] == 0 && gds_status[2] != isc_arg_end)
+		{
+			BURP_print_warning(gds_status);
+		}
+	}
+
+	// Activate the indices for foreign keys / expression indices and do another commit
 	if (!tdgbl->gbl_sw_deactivate_indexes)
 	{
-
 		// Block added to verbose index creation by Toni Martir
 		// Always try to activate deferred indices - it helps for some broken backups,
 		// and in normal cases doesn't take much time to look for such indices. AP-2008.
@@ -457,20 +470,6 @@ int RESTORE_restore (const TEXT* file_name, const TEXT* database_name)
 		ON_ERROR
 			general_on_error ();
 		END_ERROR;
-	}
-
-	if (tdgbl->global_trans)
-	{
-		BURP_verbose (68);
-		// msg 68 committing meta data
-		EXEC SQL COMMIT TRANSACTION tdgbl->global_trans;
-		if (gds_status[1])
-			general_on_error ();
-		// Check to see if there is a warning
-		if (gds_status[0] == isc_arg_gds && gds_status[1] == 0 && gds_status[2] != isc_arg_end)
-		{
-			BURP_print_warning(gds_status);
-		}
 	}
 
 	EXEC SQL SET TRANSACTION ISOLATION LEVEL READ COMMITTED NO_AUTO_UNDO;
@@ -2758,6 +2757,7 @@ rec_type get_data(BurpGlobals* tdgbl, burp_rel* relation)
 
 	ULONG records = 0;
 	rec_type record;
+	bool resync = false;
 
 	while (true)
 	{
@@ -2851,10 +2851,12 @@ rec_type get_data(BurpGlobals* tdgbl, burp_rel* relation)
 
 		// ASF: Preferable we should call isc_start_and_send only when records == 1, but this leaks
 		// memory when there are blobs and arrays fields - CORE-3802.
-		if (records % 1000 == 1)
+		if (resync || records % 1000 == 1)
 			s = isc_start_and_send(status_vector, &request, &gds_trans, 0, (USHORT) length, buffer, 0);
 		else
 			s = isc_send(status_vector, &request, 0, (USHORT) length, buffer, 0);
+
+		resync = (s != 0);
 
 		if (s)
 		{
@@ -2895,6 +2897,8 @@ rec_type get_data(BurpGlobals* tdgbl, burp_rel* relation)
 					BURP_error_redirect (status_vector, 48);
 					// msg 48 isc_send failed
 			}
+
+			records--;
 		}
 		if (record != rec_data)
 			break;
@@ -4651,7 +4655,7 @@ bool get_index(BurpGlobals* tdgbl, const burp_rel* relation)
  **************************************/
 	BASED_ON RDB$INDICES.RDB$INDEX_NAME index_name;
 	att_type	attribute;
-	bool		foreign_index = false;
+	bool		foreign_index = false, expr_index = false;
 	scan_attr_t		scan_next_attr;
 
 	SSHORT count = 0, segments = 0;
@@ -4702,7 +4706,7 @@ bool get_index(BurpGlobals* tdgbl, const burp_rel* relation)
 				}
 				else
 				{
-					if (!X.RDB$INDEX_INACTIVE && foreign_index)
+					if (!X.RDB$INDEX_INACTIVE && (foreign_index || expr_index))
 						X.RDB$INDEX_INACTIVE = DEFERRED_ACTIVE;
 				}
 				if (tdgbl->gbl_sw_deactivate_indexes)
@@ -4742,6 +4746,12 @@ bool get_index(BurpGlobals* tdgbl, const burp_rel* relation)
 				break;
 
 			case att_index_expression_blr:
+				expr_index = true;
+				// Defer expression index activation
+				if (!X.RDB$INDEX_INACTIVE)
+					X.RDB$INDEX_INACTIVE = DEFERRED_ACTIVE;
+				if (tdgbl->gbl_sw_deactivate_indexes)
+					X.RDB$INDEX_INACTIVE = TRUE;
 				X.RDB$EXPRESSION_BLR.NULL = FALSE;
 				get_blr_blob (tdgbl, X.RDB$EXPRESSION_BLR, false);
 				break;
@@ -5436,8 +5446,8 @@ bool get_relation(BurpGlobals* tdgbl)
 	TEXT		temp[GDS_NAME_LEN];
 	SSHORT		l;
 
-	SLONG		rel_flags = 0, sys_flag = 0, type = 0;
-	bool		rel_flags_null = true, type_null = true;
+	SLONG		rel_flags = 0, sys_flag = fb_sysflag_user, type = rel_persistent;
+	bool		rel_flags_null = true;
 	ISC_QUAD	view_blr = isc_blob_null, view_src = isc_blob_null,
 				rel_desc = isc_blob_null, ext_desc = isc_blob_null;
 	bool		view_blr_null = true, view_src_null = true, rel_desc_null = true,
@@ -5450,6 +5460,24 @@ bool get_relation(BurpGlobals* tdgbl)
 	BASED_ON RDB$RELATIONS.RDB$EXTERNAL_FILE ext_file_name;
 	ext_file_name[0] = '\0';
 	bool		ext_file_name_null = true;
+
+	// Before starting to restore relations, commit everything that was restored
+	// prior to this point. This ensures that no pending error can later affect
+	// other metadata being restored.
+
+	if (!tdgbl->relations)
+	{
+		BURP_verbose (68);
+		// msg 68 committing meta data
+		COMMIT
+		ON_ERROR
+			general_on_error ();
+		END_ERROR;
+
+		EXEC SQL SET TRANSACTION NO_AUTO_UNDO;
+		if (gds_status[1])
+			EXEC SQL SET TRANSACTION;
+	}
 
 	// Pick up relation attributes
 
@@ -5549,10 +5577,7 @@ bool get_relation(BurpGlobals* tdgbl)
 
 		case att_relation_type:
 			if (tdgbl->RESTORE_format >= 8)
-			{
-				type_null = false;
 				type = get_numeric(tdgbl);
-			}
 			else
 				bad_attribute(scan_next_attr, attribute, 111);
 			break;
@@ -5586,7 +5611,7 @@ bool get_relation(BurpGlobals* tdgbl)
 			X.RDB$RUNTIME.NULL = TRUE;
 			X.RDB$EXTERNAL_DESCRIPTION.NULL = ext_desc_null;
 			X.RDB$EXTERNAL_FILE.NULL = ext_file_name_null;
-			X.RDB$RELATION_TYPE.NULL = type_null;
+			X.RDB$RELATION_TYPE.NULL = FALSE;
 
 			X.RDB$SYSTEM_FLAG = (USHORT) sys_flag;
 			X.RDB$FLAGS = (USHORT) rel_flags;

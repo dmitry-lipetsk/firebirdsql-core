@@ -236,11 +236,15 @@ const UCHAR CHR_WHITE	= 16;
 const UCHAR CHR_INTRODUCER	= 32;
 const UCHAR CHR_DBLQUOTE	= 64;
 
-
-static void atexit_fb_shutdown()
+class FbShudown
 {
-	fb_shutdown(0, fb_shutrsn_app_stopped);
-}
+public:
+	~FbShudown()
+	{
+		fb_shutdown(0, fb_shutrsn_app_stopped);
+	}
+};
+
 
 //____________________________________________________________
 //
@@ -251,7 +255,8 @@ static void atexit_fb_shutdown()
 
 int main(int argc, char* argv[])
 {
-	atexit(&atexit_fb_shutdown);
+	// Must call fb_shutdown at the end of main before call destructors of global variables
+	FbShudown fbShudown;
 
 	gpre_sym* symbol;
 	const ext_table_t* ext_tab;
@@ -954,6 +959,7 @@ void CPR_exit( int stat)
 		unlink(trace_file_name);
 #endif
 
+	fb_shutdown(0, fb_shutrsn_app_stopped);
 	exit(stat);
 }
 

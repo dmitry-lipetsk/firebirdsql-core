@@ -774,6 +774,9 @@ void IDX_garbage_collect(thread_db*			tdbb,
 	insertion.iib_relation = rpb->rpb_relation;
 	insertion.iib_key = &key1;
 
+	Attachment* att = tdbb->getAttachment();
+	AutoSetRestoreFlag<ULONG> gc(&att->att_flags, ATT_no_cleanup, true);
+
 	WIN window(get_root_page(tdbb, rpb->rpb_relation));
 
 	index_root_page* root = (index_root_page*) CCH_FETCH(tdbb, &window, LCK_read, pag_root);
@@ -847,6 +850,10 @@ void IDX_garbage_collect(thread_db*			tdbb,
 				// Get rid of index node
 
 				BTR_remove(tdbb, &window, &insertion);
+
+				if (--tdbb->tdbb_quantum < 0)
+					JRD_reschedule(tdbb, 0, true);
+
 				root = (index_root_page*) CCH_FETCH(tdbb, &window, LCK_read, pag_root);
 				if (stack1.hasMore(1))
 					BTR_description(tdbb, rpb->rpb_relation, root, &idx, i);
@@ -1678,6 +1685,11 @@ void IDX_modify_flag_uk_modified(thread_db* tdbb,
  **************************************/
 
 	SET_TDBB(tdbb);
+
+	// System relations have no foreign keys - so don't waste time looking for
+	// partners. Also, avoid possible self-blockage if relation is RDB$INDICES.
+	if (org_rpb->rpb_relation->isSystem())
+		return;
 
 	if ((org_rpb->rpb_flags & rpb_uk_modified) &&
 		(org_rpb->rpb_transaction_nr == new_rpb->rpb_transaction_nr))

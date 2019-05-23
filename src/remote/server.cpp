@@ -1353,21 +1353,35 @@ static void aux_request( rem_port* port, /*P_REQ* request,*/ PACKET* send)
 
 	if (aux_port)
 	{
+		fb_assert(aux_port->port_flags & PORT_connecting);
+		bool connected = false;
+
 		ISC_STATUS* const save_status2 = aux_port->port_status_vector;
 		aux_port->port_status_vector = status_vector;
 
-		if (aux_port->connect(send))
+		try
 		{
-			aux_port->port_context = rdb;
-			aux_port->port_status_vector = save_status2;
+			connected = aux_port->connect(send) != NULL;
+			if (connected)
+			{
+				aux_port->port_context = rdb;
+				aux_port->port_flags &= ~PORT_connecting;
+			}
 		}
-		else
+		catch (const Firebird::status_exception& ex)
 		{
-			iscLogStatus(NULL, aux_port->port_status_vector);
-			fb_assert(port->port_async == aux_port);
-			port->port_async = NULL;
-			aux_port->disconnect();
+			iscLogException("", ex);
 		}
+
+		aux_port->port_status_vector = save_status2;
+
+		if (!connected)
+		{
+			iscLogStatus(NULL, status_vector);
+ 			fb_assert(port->port_async == aux_port);
+ 			port->port_async = NULL;
+ 			aux_port->disconnect();
+ 		}
 	}
 
 	// restore the port status vector
@@ -4109,8 +4123,9 @@ ISC_STATUS rem_port::receive_msg(P_DATA * data, PACKET* sendL)
 				prior = message->msg_prior;
 #else
 				prior = tail->rrq_xdr;
-				while (prior->msg_next != message)
-					prior = prior->msg_next;
+
+			while (prior->msg_next != message)
+				prior = prior->msg_next;
 #endif
 
 			// allocate a new message block and put it in the cache
@@ -4700,11 +4715,12 @@ static void server_ast(void* event_void, USHORT length, const UCHAR* items)
  **************************************/
 	Rvnt* event = static_cast<Rvnt*>(event_void);
 
-	event->rvnt_id = 0;
 	Rdb* rdb = event->rvnt_rdb;
 
 	rem_port* port = rdb->rdb_port->port_async;
-	if (!port) {
+	if (!port) 
+	{
+		event->rvnt_id = 0;
 		return;
 	}
 
@@ -4725,6 +4741,8 @@ static void server_ast(void* event_void, USHORT length, const UCHAR* items)
 	p_event->p_event_rid = event->rvnt_rid;
 
 	port->send(&packet);
+
+	event->rvnt_id = 0;
 }
 
 

@@ -130,6 +130,7 @@ using namespace Firebird;
 #include "../utilities/install/install_nt.h"
 
 #include <mstcpip.h>
+#include <Ws2tcpip.h>
 
 #ifndef SIO_LOOPBACK_FAST_PATH
 #define SIO_LOOPBACK_FAST_PATH              _WSAIOW(IOC_VENDOR,16)
@@ -155,14 +156,15 @@ const int NOTASOCKET = EBADF;
 
 static void SOCLOSE(SOCKET& socket)
 {
-	if (socket != INVALID_SOCKET)
+	SOCKET s = socket;
+	if (s != INVALID_SOCKET)
 	{
-#ifdef WIN_NT
-		closesocket(socket);
-#else
-		close(socket);
-#endif
 		socket = INVALID_SOCKET;
+#ifdef WIN_NT
+		closesocket(s);
+#else
+		close(s);
+#endif
 	}
 };
 
@@ -422,6 +424,7 @@ static void		alarm_handler(int);
 static rem_port*		alloc_port(rem_port*, const USHORT = 0);
 static rem_port*		aux_connect(rem_port*, PACKET*);
 static rem_port*		aux_request(rem_port*, PACKET*);
+static void				abort_aux_connection(rem_port*);
 
 #if !defined(WIN_NT)
 static bool		check_host(rem_port*);
@@ -453,6 +456,7 @@ static bool forkThreadStarted = false;
 static SocketsArray* forkSockets;
 #endif
 
+static void get_peer_info(rem_port*);
 static in_addr get_bind_address();
 static int get_host_address(const char* name, in_addr* const host_addr_arr, const int arr_size);
 
@@ -960,8 +964,12 @@ rem_port* INET_connect(const TEXT* name,
 			n = connect(port->port_handle, (struct sockaddr*) &address, sizeof(address));
 			inetErrNo = INET_ERRNO;
 
-			if (n != -1 && send_full(port, packet))
-				return port;
+			if (n != -1)
+			{
+				get_peer_info(port);
+				if (send_full(port, packet))
+					return port;
+			}
 		}
 		inet_error(port, "connect", isc_net_connect_err, inetErrNo);
 		disconnect(port);
@@ -1334,24 +1342,7 @@ static bool accept_connection(rem_port* port, const P_CNCT* cnct)
 	port->port_user_name = REMOTE_make_string(temp.c_str());
 
 	port->port_protocol_str = REMOTE_make_string("TCPv4");
-
-	struct sockaddr_in address;
-	socklen_t l = sizeof(address);
-
-	memset(&address, 0, sizeof(address));
-	int status = getpeername(port->port_handle, (struct sockaddr *) &address, &l);
-	if (status == 0)
-	{
-		Firebird::string addr_str;
-		const UCHAR* ip = (UCHAR*) &address.sin_addr;
-		addr_str.printf(
-			"%d.%d.%d.%d",
-			static_cast<int>(ip[0]),
-			static_cast<int>(ip[1]),
-			static_cast<int>(ip[2]),
-			static_cast<int>(ip[3]) );
-		port->port_address_str = REMOTE_make_string(addr_str.c_str());
-	}
+	get_peer_info(port);
 
 	return true;
 }
@@ -1450,6 +1441,17 @@ static rem_port* alloc_port(rem_port* const parent, const USHORT flags)
 	return port;
 }
 
+
+static void abort_aux_connection(rem_port* port)
+{
+	if (port->port_flags & PORT_connecting)
+	{
+		shutdown(port->port_channel, 2);
+		SOCLOSE(port->port_channel);
+	}
+}
+
+
 static rem_port* aux_connect(rem_port* port, PACKET* packet)
 {
 /**************************************
@@ -1502,6 +1504,9 @@ static rem_port* aux_connect(rem_port* port, PACKET* packet)
 			}
 		}
 
+		if (port->port_channel == INVALID_SOCKET)
+			return NULL;
+
 		const SOCKET n = accept(port->port_channel, (struct sockaddr*) &address, &l);
 		inetErrNo = INET_ERRNO;
 
@@ -1515,6 +1520,7 @@ static rem_port* aux_connect(rem_port* port, PACKET* packet)
 		SOCLOSE(port->port_channel);
 		port->port_handle = n;
 		port->port_flags |= PORT_async;
+		get_peer_info(port);
 		return port;
 	}
 
@@ -1523,7 +1529,7 @@ static rem_port* aux_connect(rem_port* port, PACKET* packet)
 	new_port->port_dummy_packet_interval = port->port_dummy_packet_interval;
 	new_port->port_dummy_timeout = new_port->port_dummy_packet_interval;
 	new_port->port_flags = port->port_flags & PORT_no_oob;
-	new_port->port_flags |= PORT_async;
+	new_port->port_flags |= (PORT_async | PORT_connecting);
 	P_RESP* response = &packet->p_resp;
 
 	// Set up new socket
@@ -1570,6 +1576,7 @@ static rem_port* aux_connect(rem_port* port, PACKET* packet)
 	}
 
 	new_port->port_handle = n;
+	get_peer_info(new_port);
 
 	return new_port;
 }
@@ -1639,14 +1646,14 @@ static rem_port* aux_request( rem_port* port, PACKET* packet)
 
 	setFastLoopbackOption(n);
 
-    rem_port* const new_port = alloc_port(port->port_parent, PORT_async);
+    rem_port* const new_port = alloc_port(port->port_parent,
+    	(port->port_flags & PORT_no_oob) | PORT_async | PORT_connecting);
 	port->port_async = new_port;
 	new_port->port_dummy_packet_interval = port->port_dummy_packet_interval;
 	new_port->port_dummy_timeout = new_port->port_dummy_packet_interval;
 
 	new_port->port_server_flags = port->port_server_flags;
 	new_port->port_channel = (int) n;
-	new_port->port_flags |= port->port_flags & PORT_no_oob;
 
 	P_RESP* response = &packet->p_resp;
 
@@ -1751,6 +1758,7 @@ static void disconnect(rem_port* const port)
 
 	Firebird::MutexLockGuard guard(port_mutex);
 	port->port_state = rem_port::DISCONNECTED;
+	port->port_flags &= ~PORT_connecting;
 
 	if (port->port_async)
 	{
@@ -1811,6 +1819,9 @@ static void force_close(rem_port* port)
  *	Forcebly close remote connection.
  *
  **************************************/
+
+	if (port->port_async)
+		abort_aux_connection(port->port_async);
 
 	if (port->port_state != rem_port::PENDING)
 		return;
@@ -2226,7 +2237,8 @@ static bool select_multi(rem_port* main_port, UCHAR* buffer, SSHORT bufsize, SSH
 
 			if (!packet_receive(port, buffer, bufsize, length))
 			{
-				if (port->port_flags & PORT_disconnect) {
+				if (port->port_flags & (PORT_disconnect | PORT_connecting))
+				{
 					continue;
 				}
 				*length = 0;
@@ -2308,7 +2320,9 @@ static void select_port(rem_port* main_port, Select* selct, RemPortPtr& port)
 		switch (result)
 		{
 		case Select::SEL_BAD:
-			if (port->port_state == rem_port::BROKEN)
+			if (port->port_state == rem_port::BROKEN || (port->port_flags & PORT_connecting))
+				continue;
+			if (port->port_flags & PORT_async)
 				continue;
 			return;
 
@@ -2613,6 +2627,39 @@ static XDR_INT inet_destroy( XDR*)
 	return (XDR_INT) 0;
 }
 
+void get_peer_info(rem_port* port)
+{
+/**************************************
+*
+*	g e t _ p e e r _ i n f o
+*
+**************************************
+*
+* Functional description
+*	Port just connected. Obtain some info about connection and peer.
+*
+**************************************/
+	struct sockaddr_in address;
+	socklen_t l = sizeof(address);
+
+	memset(&address, 0, sizeof(address));
+	int status = getpeername(port->port_handle, (struct sockaddr *) &address, &l);
+	if (status == 0)
+	{
+		Firebird::string addr_str;
+		char host[64];		// 32 digits, 7 colons, 1 trailing null byte
+		char serv[16];
+		int nameinfo = getnameinfo((struct sockaddr *) &address, l, host, sizeof(host),
+								   serv, sizeof(serv), NI_NUMERICHOST | NI_NUMERICSERV);
+
+		if (!nameinfo)
+			addr_str.printf("%s/%s", host, serv);
+
+		port->port_address_str = REMOTE_make_string(addr_str.c_str());
+	}
+}
+
+
 static void inet_gen_error(rem_port* port, const Arg::StatusVector& v)
 {
 /**************************************
@@ -2635,7 +2682,7 @@ static void inet_gen_error(rem_port* port, const Arg::StatusVector& v)
 	error << Arg::Str(node_name) << v;
 
 	ISC_STATUS* status_vector = NULL;
-	if (port->port_context != NULL) {
+	if (port->port_context != NULL && !(port->port_flags & PORT_async)) {
 		status_vector = port->port_context->get_status_vector();
 	}
 	if (status_vector == NULL) {
@@ -2797,8 +2844,29 @@ static void inet_error(rem_port* port, const TEXT* function, ISC_STATUS operatio
  **************************************/
 	if (status)
 	{
-		if (port->port_state != rem_port::BROKEN) {
-			gds__log("INET/inet_error: %s errno = %d", function, status);
+		if (port->port_state != rem_port::BROKEN)
+		{
+			string err;
+			err.printf("INET/inet_error: %s errno = %d", function, status);
+
+			if (port->port_address_str && port->port_address_str->str_length)
+			{
+				err.append(port->port_flags & PORT_async ? ", aux " : ", ");
+				err.append(port->port_server_flags ? "client" : "server");
+
+				err.append(" address = ");
+				err.append(port->port_address_str->str_data, port->port_address_str->str_length);
+			}
+
+			if (port->port_user_name && port->port_user_name->str_length)
+			{
+				err.append(", user = ");
+				err.append(port->port_user_name->str_data, port->port_user_name->str_length);
+			}
+
+			// Address could contain percent sign inside, therefore make
+			// sure error string not used as printf format string.
+			gds__log("%s", err.c_str());
 		}
 
 		inet_gen_error(port, Arg::Gds(operation) << SYS_ERR(status));

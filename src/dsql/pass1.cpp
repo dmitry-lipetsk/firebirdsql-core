@@ -287,8 +287,9 @@ static dsql_nod* pass1_rse_is_recursive(CompiledStatement*, dsql_nod*);
 static dsql_nod* pass1_recursive_cte(CompiledStatement*, dsql_nod*);
 static dsql_nod* process_returning(CompiledStatement*, dsql_nod*);
 
-// CVC: more global variables???
-static const dsql_str* global_temp_collation_name = NULL;
+#ifdef DSQL_DEBUG
+static void dump_context_stack(const DsqlContextStack* stack);
+#endif
 
 const char* DB_KEY_STRING	= "DB_KEY"; // NTX: pseudo field name
 const int MAX_MEMBER_LIST	= 1500;	// Maximum members in "IN" list.
@@ -519,7 +520,7 @@ dsql_ctx* PASS1_make_context(CompiledStatement* statement, const dsql_nod* relat
 				{
 					DEV_BLKCHK(field, dsql_type_fld);
 					DEV_BLKCHK(*input, dsql_type_nod);
-					MAKE_desc_from_field(&desc_node->nod_desc, field, /*IsElement*/false);
+					MAKE_desc_from_field(&desc_node->nod_desc, field);
 					//	set_parameter_type(statement, *input, &desc_node, false);
 					set_parameter_type(statement, *input, desc_node, false);
 				}
@@ -578,7 +579,7 @@ dsql_nod* PASS1_node(CompiledStatement* statement, dsql_nod* input)
 		field = (dsql_fld*) node->nod_arg[e_cast_target];
 		DEV_BLKCHK(field, dsql_type_fld);
 		DDL_resolve_intl_type(statement, field, NULL);
-		MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/false);
+		MAKE_desc_from_field(&node->nod_desc, field);
 		set_parameter_type(statement, node, NULL, false);
 		// If the source is nullable, so is the target
 		MAKE_desc(statement, &sub1->nod_desc, sub1, NULL);
@@ -606,9 +607,11 @@ dsql_nod* PASS1_node(CompiledStatement* statement, dsql_nod* input)
 		return node;
 
 	case nod_collate:
-		global_temp_collation_name = (dsql_str*) input->nod_arg[e_coll_target];
-		sub1 = PASS1_node(statement, input->nod_arg[e_coll_source]);
-		global_temp_collation_name = NULL;
+		{
+			const dsql_str* coll = (dsql_str*) input->nod_arg[e_coll_target];
+			AutoSetRestore<const dsql_str*> setColl(&statement->req_temp_coll_name, coll);
+			sub1 = PASS1_node(statement, input->nod_arg[e_coll_source]);
+		}
 		node = pass1_collate(statement, sub1, (dsql_str*) input->nod_arg[e_coll_target]);
 		return node;
 
@@ -850,7 +853,7 @@ dsql_nod* PASS1_node(CompiledStatement* statement, dsql_nod* input)
 			DEV_BLKCHK(temp, dsql_type_nod);
 
 			field->fld_flags |= FLD_nullable;
-			MAKE_desc_from_field(&(desc_node->nod_desc), field, /*IsElement*/false);
+			MAKE_desc_from_field(&(desc_node->nod_desc), field);
 			set_parameter_type(statement, temp, desc_node, false);
 		} // end scope
 
@@ -1062,7 +1065,9 @@ dsql_nod* PASS1_node(CompiledStatement* statement, dsql_nod* input)
 		break;
 
 	case nod_current_time:
+	case nod_local_time:
 	case nod_current_timestamp:
+	case nod_local_timestamp:
 		{
 			const dsql_nod* const_node = input->nod_arg[0];
 			if (const_node) {
@@ -1479,7 +1484,7 @@ dsql_nod* PASS1_statement(CompiledStatement* statement, dsql_nod* input)
 				{
 					DEV_BLKCHK(field, dsql_type_fld);
 					DEV_BLKCHK(*ptr, dsql_type_nod);
-					MAKE_desc_from_field(&desc_node->nod_desc, field, /*IsElement*/false);
+					MAKE_desc_from_field(&desc_node->nod_desc, field);
 					// set_parameter_type(*ptr, &desc_node, false);
 					set_parameter_type(statement, *ptr, desc_node, false);
 				}
@@ -2633,7 +2638,7 @@ static dsql_nod* explode_outputs( CompiledStatement* statement, const dsql_prc* 
 		dsql_par* parameter = MAKE_parameter(statement->req_receive, true, true, 0, NULL);
 		p_node->nod_arg[e_par_index] = (dsql_nod*) (IPTR) parameter->par_index;
 		p_node->nod_arg[e_par_parameter] = (dsql_nod*) parameter;
-		MAKE_desc_from_field(&parameter->par_desc, field, /*IsElement*/false);
+		MAKE_desc_from_field(&parameter->par_desc, field);
 		parameter->par_name = parameter->par_alias = field->fld_name.c_str();
 		parameter->par_rel_name = procedure->prc_name.c_str();
 		parameter->par_owner_name = procedure->prc_owner.c_str();
@@ -3240,7 +3245,9 @@ static bool invalid_reference(const dsql_ctx* context, const dsql_nod* node,
 		case nod_null:
 		case nod_current_date:
 		case nod_current_time:
+		case nod_local_time:
 		case nod_current_timestamp:
+		case nod_local_timestamp:
 		case nod_user_name:
 		case nod_current_role:
 		case nod_internal_info:
@@ -3910,7 +3917,7 @@ static dsql_nod* pass1_collate( CompiledStatement* statement, dsql_nod* sub1,
 				  Arg::Gds(isc_collation_requires_text));
 	}
 	DDL_resolve_intl_type(statement, field, collation);
-	MAKE_desc_from_field(&node->nod_desc, field, /*IsElement*/false);
+	MAKE_desc_from_field(&node->nod_desc, field);
 	return node;
 }
 
@@ -3959,16 +3966,16 @@ static dsql_nod* pass1_constant( CompiledStatement* statement, dsql_nod* input)
 					  Arg::Gds(isc_charset_not_found) << Arg::Str(string->str_charset));
 		}
 
-		if (global_temp_collation_name)
+		if (statement->req_temp_coll_name)
 		{
 			const dsql_intlsym* resolved_collation =
-				METD_get_collation(statement, global_temp_collation_name, resolved->intlsym_charset_id);
+				METD_get_collation(statement, statement->req_temp_coll_name, resolved->intlsym_charset_id);
 			if (!resolved_collation)
 			{
 				// Specified collation not found
 				ERRD_post(Arg::Gds(isc_sqlerr) << Arg::Num(-204) <<
 						  Arg::Gds(isc_dsql_datatype_err) <<
-						  Arg::Gds(isc_collation_not_found) << Arg::Str(global_temp_collation_name->str_data) <<
+						  Arg::Gds(isc_collation_not_found) << Arg::Str(statement->req_temp_coll_name->str_data) <<
 															   Arg::Str(resolved->intlsym_name));
 			}
 			resolved = resolved_collation;
@@ -5891,7 +5898,9 @@ static bool pass1_found_aggregate(const dsql_nod* node, USHORT check_scope_level
 		case nod_null:
 		case nod_current_date:
 		case nod_current_time:
+		case nod_local_time:
 		case nod_current_timestamp:
+		case nod_local_timestamp:
 		case nod_user_name:
 		case nod_current_role:
 		case nod_internal_info:
@@ -6122,7 +6131,9 @@ static bool pass1_found_field(const dsql_nod* node, USHORT check_scope_level,
 		case nod_null:
 		case nod_current_date:
 		case nod_current_time:
+		case nod_local_time:
 		case nod_current_timestamp:
+		case nod_local_timestamp:
 		case nod_user_name:
 		case nod_current_role:
 		case nod_internal_info:
@@ -6275,7 +6286,9 @@ static bool pass1_found_sub_select(const dsql_nod* node)
 		case nod_null:
 		case nod_current_date:
 		case nod_current_time:
+		case nod_local_time:
 		case nod_current_timestamp:
+		case nod_local_timestamp:
 		case nod_user_name:
 		case nod_current_role:
 		case nod_internal_info:
@@ -6372,7 +6385,9 @@ static dsql_nod* pass1_hidden_variable(CompiledStatement* statement, dsql_nod*& 
 		case nod_current_date:
 		case nod_current_role:
 		case nod_current_time:
+		case nod_local_time:
 		case nod_current_timestamp:
+		case nod_local_timestamp:
 		case nod_dbkey:
 		case nod_field:
 		case nod_internal_info:
@@ -10647,7 +10662,7 @@ static bool set_parameter_type(CompiledStatement* statement, dsql_nod* in_node,
 					{
 						parameter->par_desc = par_node->nod_desc;
 						parameter->par_node = par_node;
-						MAKE_desc_from_field(&parameter->par_desc, field, /*IsElement*/false);
+						MAKE_desc_from_field(&parameter->par_desc, field);
 						return true;
 					}
 				}
@@ -10901,19 +10916,38 @@ void CompiledStatement::clearCTEs()
 }
 
 
-void CompiledStatement::checkUnusedCTEs() const
+// Look for unused CTEs and issue a warning about its presence. Also, make DSQL 
+// pass of every found unused CTE to check all references and initialize input 
+// parameters. Note, when passing some unused CTE which refers to another unused 
+// (by the main query) CTE, "unused" flag of the second one is cleared. Therefore 
+// names is collected in separate step.
+void CompiledStatement::checkUnusedCTEs()
 {
-	for (size_t i = 0; i < req_ctes.getCount(); i++)
+	bool sqlWarn = false;
+	size_t i;
+	for (i = 0; i < req_ctes.getCount(); i++)
 	{
-		const dsql_nod* cte = req_ctes[i];
+		dsql_nod* cte = req_ctes[i];
 
 		if (!(cte->nod_flags & NOD_DT_CTE_USED))
 		{
-			const dsql_str* cte_name = (dsql_str*) cte->nod_arg[e_derived_table_alias];
+			if (!sqlWarn)
+			{
+				ERRD_post_warning(Arg::Warning(isc_sqlwarn) << Arg::Num(-104));
+				sqlWarn = true;
+			}
 
-			ERRD_post(Arg::Gds(isc_sqlerr) << Arg::Num(-104) <<
-					  Arg::Gds(isc_dsql_cte_not_used) << Arg::Str(cte_name->str_data));
+			const dsql_str* cte_name = (dsql_str*) cte->nod_arg[e_derived_table_alias];
+			ERRD_post_warning(Arg::Warning(isc_dsql_cte_not_used) << Arg::Str(cte_name->str_data));
 		}
+	}
+
+	for (i = 0; i < req_ctes.getCount(); i++)
+	{
+		dsql_nod* cte = req_ctes[i];
+
+		if (!(cte->nod_flags & NOD_DT_CTE_USED))
+			pass1_derived_table(this, cte, NULL);
 	}
 }
 
@@ -10950,6 +10984,26 @@ static void trace_line(const char* message, ...)
 	va_end(params);
 	buffer[sizeof(buffer) - 1] = 0;
 	gds__trace_raw(buffer);
+}
+
+static void dump_context_stack(const DsqlContextStack* stack)
+{
+	printf("Context dump\n");
+	printf("------------\n");
+
+	for (DsqlContextStack::const_iterator i(*stack); i.hasData(); ++i)
+	{
+		const dsql_ctx* context = i.object();
+
+		printf("scope: %2d; number: %2d; system: %d; returning: %d; alias: %-*.*s; "
+			   "internal alias: %-*.*s\n",
+			context->ctx_scope_level,
+			context->ctx_context,
+			(context->ctx_flags & CTX_system) != 0,
+			(context->ctx_flags & CTX_returning) != 0,
+			(int) MAX_SQL_IDENTIFIER_SIZE, (int) MAX_SQL_IDENTIFIER_SIZE, context->ctx_alias,
+			(int) MAX_SQL_IDENTIFIER_SIZE, (int) MAX_SQL_IDENTIFIER_SIZE, context->ctx_internal_alias);
+	}
 }
 
 /**
@@ -11089,8 +11143,14 @@ void DSQL_pretty(const dsql_nod* node, int column)
 	case nod_current_time:
 		verb = "current_time";
 		break;
+	case nod_local_time:
+		verb = "local_time";
+		break;
 	case nod_current_timestamp:
 		verb = "current_timestamp";
+		break;
+	case nod_local_timestamp:
+		verb = "local_timestamp";
 		break;
 	case nod_cursor:
 		verb = "cursor";

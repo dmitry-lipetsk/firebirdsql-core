@@ -65,6 +65,7 @@
 #include "../jrd/vio_proto.h"
 #include "../jrd/enc_proto.h"
 #include "../jrd/jrd_proto.h"
+#include "../jrd/scl_proto.h"
 #include "../common/classes/ClumpletWriter.h"
 #include "../common/classes/TriState.h"
 #include "../common/utils_proto.h"
@@ -74,6 +75,7 @@
 #include "../common/StatusArg.h"
 #include "../jrd/trace/TraceManager.h"
 #include "../jrd/trace/TraceJrdHelpers.h"
+#include "../jrd/os/fbsyslog.h"
 
 
 const int DYN_MSG_FAC	= 8;
@@ -92,7 +94,7 @@ typedef Firebird::GenericMap<Firebird::Pair<Firebird::NonPooled<USHORT, UCHAR> >
 #ifdef SUPERSERVER_V2
 static SLONG bump_transaction_id(thread_db*, WIN *);
 #else
-static header_page* bump_transaction_id(thread_db*, WIN *);
+static header_page* bump_transaction_id(thread_db*, WIN *, bool);
 #endif
 static Lock* create_transaction_lock(thread_db* tdbb, void* object);
 static void retain_context(thread_db*, jrd_tra*, bool, SSHORT);
@@ -105,7 +107,7 @@ static tx_inv_page* fetch_inventory_page(thread_db*, WIN *, SLONG, USHORT);
 static const char* get_lockname_v3(const UCHAR lock);
 static SLONG inventory_page(thread_db*, SLONG);
 static SSHORT limbo_transaction(thread_db*, SLONG);
-static void link_transaction(thread_db*, jrd_tra*);
+static void release_temp_tables(thread_db*, jrd_tra*);
 static void restart_requests(thread_db*, jrd_tra*);
 static void start_sweeper(thread_db*);
 static THREAD_ENTRY_DECLARE sweep_database(THREAD_ENTRY_PARAM);
@@ -124,12 +126,13 @@ namespace
 	struct SweepLock
 	{
 		SweepLock(MemoryPool&)
-			: database(NULL), shutdown(false)
+			: database(NULL), shutdown(false), counter(0)
 		{ }
 
 		void* database;
 		FB_THREAD_ID thd;
 		bool shutdown;
+		unsigned counter;
 	};
 	GlobalPtr<SweepLock> sweepLock;
 	GlobalPtr<Mutex> sweepLockMutex;
@@ -145,6 +148,24 @@ void TRA_sweep_shutdown()
 		sweepLock->shutdown = true;
 
 		if (sweepLock->database)
+		{
+			g.leave();
+			THREAD_SLEEP(1);
+			continue;
+		}
+		break;
+	}
+}
+
+void TRA_wait_for_sweep_completion()
+{
+	for (;;)
+	{
+		MutexEnsureUnlock g(sweepLockMutex);
+		g.enter();
+		sweepLock->shutdown = true;
+
+		if (sweepLock->counter > 0)
 		{
 			g.leave();
 			THREAD_SLEEP(1);
@@ -1202,7 +1223,7 @@ jrd_tra* TRA_reconnect(thread_db* tdbb, const UCHAR* id, USHORT length)
 	trans->tra_number = number;
 	trans->tra_flags |= TRA_prepared | TRA_reconnected | TRA_write;
 
-	link_transaction(tdbb, trans);
+	trans->linkToAttachment(attachment);
 
 	return trans;
 }
@@ -1225,6 +1246,8 @@ void TRA_release_transaction(thread_db* tdbb, jrd_tra* transaction, TraceTransac
 	SET_TDBB(tdbb);
 	Database* dbb = tdbb->getDatabase();
 	Attachment* attachment = tdbb->getAttachment();
+
+	fb_assert(dbb->locked());
 
 	if (!transaction->tra_outer)
 	{
@@ -1283,18 +1306,7 @@ void TRA_release_transaction(thread_db* tdbb, jrd_tra* transaction, TraceTransac
 		}
 	}
 
-	{ // scope
-		vec<jrd_rel*>& rels = *dbb->dbb_relations;
-		for (size_t i = 0; i < rels.count(); i++)
-		{
-			jrd_rel* relation = rels[i];
-			if (relation && (relation->rel_flags & REL_temp_tran))
-			{
-				relation->delPages(tdbb, transaction->tra_number);
-			}
-		}
-
-	} // end scope
+	release_temp_tables(tdbb, transaction);
 
 	// Release the locks associated with the transaction
 
@@ -1326,14 +1338,7 @@ void TRA_release_transaction(thread_db* tdbb, jrd_tra* transaction, TraceTransac
 
 	// Unlink the transaction from the database block
 
-	for (jrd_tra** ptr = &attachment->att_transactions; *ptr; ptr = &(*ptr)->tra_next)
-	{
-		if (*ptr == transaction)
-		{
-			*ptr = transaction->tra_next;
-			break;
-		}
-	}
+	transaction->unlinkFromAttachment();
 
 	// Release transaction's under-modification-rpb list
 
@@ -1556,16 +1561,28 @@ void TRA_set_state(thread_db* tdbb, jrd_tra* transaction, SLONG number, SSHORT s
 	WIN window(DB_PAGE_SPACE, -1);
 	tx_inv_page* tip = fetch_inventory_page(tdbb, &window, (SLONG) sequence, LCK_write);
 
-#ifdef SUPERSERVER_V2
-	CCH_MARK(tdbb, &window);
+	UCHAR* address = tip->tip_transactions + byte;
+	const int old_state = ((*address) >> shift) & TRA_MASK;
+
+#if defined(SUPERSERVER_V2)
 	const ULONG generation = tip->pag_generation;
-#else
-	CCH_MARK_MUST_WRITE(tdbb, &window);
+	const bool mustWrite = false;
+#elif defined(SUPERSERVER)
+	const bool mustWrite =
+		(!transaction ||
+		(transaction->tra_flags & TRA_write) ||
+		old_state != tra_active || state != tra_committed);
+#else // not SUPERSERVER
+	const bool mustWrite = true;
 #endif
+
+	if (mustWrite)
+		CCH_MARK_MUST_WRITE(tdbb, &window);
+	else
+		CCH_MARK(tdbb, &window);
 
 	// set the state on the TIP page
 
-	UCHAR* address = tip->tip_transactions + byte;
 	*address &= ~(TRA_MASK << shift);
 	*address |= state << shift;
 
@@ -2070,7 +2087,7 @@ static SLONG bump_transaction_id(thread_db* tdbb, WIN* window)
 #else
 
 
-static header_page* bump_transaction_id(thread_db* tdbb, WIN* window)
+static header_page* bump_transaction_id(thread_db* tdbb, WIN* window, bool mustWrite)
 {
 /**************************************
  *
@@ -2118,7 +2135,11 @@ static header_page* bump_transaction_id(thread_db* tdbb, WIN* window)
 
 	// Extend, if necessary, has apparently succeeded.  Next, update header page
 
-	CCH_MARK_MUST_WRITE(tdbb, window);
+	if (mustWrite || new_tip)
+		CCH_MARK_MUST_WRITE(tdbb, window);
+	else
+		CCH_MARK(tdbb, window);
+
 	header->hdr_next_transaction = number;
 
 	if (dbb->dbb_oldest_active > header->hdr_oldest_active)
@@ -2519,7 +2540,27 @@ static SSHORT limbo_transaction(thread_db* tdbb, SLONG id)
 }
 
 
-static void link_transaction(thread_db* tdbb, jrd_tra* transaction)
+void jrd_tra::unlinkFromAttachment()
+{
+#ifdef DEV_BUILD
+	if (!tra_attachment->att_database->locked())
+		tra_abort("DBB not locked in unlinkFromAttachment");
+#endif
+
+	for (jrd_tra** ptr = &tra_attachment->att_transactions; *ptr; ptr = &(*ptr)->tra_next)
+	{
+		if (*ptr == this)
+		{
+			*ptr = tra_next;
+			return;
+		}
+	}
+
+	tra_abort("transaction to unlink is missing in the attachment");
+}
+
+
+void jrd_tra::linkToAttachment(Attachment* attachment)
 {
 /**************************************
  *
@@ -2531,11 +2572,50 @@ static void link_transaction(thread_db* tdbb, jrd_tra* transaction)
  *	Link transaction block into database attachment.
  *
  **************************************/
-	SET_TDBB(tdbb);
+#ifdef DEV_BUILD
+	if (!attachment->att_database->locked())
+		tra_abort("DBB not locked in link");
+#endif
 
-	Attachment* attachment = tdbb->getAttachment();
-	transaction->tra_next = attachment->att_transactions;
-	attachment->att_transactions = transaction;
+	tra_next = attachment->att_transactions;
+	attachment->att_transactions = this;
+}
+
+
+void jrd_tra::tra_abort(const char* reason)
+{
+	string buff;
+	buff.printf("Failure working with transactions list: %s", reason);
+	Syslog::Record(Syslog::Error, buff.c_str());
+	gds__log(buff.c_str());
+#ifdef DEV_BUILD
+	abort();
+#endif
+}
+
+
+static void release_temp_tables(thread_db* tdbb, jrd_tra* transaction)
+{
+/**************************************
+ *
+ *	r e l e a s e _ t e m p _ t a b l e s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Release data of temporary tables with transaction lifetime
+ *
+ **************************************/
+	Database* dbb = tdbb->getDatabase();
+	vec<jrd_rel*>& rels = *dbb->dbb_relations;
+	for (size_t i = 0; i < rels.count(); i++)
+	{
+		jrd_rel* relation = rels[i];
+		if (relation && (relation->rel_flags & REL_temp_tran))
+		{
+			relation->delPages(tdbb, transaction->tra_number);
+		}
+	}
 }
 
 
@@ -2625,7 +2705,13 @@ static void retain_context(thread_db* tdbb, jrd_tra* transaction, bool commit, S
 		new_number = dbb->dbb_next_transaction + dbb->generateTransactionId(tdbb);
 	else
 	{
-		const header_page* header = bump_transaction_id(tdbb, &window);
+		const bool mustWrite =
+#ifdef SUPERSERVER
+			!(transaction->tra_flags & TRA_readonly);
+#else
+			true;
+#endif
+		const header_page* header = bump_transaction_id(tdbb, &window, mustWrite);
 		new_number = header->hdr_next_transaction;
 	}
 #endif
@@ -2670,6 +2756,9 @@ static void retain_context(thread_db* tdbb, jrd_tra* transaction, bool commit, S
 		// Set the state on the inventory page
 		TRA_set_state(tdbb, transaction, old_number, state);
 	}
+
+	release_temp_tables(tdbb, transaction);
+
 	transaction->tra_number = new_number;
 
 	// Release transaction lock since it isn't needed
@@ -2831,6 +2920,11 @@ static THREAD_ENTRY_DECLARE sweep_database(THREAD_ENTRY_PARAM database)
 	ISC_STATUS_ARRAY status_vector = {0};
 	isc_db_handle db_handle = 0;
 
+ 	{
+ 		MutexLockGuard g(sweepLockMutex);
+		sweepLock->counter++;
+	}
+
 	isc_attach_database(status_vector, 0, (const char*) database,
 						&db_handle, dpb.getBufferLength(),
 						reinterpret_cast<const char*>(dpb.getBuffer()));
@@ -2845,6 +2939,7 @@ static THREAD_ENTRY_DECLARE sweep_database(THREAD_ENTRY_PARAM database)
  		MutexLockGuard g(sweepLockMutex);
 		if (sweepLock->database && sweepLock->thd == getThreadId())
 			sweepLock->database = NULL;
+		sweepLock->counter--;
 	}
 
 	return 0;
@@ -3343,7 +3438,13 @@ static jrd_tra* transaction_start(thread_db* tdbb, jrd_tra* temp)
 	}
 	else
 	{
-		const header_page* header = bump_transaction_id(tdbb, &window);
+		const bool mustWrite =
+#ifdef SUPERSERVER
+			!(temp->tra_flags & TRA_readonly);
+#else
+			true;
+#endif
+		const header_page* header = bump_transaction_id(tdbb, &window, mustWrite);
 		number = header->hdr_next_transaction;
 		oldest = header->hdr_oldest_transaction;
 		oldest_active = header->hdr_oldest_active;
@@ -3407,7 +3508,10 @@ static jrd_tra* transaction_start(thread_db* tdbb, jrd_tra* temp)
 	// Link the transaction to the attachment block before releasing
 	// header page for handling signals.
 
-	link_transaction(tdbb, trans);
+	trans->linkToAttachment(attachment);
+
+	try
+	{
 
 #ifndef SUPERSERVER_V2
 	if (!(dbb->dbb_flags & DBB_read_only))
@@ -3651,7 +3755,7 @@ static jrd_tra* transaction_start(thread_db* tdbb, jrd_tra* temp)
 			jrd_tra::destroy(dbb, trans);
 			ERR_post(Arg::Gds(isc_lock_conflict));
 		}
-		
+
 		trans->tra_flags |= TRA_precommitted;
 	}
 
@@ -3659,6 +3763,13 @@ static jrd_tra* transaction_start(thread_db* tdbb, jrd_tra* temp)
 		TRA_precommited(tdbb, 0, trans->tra_number);
 
 	return trans;
+
+	}	// try
+	catch (const Firebird::Exception&)
+	{
+		trans->unlinkFromAttachment();
+		throw;
+	}
 }
 
 
@@ -3708,6 +3819,86 @@ jrd_tra* jrd_tra::getOuter()
 	}
 
 	return tra;
+}
+
+
+void jrd_tra::checkBlob(thread_db* tdbb, const bid* blob_id, bool punt)
+{
+	USHORT rel_id = blob_id->bid_internal.bid_relation_id;
+	if (tra_attachment->att_flags & ATT_gbak_attachment ||
+#ifdef GARBAGE_THREAD
+		tra_attachment->att_flags & ATT_garbage_collector ||
+#endif
+		tra_attachment->att_user->locksmith() ||
+		rel_id == 0)
+	{
+		return;
+	}
+
+	if (!tra_blobs->locate(blob_id->bid_temp_id()) && 
+		!tra_fetched_blobs.locate(*blob_id))
+	{
+		vec<jrd_rel*>* vector = tdbb->getDatabase()->dbb_relations;
+		jrd_rel* blb_relation;
+		if (rel_id < vector->count() &&	(blb_relation = (*vector)[rel_id]))
+		{
+			if (blb_relation->rel_security_name.isEmpty())
+				MET_scan_relation(tdbb, blb_relation);
+			SecurityClass* s_class = SCL_get_class(tdbb, blb_relation->rel_security_name.c_str());
+
+			if (!s_class)
+				return;
+
+			switch (s_class->scl_blb_access)
+			{
+			case SecurityClass::BA_UNKNOWN:
+				// Relation has not been checked for access rights
+				try
+				{
+					ThreadStatusGuard status_vector(tdbb);
+
+					SCL_check_access(tdbb, s_class, 0, NULL, NULL, SCL_read, object_table, false,
+						blb_relation->rel_name);
+					s_class->scl_blb_access = SecurityClass::BA_SUCCESS;
+				}
+				catch (const Exception& ex)
+				{
+					ISC_STATUS_ARRAY status;
+					ex.stuff_exception(status);
+					if (status[1] != isc_no_priv)
+						throw;
+
+					// We don't have access to this relation
+					s_class->scl_blb_access = SecurityClass::BA_FAILURE;
+
+					if (punt)
+						throw;
+
+					// but someone else has (SP, view)
+					// store Blob ID as allowed in this transaction
+					tra_fetched_blobs.add(*blob_id);
+				}
+				break;
+						
+			case SecurityClass::BA_FAILURE:
+				// Relation has been checked earlier and check was failed
+				if (punt)
+					ERR_post(Arg::Gds(isc_no_priv) << Arg::Str("SELECT") <<
+						Arg::Str("TABLE") <<
+						Arg::Str(blb_relation->rel_name));
+				else
+					tra_fetched_blobs.add(*blob_id);
+				break;
+
+			case SecurityClass::BA_SUCCESS:
+				// do nothing
+				break;
+
+			default:
+				fb_assert(false);
+			}
+		}
+	}
 }
 
 

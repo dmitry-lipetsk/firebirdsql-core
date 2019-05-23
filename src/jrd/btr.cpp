@@ -620,6 +620,7 @@ DSC* BTR_eval_expression(thread_db* tdbb, index_desc* idx, Record* record, bool&
 
 		expr_request->req_caller = NULL;
 		expr_request->req_flags &= ~req_in_use;
+		expr_request->req_attachment = NULL;
 		expr_request->req_timestamp.invalidate();
 
 		throw;
@@ -633,6 +634,7 @@ DSC* BTR_eval_expression(thread_db* tdbb, index_desc* idx, Record* record, bool&
 
 	expr_request->req_caller = NULL;
 	expr_request->req_flags &= ~req_in_use;
+	expr_request->req_attachment = NULL;
 	expr_request->req_timestamp.invalidate();
 
 	return result;
@@ -2270,6 +2272,9 @@ void BTR_selectivity(thread_db* tdbb, jrd_rel* relation, USHORT id, SelectivityL
 		CCH_RELEASE(tdbb, &window);
 		return;
 	}
+
+	const ULONG segments = root->irt_rpt[id].irt_keys;
+
 	window.win_flags = WIN_large_scan;
 	window.win_scans = 1;
 	btree_page* bucket = (btree_page*) CCH_HANDOFF(tdbb, &window, page, LCK_read, pag_index);
@@ -2295,7 +2300,6 @@ void BTR_selectivity(thread_db* tdbb, jrd_rel* relation, USHORT id, SelectivityL
 	SSHORT l;
 	bool firstNode = true;
 	const bool descending = (flags & btr_descending);
-	const ULONG segments = root->irt_rpt[id].irt_keys;
 
 	// SSHORT count, stuff_count, pos, i;
 	Firebird::HalfStaticArray<ULONG, 4> duplicatesList(*tdbb->getDefaultPool());
@@ -6801,9 +6805,11 @@ string print_key(thread_db* tdbb, jrd_rel* relation, index_desc* idx, Record* re
 
 			fb_assert(!desc->isBlob());
 
+			const bool octets = (DTYPE_IS_TEXT(desc->dsc_dtype) && desc->dsc_sub_type == ttype_binary);
+
 			MoveBuffer buffer;
 			UCHAR* str = NULL;
-			const int len = MOV_make_string2(tdbb, desc, ttype_dynamic, &str, buffer);
+			int len = MOV_make_string2(tdbb, desc, octets ? ttype_binary : ttype_dynamic, &str, buffer);
 
 			value.assign((const char*) str, len);
 
@@ -6815,16 +6821,21 @@ string print_key(thread_db* tdbb, jrd_rel* relation, index_desc* idx, Record* re
 					value.rtrim(pad);
 				}
 
-				if (DTYPE_IS_TEXT(desc->dsc_dtype) && desc->dsc_sub_type == ttype_binary)
+				if (octets)
 				{
 					string hex;
+
+					const bool cut = (len > (MAX_KEY_STRING_LEN - 3) / 2);
+					if (cut)
+						len = (MAX_KEY_STRING_LEN - 5) / 2;
+
 					char* s = hex.getBuffer(2 * len);
 					for (int i = 0; i < len; i++)
 					{
 						sprintf(s, "%02X", (int) str[i]);
 						s += 2;
 					}
-					value = "x'" + hex + "'";
+					value = "x'" + hex + (cut ? "..." : "'");
 				}
 				else
 				{

@@ -90,7 +90,6 @@ class Provider : public Firebird::GlobalStorage
 
 public:
 	explicit Provider(const char* prvName);
-	virtual ~Provider();
 
 	// return existing or create new Connection
 	virtual Connection* getConnection(Jrd::thread_db* tdbb, const Firebird::string& dbName,
@@ -122,6 +121,7 @@ public:
 	}
 
 protected:
+	virtual ~Provider();
 	void clearConnections(Jrd::thread_db* tdbb);
 	virtual Connection* doCreateConnection() = 0;
 
@@ -162,7 +162,7 @@ public:
 		const Firebird::string& role) = 0;
 	virtual void detach(Jrd::thread_db* tdbb);
 
-	virtual bool cancelExecution(Jrd::thread_db* tdbb) = 0;
+	virtual bool cancelExecution(Jrd::thread_db* tdbb, bool forced) = 0;
 
 	int getSqlDialect() const { return m_sqlDialect; }
 
@@ -178,6 +178,11 @@ public:
 		const Firebird::string& user, const Firebird::string& pwd,
 		const Firebird::string& role) const;
 
+	bool isBroken() const
+	{
+		return m_broken;
+	}
+
 	// Search for existing transaction of given scope, may return NULL.
 	Transaction* findTransaction(Jrd::thread_db* tdbb, TraScope traScope) const;
 
@@ -191,14 +196,14 @@ public:
 	void raise(ISC_STATUS* status, Jrd::thread_db* tdbb, const char* sWhere);
 
 	// will we wrap external errors into our ones (isc_eds_xxx) or pass them as is
-	bool getWrapErrors() const	{ return m_wrapErrors; }
+	bool getWrapErrors(const ISC_STATUS* status);
 	void setWrapErrors(bool val) { m_wrapErrors = val; }
 
 	// Transactions management within connection scope : put newly created
 	// transaction into m_transactions array and delete not needed transaction
 	// immediately (as we didn't pool transactions)
 	Transaction* createTransaction();
-	void deleteTransaction(Transaction* tran);
+	void deleteTransaction(Jrd::thread_db* tdbb, Transaction* tran);
 
 	// Statements management within connection scope : put newly created
 	// statement into m_statements array, but don't delete freed statement
@@ -241,6 +246,7 @@ protected:
 	bool m_deleting;
 	int m_sqlDialect;	// must be filled in attach call
 	bool m_wrapErrors;
+	bool m_broken;
 };
 
 
@@ -320,7 +326,7 @@ public:
 	void open(Jrd::thread_db* tdbb, Transaction* tran, int in_count,
 		const Firebird::string* const* in_names, Jrd::jrd_nod** in_params, bool singleton);
 	bool fetch(Jrd::thread_db* tdbb, int out_count, Jrd::jrd_nod** out_params);
-	void close(Jrd::thread_db* tdbb);
+	void close(Jrd::thread_db* tdbb, bool invalidTran = false);
 	void deallocate(Jrd::thread_db* tdbb);
 
 	const Firebird::string& getSql() const { return m_sql; }

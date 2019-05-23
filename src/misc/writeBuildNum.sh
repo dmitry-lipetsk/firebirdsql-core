@@ -8,8 +8,8 @@ BuildVersion="$Id: writeBuildNum.sh,v 1.25898.2.19 2010/05/28 14:38:22 alexpeshk
 BuildType=V
 MajorVer=2
 MinorVer=5
-RevNo=8
-BuildNum=27056
+RevNo=9
+BuildNum=27137
 
 if [ "$SPECIAL_BUILD_SUFFIX" = "" ]; then
 # Normal builds

@@ -517,7 +517,7 @@ public:
 	void addCTEs(dsql_nod* list);
 	dsql_nod* findCTE(const dsql_str* name);
 	void clearCTEs();
-	void checkUnusedCTEs() const;
+	void checkUnusedCTEs();
 
 	// hvlad: each member of recursive CTE can refer to CTE itself (only once) via
 	// CTE name or via alias. We need to substitute this aliases when processing CTE
@@ -596,6 +596,8 @@ public:
 	class dsql_ctx* req_recursive_ctx;	// context of recursive CTE
 	USHORT req_recursive_ctx_id;		// id of recursive union stream context
 	const dsql_str* const* req_curr_cte_alias;
+
+	const dsql_str* req_temp_coll_name; // temporarily set in PASS1_node for nod_collate
 
 private:
 	Firebird::HalfStaticArray<dsql_nod*, 4> req_ctes; // common table expressions

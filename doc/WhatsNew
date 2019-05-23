@@ -1,4 +1,260 @@
   **************************
+  * v2.5.9
+  **************************
+
+    * Bugfix CORE-6064
+        Segfaults are possible when DDL operations are performed against Stored Procedures under multi-user load
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-6054
+        Random crash 64bit fb_inet_server (possible collation issue)
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-6043
+        GTTs do not release used space
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-6015
+        Segfault when using expression index with complex expression
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-6007
+        Firebird does not build on Mac with fresh toolchain
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5980
+        Firebird crashes due to concurrent operations with expression indices
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5943
+        Server crashes preparing a query with both DISTINCT/ORDER BY and non-field expression in the select list
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+    * Bugfix CORE-5939
+        Crash for "gbak -se -b database nul"
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5936
+        Firebird server segfaults in the end of database backup
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5935
+        Bugcheck 165 (cannot find tip page)
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5910
+        Server crashes after kill in EDS manager destructor
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5868
+        fbintl exports internal functions on Darwin
+      Contributor(s):
+        Paul Beach <pbeach at ibphoenix.com>
+
+    * Bugfix CORE-5847
+        "Malformed string" error instead of key value in PK violation error message
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5800
+        After backup/restore the indexes by expression on computed field are not working properly
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+    * Bugfix CORE-5762
+        Wrong transaction number in table RDB$PAGES may cause infinite recursion and segfault
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5757
+        Deadlock with events
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5685
+        Sometime it is impossible to cancel\kill connection executing external query
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5118
+        Indices on computed fields are broken after restore (all keys are NULL)
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+    * Bugfix CORE-5017
+        Interrupt of aux connection during TCP setup phase causes server exit due to unhandled exception
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5014
+        Interrupt of aux connection during TCP setup phase causes unclear error messages in firebird.log
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-4565
+        GDSCODE can have value = 0 in WHEN-section under some concurrent env., only in SC or CS (not in SS)
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-2440
+        Restoring DB with computed index on computed field provides wrong index and wrong select results
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+    * Improvement CORE-5853
+        Forward-compatible expressions LOCALTIME and LOCALTIMESTAMP
+      Contributor(s):
+        Adriano dos Santos Fernandes <adrianosf at gmail.com>
+
+    * Improvement CORE-5434
+        Read-only transactions in SuperServer could avoid immediate write of Header and TIP pages after change
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Improvement CORE-2493
+        Append the IP address of the remote host to error messages in firebird.log for TCP connections
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+
+  **************************
+  * v2.5.8
+  **************************
+
+    * Bugfix CORE-5685
+        Sometimes it's impossible to cancel/kill connection executing external query
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5684
+        Error "no current record for fetch operation" is raised while deleting record from MON$ATTACHMENTS using ORDER BY clause
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+    * Bugfix CORE-5681
+        AV when external statement is executed and local transaction is rolled back
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5675
+        isc_vax_integer() and isc_portable_integer() work wrongly with short negative numbers
+      Contributor(s):
+        Dimitry Sibiryakov <sd at ibphoenix.com>
+
+    * Bugfix CORE-5655
+        isc_info_sql_relation_alias reports incorrect alias for CTE or nested queries
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5650
+        Segfault when procedure is dropped on classic server
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5643
+        Message "Operating system call munmap failed. Error code 12" can appear in firebird.log under heavy load (2.5.x, CS, SC)
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5641
+        Segfault when exiting classic server with running sweep thread
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5624
+        using backslash in alias on linux does not work
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5591
+        Engine hangs soon after some errors during transaction start
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Bugfix CORE-5579
+        request synchronization error in the GBAK utility (during restore)
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5566
+        Server crashes while restoring backup if the shadow file already exists
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+    * Bugfix CORE-5530
+        Random AV at client application using events when connection was broken
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5528
+        internal Firebird consistency check (limbo impossible (184), file: vio.cpp line: 2379)
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5522
+        Engine could freeze up to 2 minutes and raise deadlock error when updating RDB$INDICES if it contains backversions
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5521
+        Race condition between event notification and event registration
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-5415
+        [security3.fdb] wrong page type page 22 is of wrong type (expected pointer, found index root)
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-3596
+        Client library cannot connect to the non-ASCII host name
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+        Adriano dos Santos Fernandes <adrianosf at gmail.com>
+
+    * Bugfix CORE-2731
+        Recursive EXECUTE STATEMENT works wrong
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Bugfix CORE-2502
+        Aliases and error about cyclic dependencies in CTE
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Improvement CORE-5674
+        Allow unused Common Table Expressions
+      Contributor(s):
+        Vlad Khorsun <hvlad at users.sourceforge.net>
+
+    * Improvement CORE-5640
+        New connections to database are slow when multiple connects happen at the same moment
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Improvement CORE-5629
+        gstat output does not include datetime of analysis
+      Contributor(s):
+        Alex Peshkov <peshkoff at mail.ru>
+
+    * Improvement CORE-5543
+        Restore of pre ODS 11.1 database can leave RDB$RELATION_TYPE null
+      Contributor(s):
+        Dmitry Yemanov <dimitr at firebirdsql.org>
+
+
+  **************************
   * v2.5.7
   **************************
 

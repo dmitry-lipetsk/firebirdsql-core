@@ -123,6 +123,70 @@ namespace {
 
 using namespace Firebird;
 
+#if defined(HAVE_MMAP)
+namespace SemiDoubleLink
+{
+	// SemiDoubleLink makes it possible to walk list one direction,
+	// push/pop/remove members with very efficient back-link to the head pointer somewhere
+
+	template <class T>
+	void push(T** where, T* e)
+	{
+		// set element `e' pointers
+		e->prev = where;
+		e->next = *where;
+
+		// make next after `e' element (if present) point to it
+		if (e->next)
+			e->next->prev = &(e->next);
+
+		// make previous element point to `e'
+		*(e->prev) = e;
+	}
+
+	template <class T>
+	void remove(T* e)
+	{
+		fb_assert(e);
+		fb_assert(e->prev);
+
+		// adjust previous pointer in next element ...
+		if (e->next)
+			e->next->prev = e->prev;
+
+		// ... and next pointer in previous element
+		*(e->prev) = e->next;
+	}
+
+	template <class T>
+	T* pop(T* e)
+	{
+		if (e)
+			remove(e);
+
+		return e;
+	}
+
+	template <class T>
+	void validate(T* e)
+	{
+		if (e->next && e->next->prev != &(e->next))
+			fatal_exception::raise("bad back link in SemiDoubleLink");
+	}
+}
+
+struct FailedBlock
+{
+	size_t blockSize;
+	FailedBlock* next;
+	FailedBlock** prev;
+};
+
+FailedBlock* failedList = NULL;
+FB_UINT64 unmapStat = 0;
+FB_UINT64 unmapLimit = 1;
+#endif
+
 inline static void mem_assert(bool value)
 {
 	if (!value)
@@ -361,8 +425,33 @@ void MemoryPool::cleanup()
 	while (extents_cache.getCount())
 	{
 		size_t extent_size = OS_EXTENT_SIZE;
-		external_free(extents_cache.pop(), extent_size, false, false);
+		external_free(extents_cache.pop(), extent_size, true, false);
 	}
+
+#if defined(HAVE_MMAP)
+	unsigned oldCount = 0;
+	for(;;)
+	{
+		unsigned newCount = 0;
+		FailedBlock* oldList = failedList;
+		if (oldList)
+		{
+			fb_assert(oldList->prev);
+			oldList->prev = &oldList;
+			failedList = NULL;
+		}
+		while (oldList)
+		{
+			++newCount;
+			FailedBlock* fb = oldList;
+			SemiDoubleLink::pop(oldList);
+			external_free(fb, fb->blockSize, true, false);
+		}
+		if (newCount == oldCount)
+			break;
+		oldCount = newCount;
+	}
+#endif
 
 	cache_mutex->~Mutex();
 # endif
@@ -550,57 +639,47 @@ void* MemoryPool::external_alloc(size_t& size)
 	size = FB_ALIGN(size, get_map_page_size());
 	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
 # elif defined (HAVE_MMAP) && !defined(SOLARIS)
-
 // No successful return from mmap() will return the value MAP_FAILED.
 // The symbol MAP_FAILED is defined:
 //#define MAP_FAILED      ((void*) -1)
 
 	size = FB_ALIGN(size, get_map_page_size());
-	void* result = NULL;
-#  ifdef MAP_ANONYMOUS
-	result = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-#  else
-	// This code is needed for Solaris 2.6, AFAIK  (only?)
+	if (failedList)
+	{
+		MutexLockGuard guard(*cache_mutex);
+		for (FailedBlock* fb = failedList; fb; fb = fb->next)
+		{
+			if (fb->blockSize == size)
+			{
+				SemiDoubleLink::pop(fb);
+				return fb;
+			}
+		}
+	}
+
+#if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
+#define MAP_ANONYMOUS MAP_ANON
+#endif
+
+#ifdef MAP_ANONYMOUS
+
+	void* result = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+#else // MAP_ANONYMOUS
+
 	if (dev_zero_fd < 0)
 		dev_zero_fd = open("/dev/zero", O_RDWR);
-	result = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, dev_zero_fd, 0);
-#  endif //MAP_ANONYMOUS
+	void* result = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, dev_zero_fd, 0);
+
+#endif // MAP_ANONYMOUS
+
 	return result == MAP_FAILED ? NULL : result;
-# elif  defined(SOLARIS)
-
-// No successful return from mmap()  will  return    the value MAP_FAILED.
-//The  symbol  MAP_FAILED  is  defined  in  the header     <sys/mman.h>
-//Solaris 2.9 #define MAP_FAILED      ((void*) -1)
-
-
-	size = FB_ALIGN(size, get_map_page_size());
-	void* result = NULL;
-#  ifdef MAP_ANONYMOUS
-
-	result = mmap(0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON , -1, 0);
-	if (result == MAP_FAILED) {
-		// failure happens!
-		return NULL;
-	}
-
-	return result;
-#  else
-	// This code is needed for Solaris 2.6, AFAIK
-	if (dev_zero_fd < 0)
-		dev_zero_fd = open("/dev/zero", O_RDWR);
-	result = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, dev_zero_fd, 0);
-	if (result == MAP_FAILED) {
-		return NULL;
-	}
-
-	return result;
-#  endif //MAP_ANONYMOUS
 # else
 	return malloc(size);
 # endif
 }
 
-void MemoryPool::external_free(void* blk, size_t& size, bool /*pool_destroying*/, bool use_cache)
+void MemoryPool::external_free(void* blk, size_t& size, bool pool_destroying, bool use_cache)
 {
 # if !defined(DEBUG_GDS_ALLOC) && (defined(WIN_NT) || defined(HAVE_MMAP))
 	if (use_cache && size == OS_EXTENT_SIZE) {
@@ -617,14 +696,33 @@ void MemoryPool::external_free(void* blk, size_t& size, bool /*pool_destroying*/
 		system_call_failed::raise("VirtualFree");
 # elif defined HAVE_MMAP
 	size = FB_ALIGN(size, get_map_page_size());
+
 #  if (defined SOLARIS) && (defined HAVE_CADDR_T)
 	if (munmap((caddr_t) blk, size))
-		system_call_failed::raise("munmap");
-
 #  else
 	if (munmap(blk, size))
-		system_call_failed::raise("munmap");
 #  endif // Solaris
+
+	{
+		if (errno == ENOMEM)
+		{
+			FailedBlock* failed = (FailedBlock*) blk;
+			failed->blockSize = size;
+
+			MutexLockGuard guard(*cache_mutex);
+			SemiDoubleLink::push(&failedList, failed);
+			if ((!pool_destroying) && (++unmapStat >= unmapLimit))
+			{
+				if (!(unmapLimit <<= 1))
+					unmapLimit = 1;
+				gds__log("munmap() ENOMEM failures %" QUADFORMAT "d", unmapStat);
+			}
+
+			return;
+		}
+
+		system_call_failed::raise("munmap");
+	}
 # else
 	::free(blk);
 # endif
@@ -2125,6 +2223,13 @@ void* MemoryPool::globalAlloc(size_t s) THROW_BAD_ALLOC
 }
 #endif // LIBC_CALLS_NEW
 
+void* MemoryPool::calloc(size_t size ALLOC_PARAMS)
+{
+	void* block = allocate(size ALLOC_PASS_ARGS);
+	memset(block, 0, size);
+	return block;
+}
+
 #if defined(DEV_BUILD)
 void AutoStorage::ProbeStack() const
 {
@@ -2150,11 +2255,11 @@ void AutoStorage::ProbeStack() const
 
 void* operator new(size_t s) THROW_BAD_ALLOC
 {
-	return Firebird::MemoryPool::globalAlloc(s);
+	return Firebird::MemoryPool::globalAlloc(s ALLOC_ARGS);
 }
 void* operator new[](size_t s) THROW_BAD_ALLOC
 {
-	return Firebird::MemoryPool::globalAlloc(s);
+	return Firebird::MemoryPool::globalAlloc(s ALLOC_ARGS);
 }
 
 void operator delete(void* mem) throw()

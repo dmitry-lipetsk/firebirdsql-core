@@ -1881,6 +1881,8 @@ static jrd_nod* par_plan(thread_db* tdbb, CompilerScratch* csb)
 		Firebird::MetaName name;
 		TEXT* idx_name = 0;
 
+		const bool isGbak = (tdbb->getAttachment()->att_flags & ATT_gbak_attachment);
+
 		switch (node_type)
 		{
 		case blr_navigational:
@@ -1902,12 +1904,20 @@ static jrd_nod* par_plan(thread_db* tdbb, CompilerScratch* csb)
 
 				if (idx_status == MET_object_unknown || idx_status == MET_object_inactive)
 				{
-					if (tdbb->getAttachment()->att_flags & ATT_gbak_attachment)
+					if (isGbak)
 					{
 						warning(Arg::Warning(isc_indexname) << Arg::Str(name) <<
 															   Arg::Str(relation->rel_name));
 					}
 					else
+					{
+						error(csb, Arg::Gds(isc_indexname) << Arg::Str(name) <<
+															  Arg::Str(relation->rel_name));
+					}
+				}
+				else if (idx_status == MET_object_deferred_active)
+				{
+					if (!isGbak)
 					{
 						error(csb, Arg::Gds(isc_indexname) << Arg::Str(name) <<
 															  Arg::Str(relation->rel_name));
@@ -1970,12 +1980,20 @@ static jrd_nod* par_plan(thread_db* tdbb, CompilerScratch* csb)
 
 					if (idx_status == MET_object_unknown || idx_status == MET_object_inactive)
 					{
-						if (tdbb->getAttachment()->att_flags & ATT_gbak_attachment)
+						if (isGbak)
 						{
 							warning(Arg::Warning(isc_indexname) << Arg::Str(name) <<
 																   Arg::Str(relation->rel_name));
 						}
 						else
+						{
+							error(csb, Arg::Gds(isc_indexname) << Arg::Str(name) <<
+																  Arg::Str(relation->rel_name));
+						}
+					}
+					else if (idx_status == MET_object_deferred_active)
+					{
+						if (!isGbak)
 						{
 							error(csb, Arg::Gds(isc_indexname) << Arg::Str(name) <<
 																  Arg::Str(relation->rel_name));
@@ -2946,6 +2964,8 @@ jrd_nod* PAR_parse_node(thread_db* tdbb, CompilerScratch* csb, USHORT expected)
 
 	case blr_current_time2:
 	case blr_current_timestamp2:
+	case blr_local_time:
+	case blr_local_timestamp:
 		n = csb->csb_blr_reader.getByte();
 		if (n > MAX_TIME_PRECISION) {
 			ERR_post(Arg::Gds(isc_invalid_time_precision) << Arg::Num(MAX_TIME_PRECISION));

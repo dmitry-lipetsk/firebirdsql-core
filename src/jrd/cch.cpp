@@ -132,6 +132,7 @@ static void prefetch_init(Prefetch*, thread_db*);
 static void prefetch_io(Prefetch*, ISC_STATUS *);
 static void prefetch_prologue(Prefetch*, SLONG *);
 #endif
+static void purgePrecedence(BufferControl*, BufferDesc*);
 static SSHORT related(BufferDesc*, const BufferDesc*, SSHORT, const ULONG);
 static void release_bdb(thread_db*, BufferDesc*, const bool, const bool, const bool);
 static void unmark(thread_db*, WIN*);
@@ -352,6 +353,81 @@ USHORT CCH_checksum(BufferDesc* bdb)
 
 	return 12345;
 #endif
+}
+
+
+void CCH_clean_page(thread_db* tdbb, PageNumber page)
+{
+/**************************************
+ *  C C H _ c l e a n _ p a g e
+ **************************************
+ *
+ * Functional description
+ *  Clear dirty status and dependencies. Buffer must be unused.
+ *  If buffer with given page number is not found - it is OK, do nothing.
+ *  Used to remove dirty pages from cache after releasing temporary objects.
+ *
+ **************************************/
+	SET_TDBB(tdbb);
+	Database* dbb = tdbb->getDatabase();
+
+	fb_assert(page.getPageNum() > 0);
+	fb_assert(page.getPageSpaceID() >= TEMP_PAGE_SPACE);
+	if (page.getPageSpaceID() < TEMP_PAGE_SPACE)
+		return;
+
+	BufferControl* bcb = dbb->dbb_bcb;
+
+	QUE mod_que = &bcb->bcb_rpt[page.getPageNum() % bcb->bcb_count].bcb_page_mod;
+	QUE que_inst = mod_que->que_forward;
+	for (; que_inst != mod_que; que_inst = que_inst->que_forward)
+	{
+		BufferDesc* bdb = BLOCK(que_inst, BufferDesc*, bdb_que);
+		if (bdb->bdb_page != page)
+			continue;
+
+		fb_assert(bdb->bdb_use_count == 0);
+		if (latch_bdb(tdbb, LATCH_exclusive, bdb, page, 0) != 0)
+			return;
+
+		// temporary pages should have no precedence relationship
+		if (!QUE_EMPTY(bdb->bdb_higher))
+			purgePrecedence(bcb, bdb);
+
+		fb_assert(QUE_EMPTY(bdb->bdb_higher));
+		fb_assert(QUE_EMPTY(bdb->bdb_lower));
+
+		if (!QUE_EMPTY(bdb->bdb_lower) || !QUE_EMPTY(bdb->bdb_higher))
+		{
+			release_bdb(tdbb, bdb, true, false, false);
+			return;
+		}
+
+		if (bdb->bdb_flags & (BDB_dirty | BDB_db_dirty))
+		{
+			bdb->bdb_difference_page = 0;
+			bdb->bdb_transactions = bdb->bdb_mark_transaction = 0;
+#ifdef DIRTY_LIST
+			if (!(dbb->dbb_bcb->bcb_flags & BCB_keep_pages)) {
+				removeDirty(dbb->dbb_bcb, bdb);
+			}
+#endif
+#ifdef DIRTY_TREE
+			if (!(dbb->dbb_bcb->bcb_flags & BCB_keep_pages) &&
+				(bdb->bdb_parent || bdb == dbb->dbb_bcb->bcb_btree))
+			{
+				btc_remove(bdb);
+			}
+#endif
+			bdb->bdb_flags &= ~(BDB_must_write | BDB_system_dirty | BDB_db_dirty);
+			clear_dirty_flag(tdbb, bdb);
+		}
+
+		QUE_LEAST_RECENTLY_USED(bdb->bdb_in_use);
+
+		release_bdb(tdbb, bdb, true, false, false);
+		break;
+	}
 }
 
 
@@ -5518,6 +5594,9 @@ static SSHORT lock_buffer(thread_db* tdbb, BufferDesc* bdb, const SSHORT wait, c
 	TEXT errmsg[MAX_ERRMSG_LEN + 1];
 	ISC_STATUS* const status = tdbb->tdbb_status_vector;
 
+	ISC_STATUS_ARRAY temp_status = {0};
+	AutoSetRestore<ISC_STATUS*> autoStatus(&tdbb->tdbb_status_vector, temp_status);
+
 	if (lock->lck_logical == LCK_none)
 	{
 		// Prevent header and TIP pages from generating blocking AST
@@ -5560,9 +5639,8 @@ static SSHORT lock_buffer(thread_db* tdbb, BufferDesc* bdb, const SSHORT wait, c
 
 		// Case: a timeout was specified, or the caller didn't want to wait, return the error.
 
-		if ((wait == LCK_NO_WAIT) || ((wait < 0) && (status[1] == isc_lock_timeout)))
+		if ((wait == LCK_NO_WAIT) || ((wait < 0) && (temp_status[1] == isc_lock_timeout)))
 		{
-			fb_utils::init_status(status);
 			release_bdb(tdbb, bdb, false, false, false);
 			return -1;
 		}
@@ -5579,6 +5657,7 @@ static SSHORT lock_buffer(thread_db* tdbb, BufferDesc* bdb, const SSHORT wait, c
 		// CCH_unwind releases all the BufferDesc's and calls ERR_punt()
 		// ERR_punt will longjump.
 
+		tdbb->tdbb_status_vector = status;
 		CCH_unwind(tdbb, true);
 	}
 
@@ -5587,9 +5666,6 @@ static SSHORT lock_buffer(thread_db* tdbb, BufferDesc* bdb, const SSHORT wait, c
 	// status vector just in case
 
 	const SSHORT must_read = (lock->lck_logical < LCK_read) ? 1 : 0;
-
-	ISC_STATUS_ARRAY alt_status;
-	memcpy(alt_status, tdbb->tdbb_status_vector, sizeof(alt_status));
 
 	if (LCK_convert_opt(tdbb, lock, lock_type)) {
 		return must_read;
@@ -5601,17 +5677,14 @@ static SSHORT lock_buffer(thread_db* tdbb, BufferDesc* bdb, const SSHORT wait, c
 		return -1;
 	}
 
-	memcpy(tdbb->tdbb_status_vector, alt_status, sizeof(alt_status));
-
 	if (LCK_lock(tdbb, lock, lock_type, wait)) {
 		return 1;
 	}
 
 	// Case: a timeout was specified, or the caller didn't want to wait, return the error.
 
-	if ((wait < 0) && (status[1] == isc_lock_timeout))
+	if ((wait < 0) && (temp_status[1] == isc_lock_timeout))
 	{
-		fb_utils::init_status(status);
 		release_bdb(tdbb, bdb, false, false, false);
 		return -1;
 	}
@@ -5625,6 +5698,7 @@ static SSHORT lock_buffer(thread_db* tdbb, BufferDesc* bdb, const SSHORT wait, c
 	ERR_append_status(status, Arg::Gds(isc_random) << Arg::Str(errmsg));
 	ERR_log(JRD_BUGCHK, 215, errmsg);	// msg 215 page %ld, page type %ld lock conversion denied
 
+	tdbb->tdbb_status_vector = status;
 	CCH_unwind(tdbb, true);
 	return 0;					// Added to get rid of Compiler Warning
 #endif
