@@ -5506,9 +5506,9 @@ static void release_attachment(thread_db* tdbb, Attachment* attachment)
 	while ( !attachment->att_requests.empty() )
     {
 		fb_assert(attachment->att_requests.head());
-        fb_assert(attachment->att_requests.head()->req_attachment==attachment);
-        
-        CMP_release(tdbb, attachment->att_requests.head());
+		fb_assert(attachment->att_requests.head()->req_attachment==attachment);
+
+		CMP_release(tdbb, attachment->att_requests.head());
     }
 
 	if (attachment->att_id_lock)
