@@ -1924,7 +1924,7 @@ static int fork(SOCKET old_handle, USHORT flag)
 	}
 
 	Firebird::string cmdLine;
-	cmdLine.printf("%s -i -h %" HANDLEFORMAT "@%" ULONGFORMAT, name, new_handle, GetCurrentProcessId());
+	cmdLine.printf("%s -i -h %" HANDLEFORMAT"@%" ULONGFORMAT, name, new_handle, GetCurrentProcessId());
 
 	STARTUPINFO start_crud;
 	start_crud.cb = sizeof(STARTUPINFO);

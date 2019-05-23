@@ -558,7 +558,6 @@ bool_t xdr_protocol(XDR* xdrs, PACKET* p)
 		MAP(xdr_cstring, slice->p_slc_sdl);
 		MAP(xdr_longs, slice->p_slc_parameters);
 		slice_response = &p->p_slr;
-
 		if (slice_response->p_slr_sdl)
 		{
 			if (!xdr_slice(xdrs, &slice->p_slc_slice, //slice_response->p_slr_sdl_length,
