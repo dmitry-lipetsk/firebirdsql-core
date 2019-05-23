@@ -2058,7 +2058,7 @@ static void type_scalar(USHORT dtype,
             if (D.RDB$LOWER_BOUND  == 1)
                 fprintf(output_file, "%c%" SLONGFORMAT, c, D.RDB$UPPER_BOUND);
             else
-                fprintf(output_file, "%c%" SLONGFORMAT ":%" SLONGFORMAT, c, D.RDB$LOWER_BOUND,
+                fprintf(output_file, "%c%" SLONGFORMAT":%" SLONGFORMAT, c, D.RDB$LOWER_BOUND,
                            D.RDB$UPPER_BOUND);
             c = ',';
 	    END_FOR;
